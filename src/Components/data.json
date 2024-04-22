@@ -10,7 +10,7 @@
             { "type": "perpetual", "value": "Անժամկետ լիցենզիա" }
         ],
         "price": [
-            { "type": "price", "value": "800000" }
+            { "type": "price", "value": "1000" }
             
         ]
     },

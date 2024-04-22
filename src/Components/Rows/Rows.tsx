@@ -3,7 +3,8 @@ import { Button, Table, TableCell, TableContainer, TableHead, TableRow, TextFiel
 import { DataKV, DataType, DescriptionType, LicenseType } from '../dataType';
 import { v4 } from 'uuid';
 import data from '../data.json'
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useState, useEffect } from 'react';
+
 
 const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
     const [records, setRecords] = useState<DataType[]>(data)
@@ -11,10 +12,11 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
     const [isFilterDescription, setIsFilterDescription] = useState<string[]>([])
     const [licenseState, setLicenseState] = useState<string[]>([])
     const [price, setPrice] = useState<string[]>([])
-    const [count, setCount] = useState<string>()
-    const [disCount, setDisCount] = useState<string>()
-
-    const handleChange = (event: SelectChangeEvent<string>, columnType: 'name' | 'description' | 'licenseType' | 'price',) => {
+    const [count, setCount] = useState<number | undefined>()
+    const [disCount, setDisCount] = useState<number | undefined>()
+    const [isPricing, setIsPricing] = useState<number| undefined>()
+    const [finalyPrice, setFinalyPrice] = useState<number | undefined>()
+    const handleChange = (event: SelectChangeEvent<string>, columnType: 'name' | 'description' | 'licenseType' | 'price' | 'disCount',) => {
         setValue(event.target.value)
         switch (columnType) {
             case 'name':
@@ -29,6 +31,17 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                 const price: any = selectedRecords.map(record => record.price)
                 setPrice(price)
                 break;
+                case 'price':
+                    setIsPricing(+event.target.value)
+                    break;
+            // case 'disCount':
+            //     if (event.target.value && count && disCount) {
+
+            //         const calculation = ((+event.target.value * (+count)) * (+disCount)) / 100
+            //         setIsPricing(calculation)
+            //         console.log(typeof count)
+            //     }
+
             default:
                 break;
 
@@ -38,18 +51,41 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
 
     }
 
-    const handleInputs = (e: any) => {
+    const handleInputs = (e: ChangeEvent<HTMLInputElement>, nameElemnt:'count'|'disCount') => {
         console.log(e.target.value)
-        if(e.target.name === 'count'){
-            setCount(e.target.value)
-        }
-        else{
-            setDisCount(e.target.value)
+        switch (nameElemnt){
+            case 'count':
+                setCount(+e.target.value)
+                break;
+            
+            case 'disCount':
+                setDisCount(+e.target.value)
+
+                console.log(disCount)
+                if(count === undefined){
+                    setCount(1)
+                }
+                if(disCount === undefined){
+                    setDisCount(0)
+                }
+                break;
+            default:
+                
+                
+                break;
         }
 
     }
-    console.log(records)
-    console.log(licenseState);
+    useEffect(() => {
+
+        const countValue = count ?? 1;
+        const disCountValue = disCount ?? 0;
+        const isPricingValue = isPricing ?? 0;
+    
+
+        setFinalyPrice((countValue * isPricingValue * disCountValue) / 100);
+        console.log(countValue, disCountValue, isPricingValue);
+    }, [count, disCount, isPricing]);
 
     return (
 
@@ -151,15 +187,16 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                     variant="outlined"
                     value={count}
                     name='count'
-                    onChange={handleInputs}
+                    // onChange={handleInputs}
+                    onChange={(e:any) => handleInputs(e, 'count')}
                 />
             </TableCell>
             <TableCell sx={{ padding: 0, border: 1, }} >
 
                 <Select
-                    labelId="description"
-                    id="description"
-                    label="count"
+                    labelId="price"
+                    id="price"
+                    label="price"
                     sx={{
                         width: '100%',
                         '& .MuiSelect-select': {
@@ -169,15 +206,15 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                     name='count'
                     value={value}
                     //   onChange={handleSelectChange}
-                    onChange={(e) => handleChange(e as SelectChangeEvent, 'licenseType')}
+                    onChange={(e) => handleChange(e as SelectChangeEvent, 'price')}
 
 
                 >
 
 
-                    {price.map((description: any, index: number) => (
-                        description.map((e: DescriptionType) => (
-                            <MenuItem key={e.value} value={e.value}>{e.value}</MenuItem>
+                    {price.map((price: any, index: number) => (
+                        price.map((e: DescriptionType) => (
+                            <MenuItem key={e.value} value={+e.value}>{(+e.value)}</MenuItem>
                         ))
                     ))}
 
@@ -196,16 +233,15 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                     variant="outlined"
                     value={disCount}
                     name='disCount'
-                    onChange={handleInputs}
-                />
+                    onChange={(e:any) => handleInputs(e, 'disCount')}                />
 
             </TableCell>
             {/* ---------------------------- zexj */}
             <TableCell sx={{ padding: 0, border: 1, }}>
-
+                    {finalyPrice}
 
             </TableCell>
-
+            {/* -----------zexchvac gin */}
 
             {/* --------------------------- price */}
 
