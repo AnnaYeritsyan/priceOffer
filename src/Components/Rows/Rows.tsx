@@ -14,8 +14,10 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
     const [price, setPrice] = useState<string[]>([])
     const [count, setCount] = useState<number | undefined>()
     const [disCount, setDisCount] = useState<number | undefined>()
-    const [isPricing, setIsPricing] = useState<number| undefined>()
+    const [isPricing, setIsPricing] = useState<number | undefined>()
     const [finalyPrice, setFinalyPrice] = useState<number | undefined>()
+    const [showAddButton, setShowAddButton] = useState(false);
+    const [investment, setInvestment] = useState<any>()
     const handleChange = (event: SelectChangeEvent<string>, columnType: 'name' | 'description' | 'licenseType' | 'price' | 'disCount',) => {
         setValue(event.target.value)
         switch (columnType) {
@@ -23,6 +25,7 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
 
                 const selectedRecords = records.filter(record => record.name === event.target.value);
                 console.log(selectedRecords)
+
                 const descriptions: any = selectedRecords.map(record => record.description);
                 setIsFilterDescription(descriptions);
                 console.log(isFilterDescription)
@@ -30,10 +33,19 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                 setLicenseState(license)
                 const price: any = selectedRecords.map(record => record.price)
                 setPrice(price)
+                const selectedName = event.target.value;
+                if (selectedName === 'LIS-A ներդնում') {
+                    setInvestment(selectedRecords);
+                } else {
+                    setInvestment(null);
+                    setShowAddButton(false);
+                }
+                console.log("Investment state:", investment);
+                setShowAddButton(selectedName === 'LIS-A ներդնում');
                 break;
-                case 'price':
-                    setIsPricing(+event.target.value)
-                    break;
+            case 'price':
+                setIsPricing(+event.target.value)
+                break;
             // case 'disCount':
             //     if (event.target.value && count && disCount) {
 
@@ -51,27 +63,25 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
 
     }
 
-    const handleInputs = (e: ChangeEvent<HTMLInputElement>, nameElemnt:'count'|'disCount') => {
+    const handleInputs = (e: ChangeEvent<HTMLInputElement>, nameElemnt: 'count' | 'disCount') => {
         console.log(e.target.value)
-        switch (nameElemnt){
+        switch (nameElemnt) {
             case 'count':
                 setCount(+e.target.value)
                 break;
-            
+
             case 'disCount':
                 setDisCount(+e.target.value)
 
                 console.log(disCount)
-                if(count === undefined){
+                if (count === undefined) {
                     setCount(1)
                 }
-                if(disCount === undefined){
-                    setDisCount(0)
-                }
+
                 break;
             default:
-                
-                
+
+
                 break;
         }
 
@@ -81,12 +91,68 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
         const countValue = count ?? 1;
         const disCountValue = disCount ?? 0;
         const isPricingValue = isPricing ?? 0;
-    
 
-        setFinalyPrice((countValue * isPricingValue * disCountValue) / 100);
-        console.log(countValue, disCountValue, isPricingValue);
+
+        setFinalyPrice((isPricingValue - (countValue * isPricingValue) * (disCountValue / 100)));
+
     }, [count, disCount, isPricing]);
 
+    const addinRow = (e: any) => {
+        console.log(e.target)
+    }
+
+    console.log(investment)
+    useEffect(() => {
+        if (investment) {
+            setShowAddButton(true);
+        }
+    }, [investment]);
+
+
+    const DescriptionSelect = ({ item, onRemove }: { item: string, onRemove: () => void }) => {
+        console.log(item)
+        return (
+            <>
+           
+            <Select
+                labelId="description"
+                id="description"
+                label="description"
+                sx={{
+                    width: '100%',
+                    '& .MuiSelect-select': {
+                        whiteSpace: 'wrap',
+                    }
+                }}
+                name='description'
+                value={item}
+                //   onChange={handleSelectChange}
+                onChange={(e) => handleChange(e as SelectChangeEvent, 'description')}
+
+
+            >
+
+
+                {isFilterDescription.map((description: any, index: number) => (
+                    description.map((e: DescriptionType) => (
+                        <MenuItem key={e.value} value={e.value}>{e.value}</MenuItem>
+                    ))
+                ))}
+
+
+
+            </Select>
+            <Button variant='contained' onClick={onRemove}>
+                    remove item
+                </Button>
+            </>
+        )
+    }
+    const removeItem = (indexToRemove: number) => {
+        const updatedInvestment= investment.filter((_:any, index:number) => index !== indexToRemove);
+        console.log(updatedInvestment)
+        setInvestment(updatedInvestment);
+    };
     return (
 
         <TableRow >
@@ -123,7 +189,16 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
             {/* --------------------------- description */}
 
             <TableCell sx={{ padding: 0, border: 1, }} >
-                <Select
+                {
+                    investment ? (
+                        investment.map((e: DataType, index: number) => (
+                            e.description.map((item: DescriptionType, idx: number) => (
+                                <DescriptionSelect key={idx} item={item.value}
+                                onRemove={() => removeItem(idx)}
+                                 />
+                            ))
+                        ))
+                    ) : <Select
                     labelId="description"
                     id="description"
                     label="description"
@@ -137,20 +212,28 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                     value={value}
                     //   onChange={handleSelectChange}
                     onChange={(e) => handleChange(e as SelectChangeEvent, 'description')}
-
-
+    
+    
                 >
-
-
+    
+    
                     {isFilterDescription.map((description: any, index: number) => (
                         description.map((e: DescriptionType) => (
                             <MenuItem key={e.value} value={e.value}>{e.value}</MenuItem>
                         ))
                     ))}
-
-
-
+    
+    
+    
                 </Select>
+                }
+
+
+
+                {showAddButton && (
+                    <Button variant='contained' onClick={(e) => addinRow(e)}>Add</Button>
+                )}
+               
             </TableCell>
             {/* --------------------------- license type */}
             <TableCell sx={{ padding: 0, border: 1, }} >
@@ -188,7 +271,7 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                     value={count}
                     name='count'
                     // onChange={handleInputs}
-                    onChange={(e:any) => handleInputs(e, 'count')}
+                    onChange={(e: any) => handleInputs(e, 'count')}
                 />
             </TableCell>
             <TableCell sx={{ padding: 0, border: 1, }} >
@@ -233,12 +316,12 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                     variant="outlined"
                     value={disCount}
                     name='disCount'
-                    onChange={(e:any) => handleInputs(e, 'disCount')}                />
+                    onChange={(e: any) => handleInputs(e, 'disCount')} />
 
             </TableCell>
             {/* ---------------------------- zexj */}
             <TableCell sx={{ padding: 0, border: 1, }}>
-                    {finalyPrice}
+                {finalyPrice}
 
             </TableCell>
             {/* -----------zexchvac gin */}
