@@ -24,11 +24,11 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
             case 'name':
 
                 const selectedRecords = records.filter(record => record.name === event.target.value);
-                console.log(selectedRecords)
+                // console.log(selectedRecords)
 
                 const descriptions: any = selectedRecords.map(record => record.description);
                 setIsFilterDescription(descriptions);
-                console.log(isFilterDescription)
+                // console.log(isFilterDescription)
                 const license: any = selectedRecords.map(record => record.licenseType)
                 setLicenseState(license)
                 const price: any = selectedRecords.map(record => record.price)
@@ -40,7 +40,7 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                     setInvestment(null);
                     setShowAddButton(false);
                 }
-                console.log("Investment state:", investment);
+                // console.log("Investment state:", investment);
                 setShowAddButton(selectedName === 'LIS-A ներդնում');
                 break;
             case 'price':
@@ -73,7 +73,7 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
             case 'disCount':
                 setDisCount(+e.target.value)
 
-                console.log(disCount)
+                // console.log(disCount)
                 if (count === undefined) {
                     setCount(1)
                 }
@@ -101,58 +101,72 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
         console.log(e.target)
     }
 
-    console.log(investment)
+    // console.log(investment)
     useEffect(() => {
         if (investment) {
             setShowAddButton(true);
         }
     }, [investment]);
 
+    // const removeItem = (idToRemove: number) => {
+    //     console.log(investment);
+    //     const updatedInvestment = investment.map((item: any) => {
 
-    const DescriptionSelect = ({ item, onRemove }: { item: string, onRemove: () => void }) => {
-        console.log(item)
-        return (
-            <>
-           
-            <Select
-                labelId="description"
-                id="description"
-                label="description"
-                sx={{
-                    width: '100%',
-                    '& .MuiSelect-select': {
-                        whiteSpace: 'wrap',
-                    }
-                }}
-                name='description'
-                value={item}
-                //   onChange={handleSelectChange}
-                onChange={(e) => handleChange(e as SelectChangeEvent, 'description')}
-
-
-            >
-
-
-                {isFilterDescription.map((description: any, index: number) => (
-                    description.map((e: DescriptionType) => (
-                        <MenuItem key={e.value} value={e.value}>{e.value}</MenuItem>
-                    ))
-                ))}
-
-
-
-            </Select>
-            <Button variant='contained' onClick={onRemove}>
-                    remove item
-                </Button>
-            </>
-        )
-    }
-    const removeItem = (indexToRemove: number) => {
-        const updatedInvestment= investment.filter((_:any, index:number) => index !== indexToRemove);
-        console.log(updatedInvestment)
+    //         const updatedDescription = item.description.filter((desc: any) => desc.id !== idToRemove);
+    //         console.log(updatedDescription)
+    //         return { description: updatedDescription };
+    //     });
+    //     console.log(updatedInvestment)
+    //     setInvestment(updatedInvestment);
+    // };
+    const removeItem = (idToRemove: number) => {
+        console.log(investment)
+        investment.map((e:any)=>{
+            // console.log(e.description)
+            e.description.map((d:any, idx:number)=>{
+                // console.log(d, idx)
+                if(idx!== idToRemove){
+                    console.log(d)
+                    updatedInvestment = d
+                }
+            })
+        })
         setInvestment(updatedInvestment);
     };
+    
+    
+    
+    const DescriptionSelect = ({ item, onRemove, id }: { item: string, onRemove: () => void, id: number }) => {
+        return (
+            <>
+                <Select
+                    labelId="description"
+                    id="description"
+                    label="description"
+                    sx={{
+                        width: '100%',
+                        '& .MuiSelect-select': {
+                            whiteSpace: 'wrap',
+                        }
+                    }}
+                    name='description'
+                    value={item}
+                    onChange={(e) => handleChange(e as SelectChangeEvent, 'description')}
+                >
+                    {isFilterDescription.map((description: any, index: number) => (
+                        description.map((e: DescriptionType) => (
+                            <MenuItem key={e.value} value={e.value}>{e.value}</MenuItem>
+                        ))
+                    ))}
+                </Select>
+                <Button variant='contained' onClick={onRemove}>
+                    Remove Item
+                </Button>
+            </>
+        );
+    };
+    
+
     return (
 
         <TableRow >
@@ -193,8 +207,11 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                     investment ? (
                         investment.map((e: DataType, index: number) => (
                             e.description.map((item: DescriptionType, idx: number) => (
-                                <DescriptionSelect key={idx} item={item.value}
-                                onRemove={() => removeItem(idx)}
+                                <DescriptionSelect
+                                 key={idx}
+                                  item={item.value}
+                                  id={e.id} 
+                                  onRemove={() => removeItem(e.id)}
                                  />
                             ))
                         ))
