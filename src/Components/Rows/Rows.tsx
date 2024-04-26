@@ -24,6 +24,7 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
 
     const handleChange = (event: SelectChangeEvent<string>, columnType: 'name' | 'description' | 'licenseType' | 'price' | 'disCount',) => {
         setValue(event.target.value)
+        console.log(event)
         switch (columnType) {
             case 'name':
 
@@ -66,6 +67,10 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
         }
 
 
+    }
+    const handleChangeManyElement = (e:SelectChangeEvent<string>, item:string)=>{
+        console.log(e,item )
+        
     }
 
     const handleInputs = (e: ChangeEvent<HTMLInputElement>, nameElemnt: 'count' | 'disCount') => {
@@ -116,7 +121,7 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
             value: '',
             type: ''
         };
-    
+
 
         if (investment) {
             const newInvestment = investment.map((item: DataType) => ({
@@ -124,7 +129,7 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                 description: [...item.description, newRow],
                 licenseType: [...item.licenseType, newLicense],
                 price: [...item.price, newPrice],
-                
+
             }));
             setInvestment(newInvestment);
         }
@@ -143,7 +148,7 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                 description: item.description.filter((desc: DescriptionType, index: number) => index !== idx),
                 licenseType: item.licenseType.filter((license: LicenseType, index: number) => index !== idx),
                 price: item.price.filter((price: PriceType, index: number) => index !== idx),
-              
+
 
             }));
             setInvestment(updatedInvestment);
@@ -159,24 +164,12 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
     };
 
     const DescriptionSelect = ({ item, onRemove, id }: { item: string, onRemove: () => void, id: number }) => {
-        const [selectedItem, setSelectedItem] = useState<string>(item);
-        const [val, setVal] = useState<string>()
-        const handleItemChange = (event: SelectChangeEvent<string>) => {
-            const newItemValue = event.target.value;
-            console.log(event)
-            // setSelectedItem(newItemValue);
-            setVal(event.target.value)
-            console.log(val)
-        };
-
-
-
+    //   console.log(id)
         return (
-            <Box sx={{ display: "flex", alignItems: 'center', justifyContent: 'center' }}>
+            <TableRow sx={{ display: "flex", alignItems: 'center', justifyContent: 'center' }}>
                 <Select
                     labelId="description"
                     id="description"
-                    label="description"
                     sx={{
                         width: '100%',
                         '& .MuiSelect-select': {
@@ -184,8 +177,10 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                         }
                     }}
                     name='description'
-                    value={selectedItem}
-                    onChange={handleItemChange}
+                    value={item}
+                    // onChange={handleItemChange}
+                    onChange={(e) => handleChangeManyElement(e as SelectChangeEvent, item)}
+
                 >
                     {isFilterDescription.map((description: any, index: number) => (
                         description.map((e: DescriptionType) => (
@@ -193,21 +188,21 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                         ))
                     ))}
                 </Select>
-                <Button variant='contained' onClick={onRemove} 
-                sx={{bgcolor:"#a91f1f"}}>
+                <Button variant='contained' onClick={onRemove}
+                    sx={{ bgcolor: "#a91f1f" }}>
                     <DeleteIcon />
                 </Button>
-            </Box>
+            </TableRow>
         );
     };
 
     const LicenseSelect = ({ item, id }: { item: string, id: number }) => {
         return (
-
+<TableRow>
             <Select
                 labelId="licenseType"
                 id="licenseType"
-                label="licenseType"
+                // label="licenseType"
                 sx={{
                     width: '100%',
                     '& .MuiSelect-select': {
@@ -231,40 +226,43 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                     );
                 })}
             </Select>
-
+</TableRow>
 
         );
     };
     const PriceSelect = ({ item, id }: { item: string, id: number }) => {
         return (
+            <TableRow>
 
-            <Select
-                labelId="price"
-                id="price"
-                label="price"
-                sx={{
-                    width: '100%',
-                    '& .MuiSelect-select': {
-                        whiteSpace: 'wrap',
-                    }
-                }}
-                name='price'
-                value={item}
-                placeholder={item}
-                onChange={(e) => handleChange(e as SelectChangeEvent, 'price')}
-            >
-                <MenuItem value={item}> {item}</MenuItem>
 
-                {price.map((e: any) => {
-                    return (
-                        <Typography key={e.type}>
-                            {e.map((a: PriceType) => (
-                                <MenuItem key={a.value} value={a.value}>{a.value}</MenuItem>
-                            ))}
-                        </Typography>
-                    );
-                })}
-            </Select>
+                <Select
+                    labelId="price"
+                    id="price"
+                    // label="price"
+                    sx={{
+                        width: '100%',
+                        '& .MuiSelect-select': {
+                            whiteSpace: 'wrap',
+                        }
+                    }}
+                    name='price'
+                    value={item}
+                    placeholder={item}
+                    onChange={(e) => handleChange(e as SelectChangeEvent, 'price')}
+                >
+                    <MenuItem value={item}> {item}</MenuItem>
+
+                    {price.map((e: any) => {
+                        return (
+                            <Typography key={e.type}>
+                                {e.map((a: PriceType) => (
+                                    <MenuItem key={a.value} value={a.value}>{a.value}</MenuItem>
+                                ))}
+                            </Typography>
+                        );
+                    })}
+                </Select>
+            </TableRow>
 
 
         );
@@ -321,7 +319,7 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                     ) : <Select
                         labelId="description"
                         id="description"
-                        label="description"
+                        // label="description"
                         sx={{
                             width: '100%',
                             '& .MuiSelect-select': {
@@ -352,11 +350,11 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
 
                 {showAddButton && (
                     <Button variant='contained' onClick={addinRow}
-                    sx={{
-                        bgcolor:'#0b4a0b',
-                    }}>
-                        <AddBoxIcon/>
-                        </Button>
+                        sx={{
+                            bgcolor: '#0b4a0b',
+                        }}>
+                        <AddBoxIcon />
+                    </Button>
                 )}
 
             </TableCell>
@@ -379,7 +377,7 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                         <Select
                             labelId="licenseType"
                             id="licenseType"
-                            label="licenseType"
+                            // label="licenseType"
                             sx={{
                                 width: '100%',
                                 '& .MuiSelect-select': {
@@ -390,7 +388,6 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                             value={value}
                             //   onChange={handleSelectChange}
                             onChange={(e) => handleChange(e as SelectChangeEvent, 'licenseType')}
-
                         >
 
                             {licenseState.map((li: any, index: number) => (
@@ -403,18 +400,41 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
             </TableCell>
 
             <TableCell sx={{ padding: 0, border: 1, }} >
-                <TextField
-                    id="outlined-basic"
-                    label="Outlined"
-                    variant="outlined"
-                    value={count}
-                    name='count'
-                    // onChange={handleInputs}
-                    onChange={(e: any) => handleInputs(e, 'count')}
-                />
+                {
+                    investment ?
+                        (
+                            investment.map((e: DataType, index: number) => (
+                                e.description.map((item: DescriptionType, idx: number) => (
+                                    <TableRow    key={idx}>
+
+                                  
+                                    <TextField
+                                    
+                                        id="outlined-basic"
+                                        // label="Outlined"
+                                        variant="outlined"
+                                        value={count}
+                                        name='count'
+                                        // onChange={handleInputs}
+                                        onChange={(item: any) => handleInputs(item, 'count')}
+                                    />
+                                      </TableRow>
+                                ))
+                            ))
+                        ) : <TextField
+                            id="outlined-basic"
+                            // label="Outlined"
+                            variant="outlined"
+                            value={count}
+                            name='count'
+                            // onChange={handleInputs}
+                            onChange={(e: any) => handleInputs(e, 'count')}
+                        />
+                }
+
             </TableCell>
             <TableCell sx={{ padding: 0, border: 1, }} >
-            {
+                {
                     investment ?
                         (
                             investment.map((e: DataType, index: number) => (
@@ -428,83 +448,84 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                             ))
                         ) :
                         <Select
-                    labelId="price"
-                    id="price"
-                    label="price"
-                    sx={{
-                        width: '100%',
-                        '& .MuiSelect-select': {
-                            whiteSpace: 'wrap',
-                        }
-                    }}
-                    name='count'
-                    value={value}
-                    //   onChange={handleSelectChange}
-                    onChange={(e) => handleChange(e as SelectChangeEvent, 'price')}
+                            labelId="price"
+                            id="price"
+                            // label="price"
+                            sx={{
+                                width: '100%',
+                                '& .MuiSelect-select': {
+                                    whiteSpace: 'wrap',
+                                }
+                            }}
+                            name='count'
+                            value={value}
+                            //   onChange={handleSelectChange}
+                            onChange={(e) => handleChange(e as SelectChangeEvent, 'price')}
+
+                        >
 
 
-                >
-
-
-                    {price.map((price: any, index: number) => (
-                        price.map((e: PriceType) => (
-                            <MenuItem key={e.value} value={+e.value}>{(+e.value)}</MenuItem>
-                        ))
-                    ))}
+                            {price.map((price: any, index: number) => (
+                                price.map((e: PriceType) => (
+                                    <MenuItem key={e.value} value={+e.value}>{(+e.value)}</MenuItem>
+                                ))
+                            ))}
 
 
 
-                </Select> 
+                        </Select>
 
-                        
+
                 }
-                {/* <Select
-                    labelId="price"
-                    id="price"
-                    label="price"
-                    sx={{
-                        width: '100%',
-                        '& .MuiSelect-select': {
-                            whiteSpace: 'wrap',
-                        }
-                    }}
-                    name='count'
-                    value={value}
-                    //   onChange={handleSelectChange}
-                    onChange={(e) => handleChange(e as SelectChangeEvent, 'price')}
-
-
-                >
-
-
-                    {price.map((price: any, index: number) => (
-                        price.map((e: DescriptionType) => (
-                            <MenuItem key={e.value} value={+e.value}>{(+e.value)}</MenuItem>
-                        ))
-                    ))}
-
-
-
-                </Select> */}
 
             </TableCell>
 
             {/* --------------------------- price */}
 
-            {/* <TableCell sx={{ padding: 0, border: 1 }}>
-                <TextField
-                    id="outlined-basic"
-                    label="Outlined"
-                    variant="outlined"
-                    value={disCount}
-                    name='disCount'
-                    onChange={(e: any) => handleInputs(e, 'disCount')} />
+            <TableCell sx={{ padding: 0, border: 1 }}>
 
-            </TableCell> */}
+                {
+                    investment ?
+                        (
+                            investment.map((e: DataType, index: number) => (
+                                e.description.map((item: DescriptionType, idx: number) => (
+                                    <TableRow>
+                                    <TextField
+                                        key={idx}
+                                        id="outlined-basic"
+                                        // label="Outlined"
+                                        variant="outlined"
+                                        value={disCount}
+                                        name='disCount'
+                                        onChange={(e: any) => handleInputs(e, 'disCount')} />
+                                     </TableRow>
+                                ))
+                            ))
+                        ) : <TextField
+                            id="outlined-basic"
+                            // label="discount"
+                            variant="outlined"
+                            value={disCount}
+                            name='disCount'
+                            onChange={(e: any) => handleInputs(e, 'disCount')} />
+                }
+            </TableCell>
             {/* ---------------------------- zexj */}
             <TableCell sx={{ padding: 0, border: 1, }}>
-                {finalyPrice}
+                {
+                    investment ?
+                        (
+                            investment.map((e: DataType, index: number) => (
+                                e.description.map((item: DescriptionType, idx: number) => (
+                                    <TableRow key={idx}>
+                                        {finalyPrice}
+                                    </TableRow>
 
+                                ))
+                            ))
+                        ) : <> {finalyPrice}
+                        </>
+                }
             </TableCell>
             {/* -----------zexchvac gin */}
 
