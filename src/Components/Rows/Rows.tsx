@@ -19,7 +19,7 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
     const [finalyPrice, setFinalyPrice] = useState<number | undefined>()
     const [showAddButton, setShowAddButton] = useState(false);
     const [investment, setInvestment] = useState<any>()
-    const [updateValue, setUpdateValue] = useState<any>()
+    const [updateValue, setUpdateValue] = useState<string | undefined>(undefined)
 
 
     const handleChange = (event: SelectChangeEvent<string>, columnType: 'name' | 'description' | 'licenseType' | 'price' | 'disCount',) => {
@@ -48,6 +48,10 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                 // console.log("Investment state:", investment);
                 setShowAddButton(selectedName === 'LIS-A ներդնում');
                 break;
+            case 'description':
+                console.log(event)
+                setValue(event.target.value)
+                break;
             case 'price':
                 setIsPricing(+event.target.value)
                 break;
@@ -70,7 +74,8 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
     }
     const handleChangeManyElement = (e:SelectChangeEvent<string>, item:string)=>{
         console.log(e,item )
-        
+    
+
     }
 
     const handleInputs = (e: ChangeEvent<HTMLInputElement>, nameElemnt: 'count' | 'disCount') => {
@@ -101,8 +106,6 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
         const countValue = count ?? 1;
         const disCountValue = disCount ?? 0;
         const isPricingValue = isPricing ?? 0;
-
-
         setFinalyPrice((isPricingValue - (countValue * isPricingValue) * (disCountValue / 100)));
 
     }, [count, disCount, isPricing]);
@@ -154,7 +157,49 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
             setInvestment(updatedInvestment);
         }
     };
+   
+    const DescriptionChange = (newValue: string, index: number) => {
+        console.log(newValue, index);
+        if (investment) {
+            const updatedInvestment = investment.map((e: DataType) => ({
+                ...e,
+                description: e.description.map((change: DescriptionType, idx: number) => {
+                    if (idx === index) {
+                        return {
+                            ...change,
+                            value: newValue
+                        };
+                    }
+                    return change;
+                })
+            }));
+            setInvestment(updatedInvestment);
+        }
+    };
 
+
+    const LicenseChange = (newValue: string, index: number) => {
+        console.log(newValue, index);
+        // const updatedInvestment = investment.map((e: DataType) => ({
+        //     ...e,
+        //     licenseType: e.licenseType.map((item: LicenseType, idx: number) => (
+        //         idx === index ? { ...item, value: newValue } : item
+        //     ))
+        // }));
+        // setInvestment(updatedInvestment);
+    };
+    
+    const PriceChange = (newValue: string, index: number) => {
+        console.log(newValue, index);
+        const updatedInvestment = investment.map((e: DataType) => ({
+            ...e,
+            price: e.price.map((item: PriceType, idx: number) => (
+                idx === index ? { ...item, value: newValue } : item
+            ))
+        }));
+        setInvestment(updatedInvestment);
+    };
+    
 
     const removeAllRow = (event: React.MouseEvent<HTMLButtonElement>) => {
         const tableRow = event.currentTarget.closest('tr');
@@ -163,8 +208,13 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
         }
     };
 
-    const DescriptionSelect = ({ item, onRemove, id }: { item: string, onRemove: () => void, id: number }) => {
-    //   console.log(id)
+    const DescriptionSelect = ({ item, onRemove, id, index, onDescriptionChange }: { item: string, onRemove: () => void, id: number, index: number, onDescriptionChange: (newValue: string, index: number) => void }) => {
+
+    const handleDescriptionChange = (event: SelectChangeEvent<string>, index:number) => {
+        console.log(event, index)
+        const newValue = event.target.value;
+        onDescriptionChange(newValue, index);
+    }
         return (
             <TableRow sx={{ display: "flex", alignItems: 'center', justifyContent: 'center' }}>
                 <Select
@@ -177,14 +227,12 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                         }
                     }}
                     name='description'
-                    value={item}
-                    // onChange={handleItemChange}
-                    onChange={(e) => handleChangeManyElement(e as SelectChangeEvent, item)}
-
+                    value={updateValue ??item }
+                    onChange={(event)=>handleDescriptionChange(event, index)} 
                 >
                     {isFilterDescription.map((description: any, index: number) => (
-                        description.map((e: DescriptionType) => (
-                            <MenuItem key={e.value} value={e.value}>{e.value}</MenuItem>
+                        description.map((e: DescriptionType, idx:number) => (
+                            <MenuItem key={idx} value={e.value}>{e.value}</MenuItem>
                         ))
                     ))}
                 </Select>
@@ -196,8 +244,14 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
         );
     };
 
-    const LicenseSelect = ({ item, id }: { item: string, id: number }) => {
-        return (
+    const LicenseSelect = ({ item, id, index, onLicenseChange }: { item: string, id: number, index: number, onLicenseChange: (newValue: string, index: number) => void }) => {
+      console.log(item)
+        const handleLicenseChange = (event: SelectChangeEvent<string>, index:number) => {
+            console.log(event, index)
+            const newValue = event.target.value;
+            onLicenseChange(newValue, index);
+        }
+       return (
 <TableRow>
             <Select
                 labelId="licenseType"
@@ -211,9 +265,8 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                 }}
                 name='licenseType'
                 value={item}
-                placeholder={item}
-                onChange={(e) => handleChange(e as SelectChangeEvent, 'licenseType')}
-            >
+                onChange={(event)=>handleLicenseChange(event, index)}    
+                       >
                 <MenuItem value={item}> {item}</MenuItem>
 
                 {licenseState.map((e: any) => {
@@ -312,7 +365,9 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                                     key={idx}
                                     item={item.value}
                                     id={e.id}
+                                    index={idx}
                                     onRemove={() => removeItem(item, idx)}
+                                    onDescriptionChange={DescriptionChange}
                                 />
                             ))
                         ))
@@ -369,6 +424,8 @@ const Rows = ({ defaultRecord }: { defaultRecord: DataType }) => {
                                         key={idx}
                                         item={item.value}
                                         id={e.id}
+                                        index={index}
+                                        onLicenseChange={LicenseChange}
                                     />
                                 ))
                             ))

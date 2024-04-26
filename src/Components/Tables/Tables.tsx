@@ -41,7 +41,7 @@ const Tables = () => {
                     <TableBody>
 
                         {records?.map((data, idx) =>
-                            <Rows defaultRecord={data} />
+                            <Rows defaultRecord={data} key={idx}/>
                         )}
                         {/* {records.map((data, idx) =>
                 <Row
