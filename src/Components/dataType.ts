@@ -37,6 +37,11 @@ export type PriceType = {
     type: string;
     value: string;
 };
+export type RowState = {
+    count: number | undefined;
+    disCount: number | undefined;
+};
+
 
 export type DataType = {
     id: number;

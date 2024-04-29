@@ -24,7 +24,7 @@ const Tables = () => {
         <Box>
             <Button variant='contained' onClick={handleAddRow}>+</Button>
             <TableContainer component={Paper} sx={{ display: "flex", justifyContent: 'center', }} >
-                <Table sx={{ maxWidth: '297mm' }} >
+                <Table>
                     <TableHead>
                         <TableRow sx={{ bgcolor: '#C6D9F1' }}>
                             <TableCell align='center'>Անվանում</TableCell>
@@ -41,7 +41,7 @@ const Tables = () => {
                     <TableBody>
 
                         {records?.map((data, idx) =>
-                            <Rows defaultRecord={data} key={idx}/>
+                            <Rows defaultRecord={data} key={idx} index={idx}/>
                         )}
                         {/* {records.map((data, idx) =>
                 <Row
