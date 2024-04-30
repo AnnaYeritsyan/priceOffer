@@ -18,20 +18,24 @@ const Header = () => {
                             display: 'flex',
                             alignItems: 'center',
                         }}>
+                            <Typography component={'span'}>
+                                Պատվիրատու՝ 
+                            </Typography>
                         <DatePicker
                             label="Ներկայացման օր"
                             defaultValue={dayjs('')} />
+                            <DatePicker
+                            label="Առաջարկը գործում է ﬕնչև"
+                            value={value}
+                            onChange={(newValue) => setValue(newValue)}
+                        />
                     </Typography>
                     <Typography component={'h5'} variant='h5'
                         sx={{
                             display: 'flex',
                             alignItems: 'center',
                         }}>
-                        <DatePicker
-                            label="Առաջարկը գործում է ﬕնչև"
-                            value={value}
-                            onChange={(newValue) => setValue(newValue)}
-                        />
+                        
                     </Typography>
                 </DemoContainer>
             </LocalizationProvider>

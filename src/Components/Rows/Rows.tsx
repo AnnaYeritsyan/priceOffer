@@ -13,17 +13,11 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
     const [isFilterDescription, setIsFilterDescription] = useState<string[]>([])
     const [licenseState, setLicenseState] = useState<string[]>([])
     const [price, setPrice] = useState<string[]>([])
-    // const [count, setCount] = useState<any>()
-    // const [disCount, setDisCount] = useState<number | undefined>()
-    const [count, setCount] = useState<(number | undefined)[]>([]);
-    const [disCount, setDisCount] = useState<(number | undefined)[]>([]);
-
     const [isPricing, setIsPricing] = useState<number | undefined>()
     const [finalyPrice, setFinalyPrice] = useState<number | undefined>()
     const [showAddButton, setShowAddButton] = useState(false);
     const [investment, setInvestment] = useState<any>()
     const [updateValue, setUpdateValue] = useState<string | undefined>(undefined)
-    const [currentBool, setCurrentBool] = useState<boolean>(false)
     const [rowsState, setRowsState] = useState<RowState[]>(data.map(() => ({
         count: undefined,
         disCount: undefined,
@@ -33,16 +27,11 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
 
     const handleChange = (event: SelectChangeEvent<string>, columnType: 'name' | 'description' | 'licenseType' | 'price' | 'disCount',) => {
         setValue(event.target.value)
-        console.log(event)
         switch (columnType) {
             case 'name':
-
                 const selectedRecords = records.filter(record => record.name === event.target.value);
-                // console.log(selectedRecords)
-
                 const descriptions: any = selectedRecords.map(record => record.description);
                 setIsFilterDescription(descriptions);
-                // console.log(isFilterDescription)
                 const license: any = selectedRecords.map(record => record.licenseType)
                 setLicenseState(license)
                 const price: any = selectedRecords.map(record => record.price)
@@ -54,70 +43,36 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
                     setInvestment(null);
                     setShowAddButton(false);
                 }
-                // console.log("Investment state:", investment);
                 setShowAddButton(selectedName === 'LIS-A ներդնում');
                 break;
             case 'description':
-                console.log(event)
                 setValue(event.target.value)
+                
                 break;
             case 'price':
                 setIsPricing(+event.target.value)
                 break;
-
-            // case 'disCount':
-            //     if (event.target.value && count && disCount) {
-
-            //         const calculation = ((+event.target.value * (+count)) * (+disCount)) / 100
-            //         setIsPricing(calculation)
-            //         console.log(typeof count)
-            //     }
-
             default:
                 break;
-
-
         }
-
-
     }
 
-
-    // const handleInputs = (e:any, nameElemnt: 'count' | 'disCount', idx: number) => {
-    //     console.log(idx)
-    //     console.log(e)
-    //     switch (nameElemnt) {
-    //         case 'count':
-    //             setCount((prevCounts: (number | undefined)[]) => {
-    //                 const newCounts = [...prevCounts];
-    //                 newCounts[idx] = +e.target.value;
-    //                 return newCounts;
-    //             });
-
-    //             break;
-    //         case 'disCount':
-    //             setDisCount(+e.target.value)
-    //             if (count === undefined) {
-    //                 setCount(1)
-    //             }
-    //             break;
-    //         default:
-    //             break;
-    //     }
-
-    // }
-    // useEffect(() => {
-    //     const countValue = count ?? 1;
-    //     const disCountValue = disCount ?? 0;
-    //     const isPricingValue = isPricing ?? 0;
-    //     setFinalyPrice((isPricingValue - (countValue * isPricingValue) * (disCountValue / 100)));
-
-    // }, [count, disCount, isPricing]);
-
+    useEffect(() => {
+        if (investment) {
+            const initialRowsState = investment.map(() => ({
+                count: undefined,
+                disCount: undefined,
+            }));
+            setRowsState(initialRowsState);
+            setShowAddButton(true);
+        }
+    }, [investment]);
+    
     const handleInputs = (e: any, nameElemnt: 'count' | 'disCount', rowIndex: number) => {
-        const newValue = +e.target.value;
         console.log(rowIndex)
-        console.log(rowsState)
+        console.log(rowsState) 
+        const newValue = e.target.value;
+        
         setRowsState(prevState => {
             const newState = [...prevState];
             newState[rowIndex] = {
@@ -127,7 +82,7 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
             return newState;
         });
     };
-
+console.log(rowsState)
     const addinRow = () => {
         const newRow: DescriptionType = {
             value: '',
@@ -152,14 +107,43 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
 
             }));
             setInvestment(newInvestment);
+            setRowsState(prevState => [...prevState, { count: undefined, disCount: undefined }]);
+
         }
     };
 
     useEffect(() => {
         if (investment) {
             setShowAddButton(true);
+            console.log(rowsState)
         }
     }, [investment]);
+
+
+    if(showAddButton){
+        console.log(investment)
+        investment.map((e:any)=>{
+            e.description.map((item:any, index:number)=>{
+                console.log(item)
+                // setRowsState
+            })
+        })
+        // setRowsState
+    }
+    // const removeItem = (idToRemove: DescriptionType, idx: number) => {
+    //     if (investment) {
+    //         const updatedInvestment = investment.map((item: DataType) => ({
+    //             ...item,
+    //             description: item.description.filter((desc: DescriptionType, index: number) => index !== idx),
+    //             licenseType: item.licenseType.filter((license: LicenseType, index: number) => index !== idx),
+    //             price: item.price.filter((price: PriceType, index: number) => index !== idx),
+
+
+    //         }));
+    //         setInvestment(updatedInvestment);
+    //     } 
+    //    };
+
     const removeItem = (idToRemove: DescriptionType, idx: number) => {
         if (investment) {
             const updatedInvestment = investment.map((item: DataType) => ({
@@ -167,16 +151,28 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
                 description: item.description.filter((desc: DescriptionType, index: number) => index !== idx),
                 licenseType: item.licenseType.filter((license: LicenseType, index: number) => index !== idx),
                 price: item.price.filter((price: PriceType, index: number) => index !== idx),
-
-
             }));
             setInvestment(updatedInvestment);
+
+            setRowsState(prevState => {
+                const newState = [...prevState];
+                console.log(newState)
+                newState[idx] = {
+                    count: undefined,
+                    disCount: undefined,
+                };
+                return newState;
+            });
         }
     };
 
+
+
+
+
     const DescriptionChange = (newValue: string, index: number) => {
-        console.log(newValue, index);
-        setCurrentBool(true)
+        // console.log(newValue, index);
+    
         if (investment) {
             const updatedInvestment = investment.map((e: DataType) => ({
                 ...e,
@@ -201,7 +197,7 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
             const updatedInvestment = investment.map((e: DataType) => ({
                 ...e,
                 licenseType: e.licenseType.map((change: LicenseType, idx: number) => {
-                    console.log(e)
+                    // console.log(e)
                     if (idx === index) {
                         return {
                             ...change,
@@ -216,7 +212,7 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
     };
 
     const PriceChange = (newValue: string, index: number) => {
-        console.log(newValue, index);
+        // console.log(newValue, index);
         const updatedInvestment = investment.map((e: DataType) => ({
             ...e,
             price: e.price.map((item: PriceType, idx: number) => (
@@ -235,9 +231,9 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
     };
 
     const DescriptionSelect = ({ item, onRemove, id, index, onDescriptionChange }: { item: string, onRemove: () => void, id: number, index: number, onDescriptionChange: (newValue: string, index: number) => void }) => {
-
+        // console.log(rowsState)
         const handleDescriptionChange = (event: SelectChangeEvent<string>, index: number) => {
-            console.log(event, index)
+            // console.log(event, index)
             const newValue = event.target.value;
             onDescriptionChange(newValue, index);
         }
@@ -309,7 +305,7 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
     const PriceSelect = ({ item, id, index, onPriceChange }: { item: string, id: number, index: number, onPriceChange: (newValue: string, index: number) => void }) => {
 
         const handlePriceChange = (event: SelectChangeEvent<string>) => {
-            console.log(index)
+            // console.log(index)
             const newValue = event.target.value;
             onPriceChange(newValue, index);
         };
@@ -400,7 +396,8 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
                     ) : <Select
                         labelId="description"
                         id="description"
-                        // label="description"
+                        // label="description" 
+
                         sx={{
                             width: '100%',
                             '& .MuiSelect-select': {
@@ -437,7 +434,6 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
                         <AddBoxIcon />
                     </Button>
                 )}
-
             </TableCell>
             {/* --------------------------- license type */}
             <TableCell sx={{ padding: 0, border: 1, }} >
@@ -487,30 +483,32 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
                     investment ?
                         (
                             investment.map((e: DataType, index: number) => (
-                                e.description.map((item: DescriptionType, idx: number) => (
-                                    <TableRow key={idx}>
-                                        <TextField
-                                            key={idx}
-                                            id="outlined-basic"
-                                            variant="outlined"
-                                            value={rowsState[index].count }
-                                            name='count'
-                                            onChange={(e) => handleInputs(e, 'count', idx)}
-                                        />
 
-                                    </TableRow>
-                                ))
-                            ))
+                                e.description.map((item: DescriptionType, idx: number) => {
+                                    // console.log(idx)
+                                    return (
+                                        <TableRow key={idx}>
+                                            <TextField
+                                                key={idx}
+                                                id="outlined-basic"
+                                                variant="outlined"
+                                                value={rowsState[idx]?.count}
+                                                name='count'
+                                                onChange={(e) => handleInputs(e, 'count', idx)}
+                                            />
+
+                                        </TableRow>
+                                    )
+                                })
+                            )
+                            )
                         ) : <TextField
                             id="outlined-basic"
                             // label="Outlined"
                             variant="outlined"
-                            value={count}
+                            value={rowsState[index]?.count}
                             name='count'
-                            // onChange={handleInputs}
-                            // onChange={(e: any) => handleInputs(e, 'count')}
-                            // onChange={(e) => handleInputs(e, 'count', idx)}
-                            // onChange={(e) => handleInputs(e, 'count', 0, 0)} // Assuming index 0 for simplicity
+                            onChange={(e) => handleInputs(e, 'count', 0)}
                         />
                 }
 
@@ -575,7 +573,7 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
                             investment.map((e: DataType, index: number) => (
                                 e.description.map((item: DescriptionType, idx: number) => (
                                     <TableRow>
-                                        <TextField
+                                        {/* <TextField
                                             key={idx}
                                             id="outlined-basic"
                                             // label="Outlined"
@@ -583,6 +581,14 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
                                             value={disCount}
                                             name='disCount'
                                         // onChange={(e: any) => handleInputs(e, 'disCount')} 
+                                        /> */}
+                                        <TextField
+                                            key={idx}
+                                            id="outlined-basic"
+                                            variant="outlined"
+                                            value={rowsState[idx]?.disCount}
+                                            name='disCount'
+                                            onChange={(e) => handleInputs(e, 'disCount', idx)}
                                         />
                                     </TableRow>
                                 ))
@@ -591,9 +597,9 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
                             id="outlined-basic"
                             // label="discount"
                             variant="outlined"
-                            value={disCount}
+                            value={rowsState[index]?.disCount}
                             name='disCount'
-                        // onChange={(e) => handleInputs(e, 'disCount')} 
+                            onChange={(e) => handleInputs(e, 'disCount', 0)}
                         />
                 }
             </TableCell>
