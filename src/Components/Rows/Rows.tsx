@@ -6,6 +6,18 @@ import data from '../data.json'
 import { ChangeEvent, useState, useEffect } from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddBoxIcon from '@mui/icons-material/AddBox';
+import { useRef } from 'react';
+const styles = {
+    tableCell: {
+        padding: 0,
+        height: 'auto', // Set height to auto for dynamic height
+        borderBottom: '1px solid #828282' // Set border for table cells
+    },
+    tableRow: {
+        height: 'auto', // Set height to auto for dynamic height
+        borderBottom: '1px solid #828282' // Set border for table rows
+    }
+};
 
 const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number }) => {
     const [records, setRecords] = useState<DataType[]>(data)
@@ -22,6 +34,8 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
         count: undefined,
         disCount: undefined,
     })));
+    const selectRef = useRef<HTMLSelectElement>(null);
+    const [selectHeight, setSelectHeight] = useState<number>(0);
 
     const rowColor = index % 2 === 0 ? '#ffffff' : '#EBFAF1';
 
@@ -47,7 +61,7 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
                 break;
             case 'description':
                 setValue(event.target.value)
-                
+
                 break;
             case 'price':
                 setIsPricing(+event.target.value)
@@ -67,12 +81,12 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
             setShowAddButton(true);
         }
     }, [investment]);
-    
+
     const handleInputs = (e: any, nameElemnt: 'count' | 'disCount', rowIndex: number) => {
         console.log(rowIndex)
-        console.log(rowsState) 
+        console.log(rowsState)
         const newValue = e.target.value;
-        
+
         setRowsState(prevState => {
             const newState = [...prevState];
             newState[rowIndex] = {
@@ -82,7 +96,7 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
             return newState;
         });
     };
-console.log(rowsState)
+    console.log(rowsState)
     const addinRow = () => {
         const newRow: DescriptionType = {
             value: '',
@@ -120,10 +134,10 @@ console.log(rowsState)
     }, [investment]);
 
 
-    if(showAddButton){
+    if (showAddButton) {
         console.log(investment)
-        investment.map((e:any)=>{
-            e.description.map((item:any, index:number)=>{
+        investment.map((e: any) => {
+            e.description.map((item: any, index: number) => {
                 console.log(item)
                 // setRowsState
             })
@@ -172,7 +186,7 @@ console.log(rowsState)
 
     const DescriptionChange = (newValue: string, index: number) => {
         // console.log(newValue, index);
-    
+
         if (investment) {
             const updatedInvestment = investment.map((e: DataType) => ({
                 ...e,
@@ -232,13 +246,27 @@ console.log(rowsState)
 
     const DescriptionSelect = ({ item, onRemove, id, index, onDescriptionChange }: { item: string, onRemove: () => void, id: number, index: number, onDescriptionChange: (newValue: string, index: number) => void }) => {
         // console.log(rowsState)
+        
+        useEffect(() => {
+            if (selectRef.current) {
+                const height = selectRef.current.offsetHeight;
+                setSelectHeight(height);
+            }
+        }, []);
         const handleDescriptionChange = (event: SelectChangeEvent<string>, index: number) => {
             // console.log(event, index)
             const newValue = event.target.value;
             onDescriptionChange(newValue, index);
         }
         return (
-            <TableRow sx={{ display: "flex", alignItems: 'center', justifyContent: 'center', }}>
+            <TableRow style={styles.tableRow}sx={{ display: "flex", alignItems: 'center', justifyContent: 'center', }}>
+
+                 <FormControl fullWidth>
+                            {
+                                value?'':
+                                <InputLabel id={`license-select-label-${index}`}>Նկարագրություն</InputLabel>
+
+                            }
                 <Select
                     labelId="description"
                     id="description"
@@ -246,7 +274,16 @@ console.log(rowsState)
                         width: '100%',
                         '& .MuiSelect-select': {
                             whiteSpace: 'wrap',
-                        }
+                        },
+                        ".MuiOutlinedInput-notchedOutline": { border: 0 },
+                        "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                        {
+                            border: 0,
+                        },
+                        "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                        {
+                            border: 0,
+                        },
                     }}
                     name='description'
                     value={updateValue ?? item}
@@ -258,23 +295,38 @@ console.log(rowsState)
                         ))
                     ))}
                 </Select>
-                <Button variant='contained' onClick={onRemove}
-                    sx={{ bgcolor: "#a91f1f" }}>
-                    <DeleteIcon />
-                </Button>
+                </FormControl>
+                {/* <Button variant='contained' 
+                    sx={{ bgcolor: "#a91f1f" }}> */}
+                    <DeleteIcon onClick={onRemove} sx={{color:'#a91f1f'}}/>
+                {/* </Button> */}
+
             </TableRow>
         );
     };
 
     const LicenseSelect = ({ item, id, index, onLicenseChange }: { item: string, id: number, index: number, onLicenseChange: (newValue: string, index: number) => void }) => {
-
+        useEffect(() => {
+            const height = document.getElementById(`license-select-${index}`)?.clientHeight;
+            if (height) {
+                setSelectHeight(height);
+            }
+        }, [index]);
+    
         const handleLicenseChange = (event: SelectChangeEvent<string>) => {
             const newValue = event.target.value;
             onLicenseChange(newValue, index);
         };
 
         return (
-            <TableRow>
+            <TableRow sx={{ borderBottom:1, borderColor:'#828282', height:selectHeight}}  >
+                <TableCell style={styles.tableCell}>
+                 <FormControl fullWidth>
+                            {
+                                value?'':
+                                <InputLabel id={`license-select-label-${index}`}>Լիցենզիայի տեսակ</InputLabel>
+
+                            }
                 <Select
                     labelId="licenseType"
                     id="licenseType"
@@ -282,7 +334,16 @@ console.log(rowsState)
                         width: '100%',
                         '& .MuiSelect-select': {
                             whiteSpace: 'wrap',
-                        }
+                        },
+                        ".MuiOutlinedInput-notchedOutline": { border: 0 },
+                        "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                        {
+                            border: 0,
+                        },
+                        "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                        {
+                            border: 0,
+                        },
                     }}
                     name='licenseType'
                     value={item}
@@ -298,6 +359,7 @@ console.log(rowsState)
 
                     )}
                 </Select>
+                </FormControl></TableCell>
             </TableRow>
 
         );
@@ -319,7 +381,16 @@ console.log(rowsState)
                         width: '100%',
                         '& .MuiSelect-select': {
                             whiteSpace: 'wrap',
-                        }
+                        },
+                        ".MuiOutlinedInput-notchedOutline": { border: 0 },
+                        "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                        {
+                            border: 0,
+                        },
+                        "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                        {
+                            border: 0,
+                        },
                     }}
                     name='price'
                     value={item}
@@ -347,7 +418,13 @@ console.log(rowsState)
 
         <TableRow sx={{ bgcolor: rowColor }}>
             {/* --------------------------- name */}
-            <TableCell sx={{ padding: 0, border: '1px solid gray' }} >
+            <TableCell sx={{ padding: 0, }} >
+            <FormControl fullWidth>
+                            {
+                                value?'':
+                                <InputLabel id="demo-simple-select-label">Անվանում</InputLabel>
+
+                            }
                 <Select
                     labelId="name"
                     id="name"
@@ -357,10 +434,20 @@ console.log(rowsState)
                         '& .MuiSelect-select': {
                             whiteSpace: 'wrap',
                             width: '220px'
-                        }
+                        },
+                        ".MuiOutlinedInput-notchedOutline": { border: 0 },
+                        "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                        {
+                            border: 0,
+                        },
+                        "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                        {
+                            border: 0,
+                        },
                     }}
                     name='name'
                     value={value}
+
                     //   onChange={handleSelectChange}
                     onChange={(e) => handleChange(e as SelectChangeEvent, 'name')}
 
@@ -374,11 +461,12 @@ console.log(rowsState)
 
 
                 </Select>
+                </FormControl>
             </TableCell>
 
             {/* --------------------------- description */}
 
-            <TableCell sx={{ padding: 0, border: 1, }} >
+            <TableCell sx={{ padding: 0, }} >
                 {
                     investment ? (
                         investment.map((e: DataType, index: number) => (
@@ -393,7 +481,14 @@ console.log(rowsState)
                                 />
                             ))
                         ))
-                    ) : <Select
+                    ) : 
+                    <FormControl fullWidth>
+                    {
+                        value?'':
+                        <InputLabel id="demo-simple-select-label">Նկարագրություն</InputLabel>
+
+                    }
+                    <Select
                         labelId="description"
                         id="description"
                         // label="description" 
@@ -402,26 +497,30 @@ console.log(rowsState)
                             width: '100%',
                             '& .MuiSelect-select': {
                                 whiteSpace: 'wrap',
-                            }
+                            },
+                            ".MuiOutlinedInput-notchedOutline": { border: 0 },
+                            "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                            {
+                                border: 0,
+                            },
+                            "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                            {
+                                border: 0,
+                            },
                         }}
                         name='description'
                         value={value}
                         //   onChange={handleSelectChange}
                         onChange={(e) => handleChange(e as SelectChangeEvent, 'description')}
-
-
                     >
-
-
                         {isFilterDescription.map((description: any, index: number) => (
                             description.map((e: DescriptionType) => (
                                 <MenuItem key={e.value} value={e.value}>{e.value}</MenuItem>
                             ))
                         ))}
 
-
-
                     </Select>
+                    </FormControl>
                 }
 
 
@@ -436,7 +535,7 @@ console.log(rowsState)
                 )}
             </TableCell>
             {/* --------------------------- license type */}
-            <TableCell sx={{ padding: 0, border: 1, }} >
+            <TableCell sx={{ padding: 0,  }} >
                 {
                     investment ?
                         (
@@ -452,7 +551,12 @@ console.log(rowsState)
                                 ))
                             ))
                         ) :
+                        <FormControl fullWidth>
+                        {
+                            value?'':
+                            <InputLabel id="demo-simple-select-label">Լիցենզիայի տեսակ</InputLabel>
 
+                        }
                         <Select
                             labelId="licenseType"
                             id="licenseType"
@@ -461,7 +565,16 @@ console.log(rowsState)
                                 width: '100%',
                                 '& .MuiSelect-select': {
                                     whiteSpace: 'wrap',
-                                }
+                                },
+                                ".MuiOutlinedInput-notchedOutline": { border: 0 },
+                "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                  {
+                    border: 0,
+                  },
+                "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                  {
+                    border: 0,
+                  },
                             }}
                             name='licenseType'
                             value={value}
@@ -475,10 +588,11 @@ console.log(rowsState)
                                 ))
                             ))}
                         </Select>
+                        </FormControl>
                 }
             </TableCell>
 
-            <TableCell sx={{ padding: 0, border: 1, }} >
+            <TableCell sx={{ padding: 0, }} >
                 {
                     investment ?
                         (
@@ -513,7 +627,7 @@ console.log(rowsState)
                 }
 
             </TableCell>
-            <TableCell sx={{ padding: 0, border: 1, }} >
+            <TableCell sx={{ padding: 0, }} >
                 {
                     investment ?
                         (
@@ -530,16 +644,31 @@ console.log(rowsState)
                                 ))
                             ))
                         ) :
+                        <FormControl fullWidth>
+                            {
+                                value?'':
+                                <InputLabel id="demo-simple-select-label">Գին</InputLabel>
+
+                            }
                         <Select
                             labelId="price"
                             id="price"
-                            // label="price"
+                            label="գին"
                             sx={{
+
                                 width: '100%',
                                 '& .MuiSelect-select': {
                                     whiteSpace: 'wrap',
-                                }
-                            }}
+                                },
+                                ".MuiOutlinedInput-notchedOutline": { border: 0 },
+                                "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                                  {
+                                    border: 0,
+                                  },
+                                "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                                  {
+                                    border: 0,
+                                  },                            }}
                             name='count'
                             value={value}
                             //   onChange={handleSelectChange}
@@ -554,18 +683,15 @@ console.log(rowsState)
                                 ))
                             ))}
 
-
-
                         </Select>
-
-
+                        </FormControl>
                 }
 
             </TableCell>
 
             {/* --------------------------- price */}
 
-            <TableCell sx={{ padding: 0, border: 1 }}>
+            <TableCell sx={{ padding: 0, }}>
 
                 {
                     investment ?
@@ -586,7 +712,7 @@ console.log(rowsState)
                                             key={idx}
                                             id="outlined-basic"
                                             variant="outlined"
-                                            value={rowsState[idx]?.disCount}
+                                            value={rowsState[idx]?.disCount??0}
                                             name='disCount'
                                             onChange={(e) => handleInputs(e, 'disCount', idx)}
                                         />
@@ -604,7 +730,7 @@ console.log(rowsState)
                 }
             </TableCell>
             {/* ---------------------------- zexj */}
-            <TableCell sx={{ padding: 0, border: 1, }}>
+            <TableCell sx={{ padding: 0,  }}>
                 {
                     investment ?
                         (
@@ -624,8 +750,8 @@ console.log(rowsState)
 
             {/* --------------------------- price */}
 
-            <TableCell sx={{ padding: 0, border: 1, }}>
-                <Button variant='contained' onClick={removeAllRow}>remove all row</Button>
+            <TableCell sx={{ padding: 0}}> 
+                <Button onClick={removeAllRow}><DeleteIcon sx={{ color: 'black' }} /></Button>
 
             </TableCell>
 

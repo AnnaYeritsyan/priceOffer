@@ -3,6 +3,7 @@ import Rows from '../Rows/Rows';
 import data from '../data.json';
 import { useState } from 'react';
 import { DataRow, DataSchema, DataType } from '../dataType';
+import Header from '../Header/Header';
 
 
 const Tables = () => {
@@ -21,20 +22,63 @@ const Tables = () => {
         setRecords((prevRecords: any) => [...prevRecords, newRow]);
     }
     return (
-        <Box>
+        <Box >
+            <Box sx={{display:'flex', alignItems:'center', margin:'25px 0px'}}>
+            <Header/>
             <Button variant='contained' onClick={handleAddRow}>+</Button>
+            </Box>
+            
             <TableContainer component={Paper} sx={{ display: "flex", justifyContent: 'center', }} >
                 <Table>
                     <TableHead>
-                        <TableRow sx={{ bgcolor: '#C6D9F1' }}>
-                            <TableCell align='center'>Անվանում</TableCell>
-                            <TableCell align='center'>Նկարագրություն</TableCell>
-                            <TableCell align='center'>լիցենզիայի տեսակ</TableCell>
-                            <TableCell align='center'>Քանակ</TableCell>
-                            <TableCell align='center'>Գին (ՀՀ Դրամ)</TableCell>
-                            <TableCell align='center'>Զեղչ</TableCell>
-                            <TableCell align='center'>Զեղչված գին (ՀՀ Դրամ)</TableCell>
-                            <TableCell align='center'>Խմբագրել</TableCell>
+                        <TableRow >
+                            <TableCell align='center'   
+                            sx={{
+                                fontWeight:'bold', 
+                                borderRight:'1px solid  #DEDEDE',
+                                padding:'0px'
+                            }}
+                            >Անվանում</TableCell>
+                            <TableCell align='center'
+                              sx={{
+                                fontWeight:'bold', 
+                                borderRight:'1px solid  #DEDEDE',
+                                padding:'0px'
+                            }}>Նկարագրություն</TableCell>
+                            <TableCell align='center'
+                              sx={{
+                                fontWeight:'bold', 
+                                borderRight:'1px solid  #DEDEDE',
+                                padding:'0px'
+                            }}>Լիցենզիայի տեսակ</TableCell>
+                            <TableCell align='center'
+                              sx={{
+                                fontWeight:'bold', 
+                                borderRight:'1px solid  #DEDEDE',
+                                padding:'0px'
+                            }}>Քանակ</TableCell>
+                            <TableCell align='center'
+                              sx={{
+                                fontWeight:'bold', 
+                                borderRight:'1px solid  #DEDEDE',
+                                padding:'0px'
+                            }}>Գին (ՀՀ Դրամ)</TableCell>
+                            <TableCell align='center'
+                              sx={{
+                                fontWeight:'bold', 
+                                borderRight:'1px solid #DEDEDE',
+                            }}>Զեղչ</TableCell>
+                            <TableCell align='center'
+                              sx={{
+                                fontWeight:'bold', 
+                                borderRight:'1px solid #DEDEDE',
+                                padding:'0px'
+                            }}>Զեղչված գին (ՀՀ Դրամ)</TableCell>
+                            <TableCell align='center'
+                              sx={{
+                                fontWeight:'bold', 
+                                padding:'0px'
+                            }}>Խմբագրել</TableCell>
                         </TableRow>
                     </TableHead>
 
@@ -43,21 +87,11 @@ const Tables = () => {
                         {records?.map((data, idx) =>
                             <Rows defaultRecord={data} key={idx} index={idx}/>
                         )}
-                        {/* {records.map((data, idx) =>
-                <Row
-                key={data.id}
-                  index={idx}
-                  defaultRecord={data}
-                  onChange={handleRowChange}
-                  schema={schemaList.find(sl => sl.id === data.schemaId)!}
-                  onRemoveItem={handleRemoveItem}
-                  onRemoveAllRow={() => handleRemoveAllRow(idx)}
-                  
-                />)
-              } */}
+                        
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Button variant='contained'>Պահպանել</Button>
         </Box>
     );
 };
