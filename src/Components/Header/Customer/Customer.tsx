@@ -5,14 +5,33 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Button } from '@mui/material';
+import ModalWindow from '../ModalWindow/ModalWindow';
 
 export default function Customer() {
   const [age, setAge] = React.useState('');
-
+  const [open, setOpen]= React.useState<boolean>(false)
+  const [newItem, setNewItem] = React.useState<string>('')
   const handleChange = (event: SelectChangeEvent) => {
     setAge(event.target.value as string);
   };
+const openModal = ()=>{
+  console.log('open')
+  setOpen(true)
+}
 
+const closeModal = () => {
+  setOpen(false);
+
+};
+const addItem=(name:any)=>{
+   console.log(name)
+   setNewItem(name)
+   if (newItem.trim() !== '') {
+    console.log('Adding new item:', newItem);
+  }
+  closeModal()
+}
+console.log(newItem)
   return (
     <Box sx={{
          minWidth: 230,
@@ -38,6 +57,7 @@ export default function Customer() {
           <MenuItem value={10}>Ten</MenuItem>
           <MenuItem value={20}>Twenty</MenuItem>
           <MenuItem value={30}>Thirty</MenuItem>
+          <MenuItem value={newItem}>{newItem}</MenuItem>
         </Select>
       </FormControl>
       <Button 
@@ -47,8 +67,13 @@ export default function Customer() {
         borderRadius:'0px 8px 8px 0px',
         height:40,
         color:'rgba(0,0,0,0.54)',
-
-      }} >+</Button>
+       minWidth:'40px',
+      }} 
+      onClick={openModal}
+      >+</Button>
+      {
+        open && <ModalWindow open={open} closeModal={closeModal} setNewItem={setNewItem} addItem={addItem}/>
+      }
     </Box>
   );
 }

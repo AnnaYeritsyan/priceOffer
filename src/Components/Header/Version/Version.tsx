@@ -48,6 +48,8 @@ export default function Version() {
         borderRadius:'0px 8px 8px 0px',
         height:40,
         color:'rgba(0,0,0,0.54)',
+        minWidth:'40px',
+
       }} size='small' >+</Button>
     </Box>
   );
