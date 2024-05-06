@@ -10,16 +10,16 @@ import { useRef } from 'react';
 const styles = {
     tableCell: {
         padding: 0,
-        height: 'auto', // Set height to auto for dynamic height
-        borderBottom: '1px solid #828282' // Set border for table cells
+        height: 'auto',
+        borderBottom: '1px solid #828282'
     },
     tableRow: {
-        height: 'auto', // Set height to auto for dynamic height
-        borderBottom: '1px solid #828282' // Set border for table rows
+        height: 'auto',
+        borderBottom: '1px solid #828282'
     }
 };
 
-const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number }) => {
+const Rows = ({ defaultRecord, index , getAllJson}: { defaultRecord: DataType, index: number,getAllJson:any }) => {
     const [records, setRecords] = useState<DataType[]>(data)
     const [value, setValue] = useState<string | undefined>(undefined)
     const [isFilterDescription, setIsFilterDescription] = useState<string[]>([])
@@ -36,6 +36,9 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
     })));
     const selectRef = useRef<HTMLSelectElement>(null);
     const [selectHeight, setSelectHeight] = useState<number>(0);
+    const [allRow, setAllRow] = useState<any>([])
+    
+
 
     const rowColor = index % 2 === 0 ? '#ffffff' : '#EBFAF1';
 
@@ -79,12 +82,17 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
             }));
             setRowsState(initialRowsState);
             setShowAddButton(true);
+      
+
         }
     }, [investment]);
 
+    // ==========================================================
+
+    // ============================
+    
     const handleInputs = (e: any, nameElemnt: 'count' | 'disCount', rowIndex: number) => {
-        console.log(rowIndex)
-        console.log(rowsState)
+      
         const newValue = e.target.value;
 
         setRowsState(prevState => {
@@ -96,7 +104,7 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
             return newState;
         });
     };
-    console.log(rowsState)
+
     const addinRow = () => {
         const newRow: DescriptionType = {
             value: '',
@@ -122,28 +130,19 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
             }));
             setInvestment(newInvestment);
             setRowsState(prevState => [...prevState, { count: undefined, disCount: undefined }]);
-
+        
         }
     };
 
+
     useEffect(() => {
         if (investment) {
-            setShowAddButton(true);
-            console.log(rowsState)
+            setShowAddButton(true);   
         }
     }, [investment]);
 
 
-    if (showAddButton) {
-        console.log(investment)
-        investment.map((e: any) => {
-            e.description.map((item: any, index: number) => {
-                console.log(item)
-                // setRowsState
-            })
-        })
-        // setRowsState
-    }
+   
     // const removeItem = (idToRemove: DescriptionType, idx: number) => {
     //     if (investment) {
     //         const updatedInvestment = investment.map((item: DataType) => ({
@@ -166,11 +165,11 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
                 licenseType: item.licenseType.filter((license: LicenseType, index: number) => index !== idx),
                 price: item.price.filter((price: PriceType, index: number) => index !== idx),
             }));
+            console.log(updatedInvestment,"=========remove time")
             setInvestment(updatedInvestment);
 
             setRowsState(prevState => {
                 const newState = [...prevState];
-                console.log(newState)
                 newState[idx] = {
                     count: undefined,
                     disCount: undefined,
@@ -181,7 +180,7 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
     };
 
 
-
+// console.log(investment)
 
 
     const DescriptionChange = (newValue: string, index: number) => {
@@ -206,7 +205,7 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
 
 
     const LicenseChange = (newValue: any, index: number) => {
-        console.log(newValue, index);
+        // console.log(newValue, index);
         if (investment) {
             const updatedInvestment = investment.map((e: DataType) => ({
                 ...e,
@@ -522,7 +521,6 @@ const Rows = ({ defaultRecord, index }: { defaultRecord: DataType, index: number
                     </Select>
                     </FormControl>
                 }
-
 
 
                 {showAddButton && (

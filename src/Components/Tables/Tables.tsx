@@ -9,6 +9,12 @@ import Header from '../Header/Header';
 const Tables = () => {
     const [records, setRecords] = useState<DataType[]>([])
     const [newRow, setNewRow] = useState<boolean>(false)
+    const [customer, setCustomer] = useState<string>()
+    const [allData, setAllData] = useState<DataType[]>(data)
+    const selectCustomerValue = (items:string)=>{
+console.log(items)
+setCustomer(items)
+    }
     console.log(records)
     const handleAddRow = () => {
         const newRow = {
@@ -21,10 +27,19 @@ const Tables = () => {
 
         setRecords((prevRecords: any) => [...prevRecords, newRow]);
     }
+
+    const getAllJson = ()=>{
+        console.log('alldata')
+    }
+    const handleSave=()=>{
+        console.log('click')
+        console.log(records);
+
+    }
     return (
         <Box >
             <Box sx={{display:'flex', alignItems:'center', margin:'25px 0px'}}>
-            <Header/>
+            <Header selectCustomerValue={selectCustomerValue}/>
             <Button variant='contained' onClick={handleAddRow}>+</Button>
             </Box>
             
@@ -85,13 +100,13 @@ const Tables = () => {
                     <TableBody>
 
                         {records?.map((data, idx) =>
-                            <Rows defaultRecord={data} key={idx} index={idx}/>
+                            <Rows defaultRecord={data} key={idx} index={idx} getAllJson={getAllJson}/>
                         )}
                         
                     </TableBody>
                 </Table>
             </TableContainer>
-            <Button variant='contained'>Պահպանել</Button>
+            <Button variant='contained' onClick={handleSave}>Պահպանել</Button>
         </Box>
     );
 };

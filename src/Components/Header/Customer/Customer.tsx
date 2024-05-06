@@ -6,13 +6,31 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Button } from '@mui/material';
 import ModalWindow from '../ModalWindow/ModalWindow';
+import { useState } from 'react';
+import { v4 } from 'uuid';
+import { CustomerSelect, MenuItems } from '../../dataType';
 
-export default function Customer() {
-  const [age, setAge] = React.useState('');
-  const [open, setOpen]= React.useState<boolean>(false)
-  const [newItem, setNewItem] = React.useState<string>('')
+interface CustomerProps {
+  onCustomerSelect: (selectedItem: string) => void;
+}
+
+const Customer: React.FC<CustomerProps> = ({ onCustomerSelect }) => {
+  const [changeName, setChangeName] =useState('');
+  const [open, setOpen]= useState<boolean>(false)
+  const [newItem, setNewItem] = useState<string>('')
+  const [menuItem, setMenuItem] =useState<MenuItems[]>([
+    {
+      id:v4(),
+      item:'SGL'
+    },
+    {
+      id:v4(),
+      item:'Kean'
+    }
+  ])
   const handleChange = (event: SelectChangeEvent) => {
-    setAge(event.target.value as string);
+    setChangeName(event.target.value as string);
+    onCustomerSelect(event.target.value as string)
   };
 const openModal = ()=>{
   console.log('open')
@@ -25,9 +43,15 @@ const closeModal = () => {
 };
 const addItem=(name:any)=>{
    console.log(name)
-   setNewItem(name)
-   if (newItem.trim() !== '') {
-    console.log('Adding new item:', newItem);
+   
+
+   if (name.trim() !== '') {
+
+    const newItem = ({
+      id:v4(),
+     item:name
+   })
+   setMenuItem(prevItems => [...prevItems, newItem]);
   }
   closeModal()
 }
@@ -45,19 +69,21 @@ console.log(newItem)
         <Select
           labelId="demo-simple-select-label"
         //   id="demo-simple-select"
-          value={age}
+          value={changeName}
           label="Պատվիրատու"
           onChange={handleChange}
           sx={{
             borderRadius:'8px 0px 0px 8px ',
 
           }}
-         
         >
-          <MenuItem value={10}>Ten</MenuItem>
-          <MenuItem value={20}>Twenty</MenuItem>
-          <MenuItem value={30}>Thirty</MenuItem>
-          <MenuItem value={newItem}>{newItem}</MenuItem>
+
+         {
+          menuItem.map((e:any)=>(
+            <MenuItem value={e.item}>{e.item}</MenuItem>
+          ))
+         }
+
         </Select>
       </FormControl>
       <Button 
@@ -77,3 +103,4 @@ console.log(newItem)
     </Box>
   );
 }
+export default Customer;

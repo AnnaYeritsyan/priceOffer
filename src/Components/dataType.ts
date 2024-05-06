@@ -51,3 +51,13 @@ export type DataType = {
     price: PriceType[];
 };
 
+export type MenuItems={
+    id:string,
+    item:string
+}
+
+export type CustomerSelect={
+    onCustomerSelect: (item: string) => void;
+
+}
+
