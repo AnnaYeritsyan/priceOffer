@@ -1,0 +1,175 @@
+[
+    {
+        "id": 1,
+        "customers_name": "SGL",
+        "table_contained": [
+            {
+                "version": "1",
+                "tables": [
+                    {
+                        "id": 1,
+                        "name": "Lis-A",
+                        "description": [
+                            { "type": "doctor", "value": "Լաբորատոր տեղեկատվական կառավարման համակարգի լիցենզիա` բժիշկ / լաբորանտ։" }
+                        ],
+                        "licenseType": [
+                            { "type": "perpetual", "value": "Անժամկետ լիցենզիա" }
+                        ],
+                        "price": [
+                            { "type": "price", "value": "1000" }
+                        ]
+                    },
+                    {
+                        "id": 2,
+                        "name": "LIS-A ներդնում",
+                        "description": [
+                            { "type": "installation", "value": "ԾԱ-ի տեղադրում" },
+                            { "type": "system_configuration", "value": "Համակարգի կարգաբերում" },
+                            { "type": "admin_training", "value": "Ադմինիստրատորների ուսուցանում" },
+                            { "type": "doctor_lab_training", "value": "Բժիշկ/լաբորանտ ուսուցանում" },
+                            { "type": "management_training", "value": "Ղեկավար անձնակազմ ուսուցանում" },
+                            { "type": "form_development", "value": "Տպման ձևերի մշակում (բլանկ, հաշվետվություն)" },
+                            { "type": "his_integration", "value": "ՀՏՀ(HIS) ինտեգրման նախագծում և կարգաբերում" },
+                            { "type": "system_review", "value": "Համակարգի ﬔկնարկ" }
+                        ],
+                        "licenseType": [
+                            { "type": "duration_10h", "value": "10 ժամ" },
+                            { "type": "duration_20h", "value": "20 ժամ" },
+                            { "type": "duration_10h", "value": "10 ժամ" },
+                            { "type": "duration_5h", "value": "5 ժամ" },
+                            { "type": "duration_5h", "value": "5 ժամ" },
+                            { "type": "duration_25h", "value": "25 ժամ" },
+                            { "type": "duration_30h", "value": "30 ժամ" },
+                            { "type": "duration_40h", "value": "40 ժամ" }
+                        ],
+                        "price": [
+                            { "type": "price_1", "value": "230000" },
+                            { "type": "price_2", "value": "460000" },
+                            { "type": "price_1", "value": "230000" },
+                            { "type": "price_3", "value": "115000" },
+                            { "type": "price_3", "value": "115000" },
+                            { "type": "price_4", "value": "575000" },
+                            { "type": "price_5", "value": "690000" },
+                            { "type": "price_6", "value": "920000" }
+                        ],
+                        "count": "1",
+                        "disCount": [
+                            { "value": "1" },
+                            { "value": "5" },
+                            { "value": "4" },
+                            { "value": "10" },
+                            { "value": "100" },
+                            { "value": "80" },
+                            { "value": "0" },
+                            { "value": "0" },
+                            { "value": "30" }
+                        ]
+                    },
+                    {
+                        "id": 3,
+                        "name": "VUID",
+                        "description": [
+                            { "type": "software_integration", "value": "Սարքի և ցանկացած ծրագրային ապահովման հետ տվյալների փոխանակման ծրագրաշար" }
+                        ],
+                        "licenseType": [
+                            { "type": "annual_3_devices", "value": "Տարեկան լիցենզիա՝" }
+                        ],
+                        "price": [
+                            { "type": "price", "value": "210000" }
+                        ],
+                        "count": "1",
+                        "disCount": [
+                            { "value": "0" }
+                        ]
+                    },
+                    {
+                        "id": 4,
+                        "name": "VUID ԾԱ-ի ﬕացում",
+                        "description": [
+                            { "type": "system_upgrade", "value": "Սարքերի ﬕացում համակարգչին, ծրագրաշարերի տեղադրում, սարքերի ﬕացման կարգաբերում, տվյալների բազայի ﬕացում և թեսթավորում" }
+                        ],
+                        "licenseType": [
+                            { "type": "devices", "value": "sarqi qanak սարքի համար" }
+                        ],
+                        "price": [
+                            { "type": "price", "value": "780000" }
+                        ],
+                        "count": "1",
+                        "disCount": [
+                            { "value": "0" }
+                        ]
+                    }
+                ]
+            }, 
+            {
+                "version":"2",
+                "tables": [
+                    {
+                        "id": 2,
+                        "name": "LIS-A ներդնում",
+                        "description": [
+                            { "type": "installation", "value": "ԾԱ-ի տեղադրում" },
+                            { "type": "system_configuration", "value": "Համակարգի կարգաբերում" },
+                            { "type": "admin_training", "value": "Ադմինիստրատորների ուսուցանում" }
+                           
+                        ],
+                        "licenseType": [
+                            { "type": "duration_10h", "value": "10 ժամ" },
+                            { "type": "duration_20h", "value": "20 ժամ" },
+                            { "type": "duration_10h", "value": "10 ժամ" }
+                            
+                        ],
+                        "price": [
+                            { "type": "price_1", "value": "230000" },
+                            { "type": "price_2", "value": "460000" },
+                            { "type": "price_1", "value": "230000" }
+                            
+                        ],
+                        "count": "1",
+                        "disCount": [
+                            { "value": "1" },
+                            { "value": "5" },
+                            { "value": "4" }
+                            
+                        ]
+                    },
+                    {
+                        "id": 3,
+                        "name": "VUID",
+                        "description": [
+                            { "type": "software_integration", "value": "Սարքի և ցանկացած ծրագրային ապահովման հետ տվյալների փոխանակման ծրագրաշար" }
+                        ],
+                        "licenseType": [
+                            { "type": "annual_3_devices", "value": "Տարեկան լիցենզիա՝" }
+                        ],
+                        "price": [
+                            { "type": "price", "value": "210000" }
+                        ],
+                        "count": "1",
+                        "disCount": [
+                            { "value": "0" }
+                        ]
+                    },
+                    {
+                        "id": 4,
+                        "name": "VUID ԾԱ-ի ﬕացում",
+                        "description": [
+                            { "type": "system_upgrade", "value": "Սարքերի ﬕացում համակարգչին, ծրագրաշարերի տեղադրում, սարքերի ﬕացման կարգաբերում, տվյալների բազայի ﬕացում և թեսթավորում" }
+                        ],
+                        "licenseType": [
+                            { "type": "devices", "value": "sarqi qanak սարքի համար" }
+                        ],
+                        "price": [
+                            { "type": "price", "value": "780000" }
+                        ],
+                        "count": "1",
+                        "disCount": [
+                            { "value": "0" }
+                        ]
+                    }
+                ]
+            }
+
+        ]
+    }
+]

@@ -3,10 +3,11 @@ import { Button, Table, TableCell, TableContainer, TableHead, TableRow, TextFiel
 import { DataKV, DataSchema, DataType, DescriptionType, LicenseType, PriceType, RowState } from '../dataType';
 import { v4 } from 'uuid';
 import data from '../data.json'
-import { ChangeEvent, useState, useEffect } from 'react';
+import { ChangeEvent, useState, useEffect, useContext } from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { useRef } from 'react';
+import { useTableContext } from '../Tables/Tables';
 const styles = {
     tableCell: {
         padding: 0,
@@ -19,7 +20,7 @@ const styles = {
     }
 };
 
-const Rows = ({ defaultRecord, index , getAllJson}: { defaultRecord: DataType, index: number,getAllJson:any }) => {
+const Rows = ({ defaultRecord, index, getAllJson }: { defaultRecord: DataType, index: number, getAllJson: any }) => {
     const [records, setRecords] = useState<DataType[]>(data)
     const [value, setValue] = useState<string | undefined>(undefined)
     const [isFilterDescription, setIsFilterDescription] = useState<string[]>([])
@@ -34,11 +35,24 @@ const Rows = ({ defaultRecord, index , getAllJson}: { defaultRecord: DataType, i
         count: undefined,
         disCount: undefined,
     })));
+    const all:any = []
     const selectRef = useRef<HTMLSelectElement>(null);
     const [selectHeight, setSelectHeight] = useState<number>(0);
-    const [allRow, setAllRow] = useState<any>([])
-    
+    const [allRow, setAllRow] = useState<any[]>([])
+    const [otherRow, setOtherRow] = useState<any[]>([defaultRecord])
+    // const [otherRow, setOtherRow] = useState<any[]>([{
+    //     // id: v4(),
+    //     id: Math.floor(new Date().getTime() * Math.random()),
+    //     name: '',
+    //     description: '',
+    //     licenseType: '',
+    //     count: '',
+    //     price: '',
+    //     disCount: '',
+    //     disCountPrice: ''
+    // }])
 
+    const tableContext = useTableContext()
 
     const rowColor = index % 2 === 0 ? '#ffffff' : '#EBFAF1';
 
@@ -56,33 +70,71 @@ const Rows = ({ defaultRecord, index , getAllJson}: { defaultRecord: DataType, i
                 const selectedName = event.target.value;
                 if (selectedName === 'LIS-A ներդնում') {
                     setInvestment(selectedRecords);
+                    otherRow.map((e: any) => {
+                        e.name = selectedName
+                    })
+                    
                 } else {
                     setInvestment(null);
+                   
+                    otherRow.map((e: any) => {
+                        e.name = selectedName
+                    })
                     setShowAddButton(false);
                 }
+
                 setShowAddButton(selectedName === 'LIS-A ներդնում');
                 break;
             case 'description':
                 setValue(event.target.value)
+                otherRow.map((e: any) => {
+                    e.description = event.target.value
+                })
 
                 break;
+                case 'licenseType':
+                    setValue(event.target.value)
+                    otherRow.map((e: any) => {
+                        e.licenseType = event.target.value
+                    })
+                    break;
             case 'price':
                 setIsPricing(+event.target.value)
+                otherRow.map((e: any) => {
+                    e.price = event.target.value
+                })
+                // 
                 break;
             default:
                 break;
         }
+        // console.log(otherRow);
+        // all.push(otherRow)
+        // getAllJson(all)
+        // console.log(all)
+        // setAllRow(prev=>[...prev, otherRow])
+        tableContext.onChange && tableContext.onChange(otherRow[0])
+        console.log(otherRow)
+        // setAllRow([...allRow, othoerRow])
+        //console.log(investment);
+        // console.log(allRow)
     }
+
+
 
     useEffect(() => {
         if (investment) {
+            console.log(investment)
+        otherRow[0].description= investment[0].description
+        console.log(otherRow, '=================')
+        tableContext.onChange && tableContext.onChange(otherRow[0])
             const initialRowsState = investment.map(() => ({
                 count: undefined,
                 disCount: undefined,
             }));
             setRowsState(initialRowsState);
             setShowAddButton(true);
-      
+
 
         }
     }, [investment]);
@@ -90,9 +142,9 @@ const Rows = ({ defaultRecord, index , getAllJson}: { defaultRecord: DataType, i
     // ==========================================================
 
     // ============================
-    
+
     const handleInputs = (e: any, nameElemnt: 'count' | 'disCount', rowIndex: number) => {
-      
+
         const newValue = e.target.value;
 
         setRowsState(prevState => {
@@ -130,32 +182,17 @@ const Rows = ({ defaultRecord, index , getAllJson}: { defaultRecord: DataType, i
             }));
             setInvestment(newInvestment);
             setRowsState(prevState => [...prevState, { count: undefined, disCount: undefined }]);
-        
+
         }
     };
 
 
     useEffect(() => {
         if (investment) {
-            setShowAddButton(true);   
+            setShowAddButton(true);
         }
     }, [investment]);
 
-
-   
-    // const removeItem = (idToRemove: DescriptionType, idx: number) => {
-    //     if (investment) {
-    //         const updatedInvestment = investment.map((item: DataType) => ({
-    //             ...item,
-    //             description: item.description.filter((desc: DescriptionType, index: number) => index !== idx),
-    //             licenseType: item.licenseType.filter((license: LicenseType, index: number) => index !== idx),
-    //             price: item.price.filter((price: PriceType, index: number) => index !== idx),
-
-
-    //         }));
-    //         setInvestment(updatedInvestment);
-    //     } 
-    //    };
 
     const removeItem = (idToRemove: DescriptionType, idx: number) => {
         if (investment) {
@@ -165,7 +202,6 @@ const Rows = ({ defaultRecord, index , getAllJson}: { defaultRecord: DataType, i
                 licenseType: item.licenseType.filter((license: LicenseType, index: number) => index !== idx),
                 price: item.price.filter((price: PriceType, index: number) => index !== idx),
             }));
-            console.log(updatedInvestment,"=========remove time")
             setInvestment(updatedInvestment);
 
             setRowsState(prevState => {
@@ -180,7 +216,7 @@ const Rows = ({ defaultRecord, index , getAllJson}: { defaultRecord: DataType, i
     };
 
 
-// console.log(investment)
+    // console.log(investment)
 
 
     const DescriptionChange = (newValue: string, index: number) => {
@@ -245,7 +281,7 @@ const Rows = ({ defaultRecord, index , getAllJson}: { defaultRecord: DataType, i
 
     const DescriptionSelect = ({ item, onRemove, id, index, onDescriptionChange }: { item: string, onRemove: () => void, id: number, index: number, onDescriptionChange: (newValue: string, index: number) => void }) => {
         // console.log(rowsState)
-        
+
         useEffect(() => {
             if (selectRef.current) {
                 const height = selectRef.current.offsetHeight;
@@ -258,46 +294,46 @@ const Rows = ({ defaultRecord, index , getAllJson}: { defaultRecord: DataType, i
             onDescriptionChange(newValue, index);
         }
         return (
-            <TableRow style={styles.tableRow}sx={{ display: "flex", alignItems: 'center', justifyContent: 'center', }}>
+            <TableRow style={styles.tableRow} sx={{ display: "flex", alignItems: 'center', justifyContent: 'center', }}>
 
-                 <FormControl fullWidth>
+                <FormControl fullWidth>
+                    {
+                        value ? '' :
+                            <InputLabel id={`license-select-label-${index}`}>Նկարագրություն</InputLabel>
+
+                    }
+                    <Select
+                        labelId="description"
+                        id="description"
+                        sx={{
+                            width: '100%',
+                            '& .MuiSelect-select': {
+                                whiteSpace: 'wrap',
+                            },
+                            ".MuiOutlinedInput-notchedOutline": { border: 0 },
+                            "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
                             {
-                                value?'':
-                                <InputLabel id={`license-select-label-${index}`}>Նկարագրություն</InputLabel>
-
-                            }
-                <Select
-                    labelId="description"
-                    id="description"
-                    sx={{
-                        width: '100%',
-                        '& .MuiSelect-select': {
-                            whiteSpace: 'wrap',
-                        },
-                        ".MuiOutlinedInput-notchedOutline": { border: 0 },
-                        "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
-                        {
-                            border: 0,
-                        },
-                        "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                        {
-                            border: 0,
-                        },
-                    }}
-                    name='description'
-                    value={updateValue ?? item}
-                    onChange={(event) => handleDescriptionChange(event, index)}
-                >
-                    {isFilterDescription.map((description: any, index: number) => (
-                        description.map((e: DescriptionType, idx: number) => (
-                            <MenuItem key={idx} value={e.value}>{e.value}</MenuItem>
-                        ))
-                    ))}
-                </Select>
+                                border: 0,
+                            },
+                            "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                            {
+                                border: 0,
+                            },
+                        }}
+                        name='description'
+                        value={updateValue ?? item}
+                        onChange={(event) => handleDescriptionChange(event, index)}
+                    >
+                        {isFilterDescription.map((description: any, index: number) => (
+                            description.map((e: DescriptionType, idx: number) => (
+                                <MenuItem key={idx} value={e.value}>{e.value}</MenuItem>
+                            ))
+                        ))}
+                    </Select>
                 </FormControl>
                 {/* <Button variant='contained' 
                     sx={{ bgcolor: "#a91f1f" }}> */}
-                    <DeleteIcon onClick={onRemove} sx={{color:'#a91f1f'}}/>
+                <DeleteIcon onClick={onRemove} sx={{ color: '#a91f1f' }} />
                 {/* </Button> */}
 
             </TableRow>
@@ -311,54 +347,54 @@ const Rows = ({ defaultRecord, index , getAllJson}: { defaultRecord: DataType, i
                 setSelectHeight(height);
             }
         }, [index]);
-    
+
         const handleLicenseChange = (event: SelectChangeEvent<string>) => {
             const newValue = event.target.value;
             onLicenseChange(newValue, index);
         };
 
         return (
-            <TableRow sx={{ borderBottom:1, borderColor:'#828282', height:selectHeight}}  >
+            <TableRow sx={{ borderBottom: 1, borderColor: '#828282', height: selectHeight }}  >
                 <TableCell style={styles.tableCell}>
-                 <FormControl fullWidth>
-                            {
-                                value?'':
+                    <FormControl fullWidth>
+                        {
+                            value ? '' :
                                 <InputLabel id={`license-select-label-${index}`}>Լիցենզիայի տեսակ</InputLabel>
 
-                            }
-                <Select
-                    labelId="licenseType"
-                    id="licenseType"
-                    sx={{
-                        width: '100%',
-                        '& .MuiSelect-select': {
-                            whiteSpace: 'wrap',
-                        },
-                        ".MuiOutlinedInput-notchedOutline": { border: 0 },
-                        "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
-                        {
-                            border: 0,
-                        },
-                        "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                        {
-                            border: 0,
-                        },
-                    }}
-                    name='licenseType'
-                    value={item}
-                    onChange={handleLicenseChange}
-                >
-                    <MenuItem value={item} key={id}> {item}</MenuItem>
+                        }
+                        <Select
+                            labelId="licenseType"
+                            id="licenseType"
+                            sx={{
+                                width: '100%',
+                                '& .MuiSelect-select': {
+                                    whiteSpace: 'wrap',
+                                },
+                                ".MuiOutlinedInput-notchedOutline": { border: 0 },
+                                "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                                {
+                                    border: 0,
+                                },
+                                "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                                {
+                                    border: 0,
+                                },
+                            }}
+                            name='licenseType'
+                            value={item}
+                            onChange={handleLicenseChange}
+                        >
+                            <MenuItem value={item} key={id}> {item}</MenuItem>
 
-                    {licenseState.map((e: any) =>
-                        e.map((a: LicenseType, idx: number) => (
-                            <MenuItem key={idx} value={a.value} >{a.value}</MenuItem>
-                        ))
+                            {licenseState.map((e: any) =>
+                                e.map((a: LicenseType, idx: number) => (
+                                    <MenuItem key={idx} value={a.value} >{a.value}</MenuItem>
+                                ))
 
 
-                    )}
-                </Select>
-                </FormControl></TableCell>
+                            )}
+                        </Select>
+                    </FormControl></TableCell>
             </TableRow>
 
         );
@@ -418,48 +454,48 @@ const Rows = ({ defaultRecord, index , getAllJson}: { defaultRecord: DataType, i
         <TableRow sx={{ bgcolor: rowColor }}>
             {/* --------------------------- name */}
             <TableCell sx={{ padding: 0, }} >
-            <FormControl fullWidth>
-                            {
-                                value?'':
-                                <InputLabel id="demo-simple-select-label">Անվանում</InputLabel>
-
-                            }
-                <Select
-                    labelId="name"
-                    id="name"
-                    label="name"
-                    sx={{
-                        width: '70%',
-                        '& .MuiSelect-select': {
-                            whiteSpace: 'wrap',
-                            width: '220px'
-                        },
-                        ".MuiOutlinedInput-notchedOutline": { border: 0 },
-                        "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
-                        {
-                            border: 0,
-                        },
-                        "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                        {
-                            border: 0,
-                        },
-                    }}
-                    name='name'
-                    value={value}
-
-                    //   onChange={handleSelectChange}
-                    onChange={(e) => handleChange(e as SelectChangeEvent, 'name')}
-
-
-                >
+                <FormControl fullWidth>
                     {
-                        records.map((e: DataType, idx) =>
-                            <MenuItem value={e.name} key={idx}>{e.name}</MenuItem>
-                        )
+                        value ? '' :
+                            <InputLabel id="demo-simple-select-label">Անվանում</InputLabel>
+
                     }
+                    <Select
+                        labelId="name"
+                        id="name"
+                        label="name"
+                        sx={{
+                            width: '70%',
+                            '& .MuiSelect-select': {
+                                whiteSpace: 'wrap',
+                                width: '220px'
+                            },
+                            ".MuiOutlinedInput-notchedOutline": { border: 0 },
+                            "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                            {
+                                border: 0,
+                            },
+                            "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                            {
+                                border: 0,
+                            },
+                        }}
+                        name='name'
+                        value={value}
+
+                        //   onChange={handleSelectChange}
+                        onChange={(e) => handleChange(e as SelectChangeEvent, 'name')}
 
 
-                </Select>
+                    >
+                        {
+                            records.map((e: DataType, idx) =>
+                                <MenuItem value={e.name} key={idx}>{e.name}</MenuItem>
+                            )
+                        }
+
+
+                    </Select>
                 </FormControl>
             </TableCell>
 
@@ -480,46 +516,46 @@ const Rows = ({ defaultRecord, index , getAllJson}: { defaultRecord: DataType, i
                                 />
                             ))
                         ))
-                    ) : 
-                    <FormControl fullWidth>
-                    {
-                        value?'':
-                        <InputLabel id="demo-simple-select-label">Նկարագրություն</InputLabel>
-
-                    }
-                    <Select
-                        labelId="description"
-                        id="description"
-                        // label="description" 
-
-                        sx={{
-                            width: '100%',
-                            '& .MuiSelect-select': {
-                                whiteSpace: 'wrap',
-                            },
-                            ".MuiOutlinedInput-notchedOutline": { border: 0 },
-                            "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                    ) :
+                        <FormControl fullWidth>
                             {
-                                border: 0,
-                            },
-                            "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                            {
-                                border: 0,
-                            },
-                        }}
-                        name='description'
-                        value={value}
-                        //   onChange={handleSelectChange}
-                        onChange={(e) => handleChange(e as SelectChangeEvent, 'description')}
-                    >
-                        {isFilterDescription.map((description: any, index: number) => (
-                            description.map((e: DescriptionType) => (
-                                <MenuItem key={e.value} value={e.value}>{e.value}</MenuItem>
-                            ))
-                        ))}
+                                value ? '' :
+                                    <InputLabel id="demo-simple-select-label">Նկարագրություն</InputLabel>
 
-                    </Select>
-                    </FormControl>
+                            }
+                            <Select
+                                labelId="description"
+                                id="description"
+                                // label="description" 
+
+                                sx={{
+                                    width: '100%',
+                                    '& .MuiSelect-select': {
+                                        whiteSpace: 'wrap',
+                                    },
+                                    ".MuiOutlinedInput-notchedOutline": { border: 0 },
+                                    "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                                    {
+                                        border: 0,
+                                    },
+                                    "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                                    {
+                                        border: 0,
+                                    },
+                                }}
+                                name='description'
+                                value={value}
+                                //   onChange={handleSelectChange}
+                                onChange={(e) => handleChange(e as SelectChangeEvent, 'description')}
+                            >
+                                {isFilterDescription.map((description: any, index: number) => (
+                                    description.map((e: DescriptionType) => (
+                                        <MenuItem key={e.value} value={e.value}>{e.value}</MenuItem>
+                                    ))
+                                ))}
+
+                            </Select>
+                        </FormControl>
                 }
 
 
@@ -533,7 +569,7 @@ const Rows = ({ defaultRecord, index , getAllJson}: { defaultRecord: DataType, i
                 )}
             </TableCell>
             {/* --------------------------- license type */}
-            <TableCell sx={{ padding: 0,  }} >
+            <TableCell sx={{ padding: 0, }} >
                 {
                     investment ?
                         (
@@ -550,42 +586,42 @@ const Rows = ({ defaultRecord, index , getAllJson}: { defaultRecord: DataType, i
                             ))
                         ) :
                         <FormControl fullWidth>
-                        {
-                            value?'':
-                            <InputLabel id="demo-simple-select-label">Լիցենզիայի տեսակ</InputLabel>
+                            {
+                                value ? '' :
+                                    <InputLabel id="demo-simple-select-label">Լիցենզիայի տեսակ</InputLabel>
 
-                        }
-                        <Select
-                            labelId="licenseType"
-                            id="licenseType"
-                            // label="licenseType"
-                            sx={{
-                                width: '100%',
-                                '& .MuiSelect-select': {
-                                    whiteSpace: 'wrap',
-                                },
-                                ".MuiOutlinedInput-notchedOutline": { border: 0 },
-                "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
-                  {
-                    border: 0,
-                  },
-                "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                  {
-                    border: 0,
-                  },
-                            }}
-                            name='licenseType'
-                            value={value}
-                            //   onChange={handleSelectChange}
-                            onChange={(e) => handleChange(e as SelectChangeEvent, 'licenseType')}
-                        >
+                            }
+                            <Select
+                                labelId="licenseType"
+                                id="licenseType"
+                                // label="licenseType"
+                                sx={{
+                                    width: '100%',
+                                    '& .MuiSelect-select': {
+                                        whiteSpace: 'wrap',
+                                    },
+                                    ".MuiOutlinedInput-notchedOutline": { border: 0 },
+                                    "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                                    {
+                                        border: 0,
+                                    },
+                                    "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                                    {
+                                        border: 0,
+                                    },
+                                }}
+                                name='licenseType'
+                                value={value}
+                                //   onChange={handleSelectChange}
+                                onChange={(e) => handleChange(e as SelectChangeEvent, 'licenseType')}
+                            >
 
-                            {licenseState.map((li: any, index: number) => (
-                                li.map((e: LicenseType) => (
-                                    <MenuItem key={e.value} value={e.value}>{e.value}</MenuItem>
-                                ))
-                            ))}
-                        </Select>
+                                {licenseState.map((li: any, index: number) => (
+                                    li.map((e: LicenseType) => (
+                                        <MenuItem key={e.value} value={e.value}>{e.value}</MenuItem>
+                                    ))
+                                ))}
+                            </Select>
                         </FormControl>
                 }
             </TableCell>
@@ -644,44 +680,45 @@ const Rows = ({ defaultRecord, index , getAllJson}: { defaultRecord: DataType, i
                         ) :
                         <FormControl fullWidth>
                             {
-                                value?'':
-                                <InputLabel id="demo-simple-select-label">Գին</InputLabel>
+                                value ? '' :
+                                    <InputLabel id="demo-simple-select-label">Գին</InputLabel>
 
                             }
-                        <Select
-                            labelId="price"
-                            id="price"
-                            label="գին"
-                            sx={{
+                            <Select
+                                labelId="price"
+                                id="price"
+                                label="գին"
+                                sx={{
 
-                                width: '100%',
-                                '& .MuiSelect-select': {
-                                    whiteSpace: 'wrap',
-                                },
-                                ".MuiOutlinedInput-notchedOutline": { border: 0 },
-                                "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
-                                  {
-                                    border: 0,
-                                  },
-                                "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                                  {
-                                    border: 0,
-                                  },                            }}
-                            name='count'
-                            value={value}
-                            //   onChange={handleSelectChange}
-                            onChange={(e) => handleChange(e as SelectChangeEvent, 'price')}
+                                    width: '100%',
+                                    '& .MuiSelect-select': {
+                                        whiteSpace: 'wrap',
+                                    },
+                                    ".MuiOutlinedInput-notchedOutline": { border: 0 },
+                                    "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                                    {
+                                        border: 0,
+                                    },
+                                    "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                                    {
+                                        border: 0,
+                                    },
+                                }}
+                                name='count'
+                                value={value}
+                                //   onChange={handleSelectChange}
+                                onChange={(e) => handleChange(e as SelectChangeEvent, 'price')}
 
-                        >
+                            >
 
 
-                            {price.map((price: any, index: number) => (
-                                price.map((e: PriceType) => (
-                                    <MenuItem key={e.value} value={+e.value}>{(+e.value)}</MenuItem>
-                                ))
-                            ))}
+                                {price.map((price: any, index: number) => (
+                                    price.map((e: PriceType) => (
+                                        <MenuItem key={e.value} value={+e.value}>{(+e.value)}</MenuItem>
+                                    ))
+                                ))}
 
-                        </Select>
+                            </Select>
                         </FormControl>
                 }
 
@@ -710,7 +747,7 @@ const Rows = ({ defaultRecord, index , getAllJson}: { defaultRecord: DataType, i
                                             key={idx}
                                             id="outlined-basic"
                                             variant="outlined"
-                                            value={rowsState[idx]?.disCount??0}
+                                            value={rowsState[idx]?.disCount ?? 0}
                                             name='disCount'
                                             onChange={(e) => handleInputs(e, 'disCount', idx)}
                                         />
@@ -728,7 +765,7 @@ const Rows = ({ defaultRecord, index , getAllJson}: { defaultRecord: DataType, i
                 }
             </TableCell>
             {/* ---------------------------- zexj */}
-            <TableCell sx={{ padding: 0,  }}>
+            <TableCell sx={{ padding: 0, }}>
                 {
                     investment ?
                         (
@@ -748,7 +785,7 @@ const Rows = ({ defaultRecord, index , getAllJson}: { defaultRecord: DataType, i
 
             {/* --------------------------- price */}
 
-            <TableCell sx={{ padding: 0}}> 
+            <TableCell sx={{ padding: 0 }}>
                 <Button onClick={removeAllRow}><DeleteIcon sx={{ color: 'black' }} /></Button>
 
             </TableCell>
