@@ -272,12 +272,26 @@ const Rows = ({ defaultRecord, index, getAllJson }: { defaultRecord: DataType, i
     };
 
 
+    // const removeAllRow = (event: React.MouseEvent<HTMLButtonElement>) => {
+    //     const tableRow = event.currentTarget.closest('tr');
+    //     if (tableRow) {
+    //         tableRow.remove();
+
+    //     }
+    // };
     const removeAllRow = (event: React.MouseEvent<HTMLButtonElement>) => {
         const tableRow = event.currentTarget.closest('tr');
         if (tableRow) {
+            // Remove the row from otherRow state
+            const updatedOtherRow = otherRow.filter(row => row.id !== defaultRecord.id);
+            setOtherRow(updatedOtherRow);
+            // Call tableContext.onChange with the updated otherRow[0]
+            tableContext.onChange && tableContext.onChange(updatedOtherRow[0]);
+            // Remove the table row from the DOM
             tableRow.remove();
         }
     };
+    
 
     const DescriptionSelect = ({ item, onRemove, id, index, onDescriptionChange }: { item: string, onRemove: () => void, id: number, index: number, onDescriptionChange: (newValue: string, index: number) => void }) => {
         // console.log(rowsState)
