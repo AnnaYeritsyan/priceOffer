@@ -7,7 +7,7 @@ import Header from '../Header/Header';
 import axios from 'axios'
 const TableContext = createContext<{
     onChange?: (value: any) => void;
-    getAllJson?: () => void;
+    getRemoved?: (tablerow:any) => void; 
 }>({})
 
 export function useTableContext() {
@@ -16,21 +16,20 @@ export function useTableContext() {
 
 const Tables = () => {
     const [records, setRecords] = useState<DataType[]>([])
-    const [newRow, setNewRow] = useState<boolean>(false)
     const [customer, setCustomer] = useState<string>()
-    const [allData, setAllData] = useState<DataType[]>(data)
     const [dates, setDates] = useState<any[]>([]);
     const [getValues, setGetValues] = useState<any[]>([])
-    const [clientRecords, setClientRecords] = useState<{ client: string, version: number, record: DataType }[]>([]);
-
     const selectCustomerValue = (items: string) => {
 
         setCustomer(items)
     }
+    const getRemoved = (tablerow:number) => {
+        console.log('Removed', tablerow);
+        console.log(records)
+        const updatedRecords = records.filter((record, index) => index !== tablerow);
+        setRecords(updatedRecords);
+    };
 
-    const getAllJson = () => {
-
-    }
     const handleAddRow = () => {
         const newRow = {
             id: Math.floor(new Date().getTime() * Math.random()),
@@ -72,15 +71,44 @@ const Tables = () => {
     }
     return (
         <TableContext.Provider value={{
-            getAllJson,
+            getRemoved:getRemoved
+            // (tablerow)=>{
+            //     console.log(tablerow)
+            //     // petq e uxarkel jnjvac elementi id 
+            //    if(tablerow) {
+            //     const recordIndex = records.findIndex(record => record.id !== tablerow)
+            //     if (recordIndex >= 0) {
+            //         records[recordIndex] = tablerow
+            //         setRecords([...records])
+            //         console.log(records)
+            //     }
+            //    }
+                
+            // }
+            ,
             onChange: (value) => {
+
                 console.log(value, records)
+                
+                // const recordIndex = records.findIndex(record => record.id === value.id)
+                // if (recordIndex >= 0) {
+                //     records[recordIndex] = value
+                //     setRecords([...records])
+                //     console.log(records)
+
+                // }
+                if (!value) {
+                    console.error('Value is undefined.');
+                    return; 
+                }
+                
+                console.log(value, records)
+                
                 const recordIndex = records.findIndex(record => record.id === value.id)
                 if (recordIndex >= 0) {
                     records[recordIndex] = value
                     setRecords([...records])
                     console.log(records)
-
                 }
                 //setRecords((prevRecords: any) => [...prevRecords, value]);
                 // Write something to update
@@ -153,7 +181,7 @@ const Tables = () => {
                                     defaultRecord={data}
                                     key={idx}
                                     index={idx}
-                                    getAllJson={getAllJson} />
+                                    getRemoved={getRemoved} />
                             )}
 
                         </TableBody>

@@ -79,8 +79,8 @@ console.log(newItem)
         >
 
          {
-          menuItem.map((e:any)=>(
-            <MenuItem value={e.item}>{e.item}</MenuItem>
+          menuItem.map((e:any, idx:number)=>(
+            <MenuItem value={e.item} key={idx}>{e.item}</MenuItem>
           ))
          }
 
