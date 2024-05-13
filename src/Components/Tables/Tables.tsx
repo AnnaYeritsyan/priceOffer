@@ -31,15 +31,11 @@ const Tables = () => {
         //amboxj datan avelacvac- idin stugel ete havasar e durs hanel datan toxel miayn
         // nranq vory vor havasar chi 
        
-        const remainingRecords = records.filter((e: any) => e.id !== tablerow); // Change filter condition
-        console.log('=======A Remaining Records:', remainingRecords); // Log the remaining records
+        const remainingRecords = records.filter((e: any) => e.id !== tablerow); 
+        console.log('=======A Remaining Records:', remainingRecords); 
     
         setRecords(remainingRecords);
       
-
-        // const updatedRecords = records.filter((record, index) => record.id !== tablerow);
-        // setRecords(updatedRecords);
-        // console.log(records)
     };
   console.log(remain)
     const handleAddRow = () => {
@@ -85,12 +81,7 @@ const Tables = () => {
             
         }
     
-        // const newClientRecord = {
-        //     client: customer,
-        //     version: 1,
-        //     record: records // Use the updated records state here
-        // };
-        // console.log(newClientRecord);
+      
         console.log(records);
     
         
@@ -103,7 +94,21 @@ const Tables = () => {
     useEffect(() => {
         // Temporary code, you have to call API to get saved JSON data from API.
         setRecords([])
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:3004/');
+                console.log(response.data.data)
+                setRecords(response.data.data.records);
+                console.log(records, 'get')
+            } catch (error) {
+                console.error('Failed to fetch data:', error);
+            }
+        };
 
+        fetchData();
+
+        // Clean up function to cancel any pending requests if the component unmounts
+        return () => {};
         // TODO: Call API to get current saved JSON data, and update records state as initial state.
         // ...
     }, [])
