@@ -1,13 +1,13 @@
 import { Button, Table, TableCell, TableContainer, TableHead, TableRow, Paper, Select, MenuItem, SelectChangeEvent, FormControl, Box, InputLabel, TableBody } from '@mui/material';
 import Rows from '../Rows/Rows';
 import data from '../data.json';
-import { useState, createContext, useContext } from 'react';
+import { useState, createContext, useContext, useEffect } from 'react';
 import { DataRow, DataSchema, DataType } from '../dataType';
 import Header from '../Header/Header';
 import axios from 'axios'
 const TableContext = createContext<{
     onChange?: (value: any) => void;
-    getRemoved?: (tablerow:any) => void; 
+    getRemoved?: (tablerow: any) => void;
 }>({})
 
 export function useTableContext() {
@@ -19,18 +19,31 @@ const Tables = () => {
     const [customer, setCustomer] = useState<string>()
     const [dates, setDates] = useState<any[]>([]);
     const [getValues, setGetValues] = useState<any[]>([])
+    const [remain, setRemain] = useState<any[]>([])
     const selectCustomerValue = (items: string) => {
 
         setCustomer(items)
     }
-    const getRemoved = (tablerow:number) => {
+    const getRemoved = (tablerow: number) => {
         console.log('Removed', tablerow);
         console.log(records)
-        const updatedRecords = records.filter((record, index) => index !== tablerow);
-        setRecords(updatedRecords);
-    };
 
+        //amboxj datan avelacvac- idin stugel ete havasar e durs hanel datan toxel miayn
+        // nranq vory vor havasar chi 
+       
+        const remainingRecords = records.filter((e: any) => e.id !== tablerow); // Change filter condition
+        console.log('=======A Remaining Records:', remainingRecords); // Log the remaining records
+    
+        setRecords(remainingRecords);
+      
+
+        // const updatedRecords = records.filter((record, index) => record.id !== tablerow);
+        // setRecords(updatedRecords);
+        // console.log(records)
+    };
+  console.log(remain)
     const handleAddRow = () => {
+
         const newRow = {
             id: Math.floor(new Date().getTime() * Math.random()),
             name: '',
@@ -47,31 +60,57 @@ const Tables = () => {
     }
 
 
-
     const handleSave = async () => {
-        console.log('click')
-        console.log(customer)
-        const newClientRecord = {
-            client: customer, 
-            version: 1, 
-            record: records 
+        console.log('click');
+        console.log(remain);
+    
+        if (records.length > 0) {
+            console.log(records)
+            console.log('=======B', remain)
+            const newClientRecord = {
+            client: customer,
+            version: 1,
+            records
         };
-       console.log(newClientRecord)
-        console.log(records)
+        console.log(newClientRecord);
         try {
-
-            // const response = await axios.post('http://localhost:3004/', { records });
             const response = await axios.post('http://localhost:3004/', { newClientRecord });
-
             console.log(response.data.message);
         } catch (error) {
             console.error('Failed to save data:', error);
         }
+        }
+        else{
+            console.log('else ', records);
+            
+        }
+    
+        // const newClientRecord = {
+        //     client: customer,
+        //     version: 1,
+        //     record: records // Use the updated records state here
+        // };
+        // console.log(newClientRecord);
+        console.log(records);
+    
+        
+    };
 
-    }
+    useEffect(() => {
+        console.log('======C', records)
+    }, [records])
+
+    useEffect(() => {
+        // Temporary code, you have to call API to get saved JSON data from API.
+        setRecords([])
+
+        // TODO: Call API to get current saved JSON data, and update records state as initial state.
+        // ...
+    }, [])
+    
     return (
         <TableContext.Provider value={{
-            getRemoved:getRemoved
+            getRemoved: getRemoved
             // (tablerow)=>{
             //     console.log(tablerow)
             //     // petq e uxarkel jnjvac elementi id 
@@ -83,13 +122,13 @@ const Tables = () => {
             //         console.log(records)
             //     }
             //    }
-                
+
             // }
             ,
             onChange: (value) => {
 
                 console.log(value, records)
-                
+
                 // const recordIndex = records.findIndex(record => record.id === value.id)
                 // if (recordIndex >= 0) {
                 //     records[recordIndex] = value
@@ -99,11 +138,11 @@ const Tables = () => {
                 // }
                 if (!value) {
                     console.error('Value is undefined.');
-                    return; 
+                    return;
                 }
-                
+
                 console.log(value, records)
-                
+
                 const recordIndex = records.findIndex(record => record.id === value.id)
                 if (recordIndex >= 0) {
                     records[recordIndex] = value

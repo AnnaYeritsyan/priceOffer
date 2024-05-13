@@ -24,7 +24,7 @@ const Rows = ({ defaultRecord, index, getRemoved }:
     {
         defaultRecord: DataType,
         index: number,
-        getRemoved: any
+        getRemoved: any,
     }) => {
     const [records, setRecords] = useState<DataType[]>(data)
     const [value, setValue] = useState<string | undefined>(undefined)
@@ -102,24 +102,26 @@ const Rows = ({ defaultRecord, index, getRemoved }:
             default:
                 break;
         }
-        console.log(otherRow)
+        // console.log(otherRow)
         tableContext.onChange && tableContext.onChange(otherRow[0])
 
     }
-    console.log(otherRow)
-    useEffect(() => {
-        // tableContext.onChange && tableContext.onChange(otherRow)
-        tableContext.getRemoved && tableContext.getRemoved(otherRow[0]);
+    // console.log(otherRow)
+    // useEffect(() => {
+    //     // tableContext.onChange && tableContext.onChange(otherRow)
+    //     tableContext.getRemoved && tableContext.getRemoved(defaultRecord);
 
-        console.log(otherRow)
-    }, [otherRow])
+    //     console.log(otherRow,'=====',
+    //           tableContext.getRemoved && tableContext.getRemoved(defaultRecord))
+    //           console.log(defaultRecord, '===defaultrecorder')
+    // }, [otherRow])
 
 
     useEffect(() => {
         if (investment) {
-            console.log(investment)
+            // console.log(investment)
             otherRow[0].description = investment[0].description
-            console.log(otherRow, '=================')
+            // console.log(otherRow, '=================')
             tableContext.onChange && tableContext.onChange(otherRow[0])
             const initialRowsState = investment.map(() => ({
                 count: undefined,
@@ -254,7 +256,7 @@ const Rows = ({ defaultRecord, index, getRemoved }:
     };
 
     const PriceChange = (newValue: string, index: number) => {
-        // console.log(newValue, index);
+
         const updatedInvestment = investment.map((e: DataType) => ({
             ...e,
             price: e.price.map((item: PriceType, idx: number) => (
@@ -265,47 +267,13 @@ const Rows = ({ defaultRecord, index, getRemoved }:
     };
 
 
-    // const removeAllRow = (event: React.MouseEvent<HTMLButtonElement>) => {
-    //     const tableRow = event.currentTarget.closest('tr');
-    //     if (tableRow) {
-    //         tableRow.remove();
-
-    //     }
-    // };
-
-    //     const removeAllRow = (event: React.MouseEvent<HTMLButtonElement>) => {
-    //         const tableRow = event.currentTarget.closest('tr');
-
-    //         if (tableRow && defaultRecord && 'id' in defaultRecord) { // Check if defaultRecord is defined and has an 'id' property
-    //             const updatedOtherRow:any = otherRow.filter((row:any) => row.id !== defaultRecord.id);
-    //             setOtherRow(updatedOtherRow);
-    //             console.log(updatedOtherRow)
-    //             tableRow.remove();
-    //             setRemoveUpdate(true);
-    // console.log(tableContext)
-    //             // Call context onChange with the updated data
-    //             tableContext.getRemoved && tableContext.getRemoved(updatedOtherRow[0]);
-    //         } 
-    //              console.log(defaultRecord)
-    //     };
-    console.log(defaultRecord, otherRow, records)
-
     const removeAllRow = (event: React.MouseEvent<HTMLButtonElement>) => {
         const tableRow = event.currentTarget.closest('tr');
 
         if (tableRow && defaultRecord && 'id' in defaultRecord) {
-            const idToRemove = defaultRecord.id;
+  
+        tableContext.getRemoved && tableContext.getRemoved(defaultRecord.id);
 
-            const updatedOtherRow = otherRow.filter((row: any) => row.id !== idToRemove);
-
-            setOtherRow(updatedOtherRow);
-            console.log(idToRemove)
-console.log( tableContext.onChange && tableContext.onChange(idToRemove));
-            tableContext.getRemoved && tableContext.getRemoved(idToRemove);
-
-            tableRow.remove();
-
-            setRemoveUpdate(true);
         } else {
             console.error('Error: Unable to remove row. Default record is not defined or does not have an "id" property.');
         }
@@ -317,8 +285,6 @@ console.log( tableContext.onChange && tableContext.onChange(idToRemove));
 
 
     const DescriptionSelect = ({ item, onRemove, id, index, onDescriptionChange }: { item: string, onRemove: () => void, id: number, index: number, onDescriptionChange: (newValue: string, index: number) => void }) => {
-        // console.log(rowsState)
-
         useEffect(() => {
             if (selectRef.current) {
                 const height = selectRef.current.offsetHeight;
@@ -370,7 +336,7 @@ console.log( tableContext.onChange && tableContext.onChange(idToRemove));
                 </FormControl>
                 {/* <Button variant='contained' 
                     sx={{ bgcolor: "#a91f1f" }}> */}
-                <DeleteIcon onClick={onRemove} sx={{ color: '#a91f1f' }} />
+                <DeleteIcon onClick={onRemove} sx={{ color: '#a91f1f', cursor:'pointer' }} />
                 {/* </Button> */}
 
             </TableRow>

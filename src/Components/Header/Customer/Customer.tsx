@@ -42,7 +42,7 @@ const closeModal = () => {
 
 };
 const addItem=(name:any)=>{
-   console.log(name)
+  //  console.log(name)
    
 
    if (name.trim() !== '') {
@@ -55,7 +55,7 @@ const addItem=(name:any)=>{
   }
   closeModal()
 }
-console.log(newItem)
+
   return (
     <Box sx={{
          minWidth: 230,
