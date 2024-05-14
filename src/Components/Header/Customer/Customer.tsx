@@ -8,7 +8,7 @@ import { Button } from '@mui/material';
 import ModalWindow from '../ModalWindow/ModalWindow';
 import { useState } from 'react';
 import { v4 } from 'uuid';
-import { CustomerSelect, MenuItems } from '../../dataType';
+import { CustomerSelect, MenuItems, ModalTextInformation } from '../../dataType';
 
 interface CustomerProps {
   onCustomerSelect: (selectedItem: string) => void;
@@ -28,9 +28,14 @@ const Customer: React.FC<CustomerProps> = ({ onCustomerSelect }) => {
       item:'Kean'
     }
   ])
+  const modalTextInformation:ModalTextInformation = {
+    title:'Ստեղծել նոր պատվիրատու',
+    content:'Եթե ցանկանում եք ստեղծել նոր պատվիրատու, ապա մուտքագրեք անվանում',
+  }
   const handleChange = (event: SelectChangeEvent) => {
     setChangeName(event.target.value as string);
     onCustomerSelect(event.target.value as string)
+  
   };
 const openModal = ()=>{
   console.log('open')
@@ -41,10 +46,10 @@ const closeModal = () => {
   setOpen(false);
 
 };
-const addItem=(name:any)=>{
-  //  console.log(name)
-   
-
+const addItem=(name:string)=>{ 
+ 
+setChangeName(name)
+onCustomerSelect(name)
    if (name.trim() !== '') {
 
     const newItem = ({
@@ -55,7 +60,7 @@ const addItem=(name:any)=>{
   }
   closeModal()
 }
-
+console.log(menuItem)
   return (
     <Box sx={{
          minWidth: 230,
@@ -98,7 +103,13 @@ const addItem=(name:any)=>{
       onClick={openModal}
       >+</Button>
       {
-        open && <ModalWindow open={open} closeModal={closeModal} setNewItem={setNewItem} addItem={addItem}/>
+        open && <ModalWindow 
+        open={open} 
+        closeModal={closeModal} 
+        setNewItem={setNewItem} 
+        addItem={addItem} 
+        modalTextInformation={modalTextInformation}
+        />
       }
     </Box>
   );

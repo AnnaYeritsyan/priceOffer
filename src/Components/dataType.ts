@@ -61,3 +61,8 @@ export type CustomerSelect={
 
 }
 
+export interface ModalTextInformation {
+    title: string;
+    content: string;
+  }
+

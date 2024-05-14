@@ -20,11 +20,11 @@ const styles = {
     }
 };
 
-const Rows = ({ defaultRecord, index, getRemoved }:
+const Rows = ({ defaultRecord, index,databaseData }:
     {
         defaultRecord: DataType,
         index: number,
-        getRemoved: any,
+        databaseData:any
     }) => {
     const [records, setRecords] = useState<DataType[]>(data)
     const [value, setValue] = useState<string | undefined>(undefined)
@@ -40,11 +40,90 @@ const Rows = ({ defaultRecord, index, getRemoved }:
         count: undefined,
         disCount: undefined,
     })));
-    const [removeUpdate, setRemoveUpdate] = useState<boolean>(false)
     const selectRef = useRef<HTMLSelectElement>(null);
     const [selectHeight, setSelectHeight] = useState<number>(0);
     const [otherRow, setOtherRow] = useState<any[]>([defaultRecord])
+    const [name, setName] = useState<string>('')
+    const [description, setDescription]=useState<any>()
+    const [descriptionInvestment, setDescriptionInvestment] = useState<any[]>([])
 
+console.log(defaultRecord)
+console.log(otherRow)
+
+useEffect(() => {
+    if (defaultRecord) {
+        databaseData((prevOtherRow:any) => [...prevOtherRow, defaultRecord]);
+        setName(defaultRecord.name)
+        // console.log(defaultRecord)
+        // console.log(name)
+
+// ====================================================
+
+        const selectedRecords = records.filter(record => record.name === name);
+        console.log(selectedRecords, '========',defaultRecord.description )
+        if(name === 'LIS-A ներդնում'){
+            setDescriptionInvestment(defaultRecord.description)
+            console.log(descriptionInvestment, '=============== investmentdescription')
+        }
+        else{
+            setDescription(defaultRecord.description)
+            console.log(description, '============= description')
+        }
+        // setDescription(defaultRecord.description)
+        // const descriptions: any = selectedRecords.map(record => record.description);
+        // setIsFilterDescription(descriptions);
+        // const license: any = selectedRecords.map(record => record.licenseType)
+        // setLicenseState(license)
+        // const price: any = selectedRecords.map(record => record.price)
+        // setPrice(price)
+
+        const selectedName = name;
+        if (selectedName === 'LIS-A ներդնում') {
+            setInvestment(selectedRecords);
+            otherRow.map((e: any) => {
+                e.name = selectedName
+            })
+
+        }
+         else {
+            setInvestment(null);
+   
+            // otherRow.map((e: any) => {
+            //     e.name = selectedName
+            // })
+            setShowAddButton(false);
+        }
+
+        // setShowAddButton(selectedName === 'LIS-A ներդնում');
+    
+   console.log(otherRow)
+        // otherRow.map((e: any) => {
+        //     e.description = description
+        // })
+
+    
+    // case 'licenseType':
+    //     setValue(event.target.value)
+    //     otherRow.map((e: any) => {
+    //         e.licenseType = event.target.value
+    //     })
+    //     break;
+    // case 'price':
+    //     setIsPricing(+event.target.value)
+    //     otherRow.map((e: any) => {
+    //         e.price = event.target.value
+    //     })
+    //     // 
+    //     break;
+    // default:
+    //     break;
+}
+
+// tableContext.onChange && tableContext.onChange(otherRow[0])
+
+    
+    console.log(name)
+}, [defaultRecord]);
 
     const tableContext = useTableContext()
 
@@ -52,8 +131,10 @@ const Rows = ({ defaultRecord, index, getRemoved }:
 
     const handleChange = (event: SelectChangeEvent<string>, columnType: 'name' | 'description' | 'licenseType' | 'price' | 'disCount',) => {
         setValue(event.target.value)
+
         switch (columnType) {
             case 'name':
+                setName(event.target.value)
                 const selectedRecords = records.filter(record => record.name === event.target.value);
                 const descriptions: any = selectedRecords.map(record => record.description);
                 setIsFilterDescription(descriptions);
@@ -81,6 +162,7 @@ const Rows = ({ defaultRecord, index, getRemoved }:
                 break;
             case 'description':
                 setValue(event.target.value)
+                setDescription(event.target.value)
                 otherRow.map((e: any) => {
                     e.description = event.target.value
                 })
@@ -102,26 +184,16 @@ const Rows = ({ defaultRecord, index, getRemoved }:
             default:
                 break;
         }
-        // console.log(otherRow)
+       
         tableContext.onChange && tableContext.onChange(otherRow[0])
 
     }
-    // console.log(otherRow)
-    // useEffect(() => {
-    //     // tableContext.onChange && tableContext.onChange(otherRow)
-    //     tableContext.getRemoved && tableContext.getRemoved(defaultRecord);
-
-    //     console.log(otherRow,'=====',
-    //           tableContext.getRemoved && tableContext.getRemoved(defaultRecord))
-    //           console.log(defaultRecord, '===defaultrecorder')
-    // }, [otherRow])
+ 
 
 
     useEffect(() => {
         if (investment) {
-            // console.log(investment)
             otherRow[0].description = investment[0].description
-            // console.log(otherRow, '=================')
             tableContext.onChange && tableContext.onChange(otherRow[0])
             const initialRowsState = investment.map(() => ({
                 count: undefined,
@@ -272,7 +344,7 @@ const Rows = ({ defaultRecord, index, getRemoved }:
 
         if (tableRow && defaultRecord && 'id' in defaultRecord) {
   
-        tableContext.getRemoved && tableContext.getRemoved(defaultRecord.id);
+        tableContext.onRemoved && tableContext.onRemoved(defaultRecord.id);
 
         } else {
             console.error('Error: Unable to remove row. Default record is not defined or does not have an "id" property.');
@@ -484,7 +556,8 @@ const Rows = ({ defaultRecord, index, getRemoved }:
                             },
                         }}
                         name='name'
-                        value={value}
+                        // value={value}
+                        value={name}
 
                         //   onChange={handleSelectChange}
                         onChange={(e) => handleChange(e as SelectChangeEvent, 'name')}
@@ -547,7 +620,8 @@ const Rows = ({ defaultRecord, index, getRemoved }:
                                     },
                                 }}
                                 name='description'
-                                value={value}
+                                // value={value}
+                                value={description}
                                 //   onChange={handleSelectChange}
                                 onChange={(e) => handleChange(e as SelectChangeEvent, 'description')}
                             >

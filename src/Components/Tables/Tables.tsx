@@ -7,7 +7,7 @@ import Header from '../Header/Header';
 import axios from 'axios'
 const TableContext = createContext<{
     onChange?: (value: any) => void;
-    getRemoved?: (tablerow: any) => void;
+    onRemoved?: (tablerow: any) => void;
 }>({})
 
 export function useTableContext() {
@@ -16,28 +16,32 @@ export function useTableContext() {
 
 const Tables = () => {
     const [records, setRecords] = useState<DataType[]>([])
-    const [customer, setCustomer] = useState<string>()
+    const [customer, setCustomer] = useState<any>()
+    const [version, setVersion] = useState<any>()
     const [dates, setDates] = useState<any[]>([]);
     const [getValues, setGetValues] = useState<any[]>([])
     const [remain, setRemain] = useState<any[]>([])
-    const selectCustomerValue = (items: string) => {
+    const [otherRow, setOtherRow] = useState<DataType[]>([]);
 
-        setCustomer(items)
+    const selectCustomerValue = (items: any) => {
+        console.log(items)
+        setCustomer(items.client)
+        setVersion(items.version)
     }
-    const getRemoved = (tablerow: number) => {
+    const onRemoved = (tablerow: number) => {
         console.log('Removed', tablerow);
         console.log(records)
 
         //amboxj datan avelacvac- idin stugel ete havasar e durs hanel datan toxel miayn
         // nranq vory vor havasar chi 
-       
-        const remainingRecords = records.filter((e: any) => e.id !== tablerow); 
-        console.log('=======A Remaining Records:', remainingRecords); 
-    
+
+        const remainingRecords = records.filter((e: any) => e.id !== tablerow);
+        console.log('=======A Remaining Records:', remainingRecords);
+
         setRecords(remainingRecords);
-      
+
     };
-  console.log(remain)
+    console.log(remain)
     const handleAddRow = () => {
 
         const newRow = {
@@ -57,34 +61,26 @@ const Tables = () => {
 
 
     const handleSave = async () => {
-        console.log('click');
-        console.log(remain);
-    
+
         if (records.length > 0) {
-            console.log(records)
-            console.log('=======B', remain)
             const newClientRecord = {
-            client: customer,
-            version: 1,
-            records
-        };
-        console.log(newClientRecord);
-        try {
-            const response = await axios.post('http://localhost:3004/', { newClientRecord });
-            console.log(response.data.message);
-        } catch (error) {
-            console.error('Failed to save data:', error);
+                client: customer,
+                version: version,
+                records
+            };
+            try {
+                const response = await axios.post('http://localhost:3004/', { newClientRecord });
+                console.log(response.data.message);
+            } catch (error) {
+                console.error('Failed to save data:', error);
+            }
         }
-        }
-        else{
+        else {
             console.log('else ', records);
-            
+
         }
-    
-      
-        console.log(records);
-    
-        
+
+
     };
 
     useEffect(() => {
@@ -92,13 +88,16 @@ const Tables = () => {
     }, [records])
 
     useEffect(() => {
-        // Temporary code, you have to call API to get saved JSON data from API.
+ // TODO: Call API to get current saved JSON data, and update records state as initial state.
+        // ...
         setRecords([])
         const fetchData = async () => {
             try {
                 const response = await axios.get('http://localhost:3004/');
                 console.log(response.data.data)
                 setRecords(response.data.data.records);
+                setOtherRow([response.data.data.defaultRecord]);
+
                 console.log(records, 'get')
             } catch (error) {
                 console.error('Failed to fetch data:', error);
@@ -108,39 +107,16 @@ const Tables = () => {
         fetchData();
 
         // Clean up function to cancel any pending requests if the component unmounts
-        return () => {};
-        // TODO: Call API to get current saved JSON data, and update records state as initial state.
-        // ...
+        // return () => { };
+       
     }, [])
-    
+    console.log(otherRow)
     return (
         <TableContext.Provider value={{
-            getRemoved: getRemoved
-            // (tablerow)=>{
-            //     console.log(tablerow)
-            //     // petq e uxarkel jnjvac elementi id 
-            //    if(tablerow) {
-            //     const recordIndex = records.findIndex(record => record.id !== tablerow)
-            //     if (recordIndex >= 0) {
-            //         records[recordIndex] = tablerow
-            //         setRecords([...records])
-            //         console.log(records)
-            //     }
-            //    }
-
-            // }
-            ,
+            onRemoved: onRemoved,
             onChange: (value) => {
 
                 console.log(value, records)
-
-                // const recordIndex = records.findIndex(record => record.id === value.id)
-                // if (recordIndex >= 0) {
-                //     records[recordIndex] = value
-                //     setRecords([...records])
-                //     console.log(records)
-
-                // }
                 if (!value) {
                     console.error('Value is undefined.');
                     return;
@@ -225,7 +201,10 @@ const Tables = () => {
                                     defaultRecord={data}
                                     key={idx}
                                     index={idx}
-                                    getRemoved={getRemoved} />
+                                    databaseData={setOtherRow}
+     
+
+                                    />
                             )}
 
                         </TableBody>

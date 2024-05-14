@@ -7,14 +7,23 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
-export default function ModalWindow({open, closeModal, setNewItem, addItem}:
-  {
-    open:boolean, 
-    closeModal:()=>void,
-    setNewItem: React.Dispatch<React.SetStateAction<string>>;
-     addItem:(name:string)=>void}) {
+interface ModalWindowProps {
+  open: boolean;
+  closeModal: () => void;
+  setNewItem: React.Dispatch<React.SetStateAction<string>>;
+  addItem: (name: string) => void;
+  modalTextInformation: {
+    title: string;
+    content: string;
+  };
+}
 
-  
+export default function ModalWindow({open, 
+  closeModal, 
+  setNewItem,
+   addItem,
+   modalTextInformation
+  }:ModalWindowProps) {
 
   return (
     <React.Fragment>
@@ -37,10 +46,10 @@ export default function ModalWindow({open, closeModal, setNewItem, addItem}:
           },
         }}
       >
-        <DialogTitle>Ստեղծել նոր պատվիրատու</DialogTitle>
+        <DialogTitle>{modalTextInformation.title}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Եթե ցանկանում եք ստեղծել նոր պատվիրատու, ապա մուտքագրեք անվանում
+            {modalTextInformation.content}
           </DialogContentText>
           <TextField
             autoFocus
