@@ -24,24 +24,24 @@ const Tables = () => {
     const [otherRow, setOtherRow] = useState<DataType[]>([]);
 
     const selectCustomerValue = (items: any) => {
-        console.log(items)
+        // console.log(items)
         setCustomer(items.client)
         setVersion(items.version)
     }
     const onRemoved = (tablerow: number) => {
-        console.log('Removed', tablerow);
-        console.log(records)
+        // console.log('Removed', tablerow);
+        // console.log(records)
 
         //amboxj datan avelacvac- idin stugel ete havasar e durs hanel datan toxel miayn
         // nranq vory vor havasar chi 
 
         const remainingRecords = records.filter((e: any) => e.id !== tablerow);
-        console.log('=======A Remaining Records:', remainingRecords);
+        // console.log('=======A Remaining Records:', remainingRecords);
 
         setRecords(remainingRecords);
 
     };
-    console.log(remain)
+    // console.log(remain)
     const handleAddRow = () => {
 
         const newRow = {
@@ -54,6 +54,8 @@ const Tables = () => {
 
         setRecords((prevRecords: any) => [...prevRecords, newRow]);
         // console.log(getValues)
+        console.log(records);
+        
 
         setDates(prevDates => [...prevDates, getValues]);
         // console.log(dates)
@@ -84,7 +86,7 @@ const Tables = () => {
     };
 
     useEffect(() => {
-        console.log('======C', records)
+        // console.log('======C', records)
     }, [records])
 
     useEffect(() => {
@@ -96,9 +98,10 @@ const Tables = () => {
                 const response = await axios.get('http://localhost:3004/');
                 console.log(response.data.data)
                 setRecords(response.data.data.records);
+                console.log(records)
                 setOtherRow([response.data.data.defaultRecord]);
 
-                console.log(records, 'get')
+                console.log(otherRow, 'get')
             } catch (error) {
                 console.error('Failed to fetch data:', error);
             }
@@ -110,25 +113,25 @@ const Tables = () => {
         // return () => { };
        
     }, [])
-    console.log(otherRow)
+    // console.log(otherRow)
     return (
         <TableContext.Provider value={{
             onRemoved: onRemoved,
             onChange: (value) => {
 
-                console.log(value, records)
+                // console.log(value, records)
                 if (!value) {
                     console.error('Value is undefined.');
                     return;
                 }
 
-                console.log(value, records)
+                // console.log(value, records)
 
                 const recordIndex = records.findIndex(record => record.id === value.id)
                 if (recordIndex >= 0) {
                     records[recordIndex] = value
                     setRecords([...records])
-                    console.log(records)
+                    // console.log(records)
                 }
                 //setRecords((prevRecords: any) => [...prevRecords, value]);
                 // Write something to update
@@ -196,8 +199,12 @@ const Tables = () => {
 
                         <TableBody>
 
-                            {records?.map((data, idx) =>
-                                <Rows
+                            {
+                               
+                            records?.map((data, idx) =>{
+                                // console.log(data)
+                                return (
+                                  <Rows
                                     defaultRecord={data}
                                     key={idx}
                                     index={idx}
@@ -205,7 +212,10 @@ const Tables = () => {
      
 
                                     />
-                            )}
+                            )  
+                                
+                            }
+                              )  }
 
                         </TableBody>
                     </Table>

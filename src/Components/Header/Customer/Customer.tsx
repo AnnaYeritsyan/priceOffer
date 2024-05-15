@@ -60,7 +60,7 @@ onCustomerSelect(name)
   }
   closeModal()
 }
-console.log(menuItem)
+// console.log(menuItem)
   return (
     <Box sx={{
          minWidth: 230,

@@ -20,11 +20,11 @@ const styles = {
     }
 };
 
-const Rows = ({ defaultRecord, index,databaseData }:
+const Rows = ({ defaultRecord, index, databaseData }:
     {
         defaultRecord: DataType,
         index: number,
-        databaseData:any
+        databaseData: any
     }) => {
     const [records, setRecords] = useState<DataType[]>(data)
     const [value, setValue] = useState<string | undefined>(undefined)
@@ -34,7 +34,11 @@ const Rows = ({ defaultRecord, index,databaseData }:
     const [isPricing, setIsPricing] = useState<number | undefined>()
     const [finalyPrice, setFinalyPrice] = useState<number | undefined>()
     const [showAddButton, setShowAddButton] = useState(false);
-    const [investment, setInvestment] = useState<any>()
+    // const [investment, setInvestment] = useState<any>()
+    const [investment, setInvestment] = useState<any | any[]>();
+
+    const [investment1, setInvestment1] = useState<any>()
+
     const [updateValue, setUpdateValue] = useState<string | undefined>(undefined)
     const [rowsState, setRowsState] = useState<RowState[]>(data.map(() => ({
         count: undefined,
@@ -44,86 +48,50 @@ const Rows = ({ defaultRecord, index,databaseData }:
     const [selectHeight, setSelectHeight] = useState<number>(0);
     const [otherRow, setOtherRow] = useState<any[]>([defaultRecord])
     const [name, setName] = useState<string>('')
-    const [description, setDescription]=useState<any>()
+    const [description, setDescription] = useState<any>()
     const [descriptionInvestment, setDescriptionInvestment] = useState<any[]>([])
 
-console.log(defaultRecord)
-console.log(otherRow)
+    let def:DataType[] = []
+    def.push(defaultRecord)
+    // //console.log(defaultRecord, onComeData)
+    // //console.log(otherRow)
+    useEffect(() => {
+        if (defaultRecord) {
+            databaseData((prevOtherRow: any) => [...prevOtherRow, defaultRecord]);
+            setName(defaultRecord.name)
+            // //console.log(defaultRecord)
+            // //console.log(name)
 
-useEffect(() => {
-    if (defaultRecord) {
-        databaseData((prevOtherRow:any) => [...prevOtherRow, defaultRecord]);
-        setName(defaultRecord.name)
-        // console.log(defaultRecord)
-        // console.log(name)
+            // ====================================================
+        
+            console.log(defaultRecord);
+            console.log(records, 'records')
+            const getFilterAllElements = records.filter(e => e.name === defaultRecord.name)
 
-// ====================================================
+            const getFilterDescription = getFilterAllElements.filter(e => e.description !== defaultRecord.description)
+            console.log(getFilterAllElements, getFilterDescription, '==========')
+            console.log(def, 'def')
 
-        const selectedRecords = records.filter(record => record.name === name);
-        console.log(selectedRecords, '========',defaultRecord.description )
-        if(name === 'LIS-A ներդնում'){
-            setDescriptionInvestment(defaultRecord.description)
-            console.log(descriptionInvestment, '=============== investmentdescription')
+            console.log(typeof investment)
+            const selectedName = name;
+            if (name === 'LIS-A ներդնում') {
+                setDescriptionInvestment(defaultRecord.description)
+                otherRow.map((e: any) => {
+                    e.name = selectedName
+                })
+            }
+            else {
+
+                //console.log(defaultRecord)
+                setDescription(defaultRecord.description)
+                setInvestment(null);
+                // setDescription(defaultRecord.description)
+                setShowAddButton(false);
+            }
+
+
         }
-        else{
-            setDescription(defaultRecord.description)
-            console.log(description, '============= description')
-        }
-        // setDescription(defaultRecord.description)
-        // const descriptions: any = selectedRecords.map(record => record.description);
-        // setIsFilterDescription(descriptions);
-        // const license: any = selectedRecords.map(record => record.licenseType)
-        // setLicenseState(license)
-        // const price: any = selectedRecords.map(record => record.price)
-        // setPrice(price)
-
-        const selectedName = name;
-        if (selectedName === 'LIS-A ներդնում') {
-            setInvestment(selectedRecords);
-            otherRow.map((e: any) => {
-                e.name = selectedName
-            })
-
-        }
-         else {
-            setInvestment(null);
-   
-            // otherRow.map((e: any) => {
-            //     e.name = selectedName
-            // })
-            setShowAddButton(false);
-        }
-
-        // setShowAddButton(selectedName === 'LIS-A ներդնում');
-    
-   console.log(otherRow)
-        // otherRow.map((e: any) => {
-        //     e.description = description
-        // })
-
-    
-    // case 'licenseType':
-    //     setValue(event.target.value)
-    //     otherRow.map((e: any) => {
-    //         e.licenseType = event.target.value
-    //     })
-    //     break;
-    // case 'price':
-    //     setIsPricing(+event.target.value)
-    //     otherRow.map((e: any) => {
-    //         e.price = event.target.value
-    //     })
-    //     // 
-    //     break;
-    // default:
-    //     break;
-}
-
-// tableContext.onChange && tableContext.onChange(otherRow[0])
-
-    
-    console.log(name)
-}, [defaultRecord]);
+    }, [defaultRecord]);
 
     const tableContext = useTableContext()
 
@@ -144,13 +112,14 @@ useEffect(() => {
                 setPrice(price)
                 const selectedName = event.target.value;
                 if (selectedName === 'LIS-A ներդնում') {
+                    console.log(selectedRecords)
                     setInvestment(selectedRecords);
                     otherRow.map((e: any) => {
                         e.name = selectedName
                     })
 
                 } else {
-                    setInvestment(null);
+                    // setInvestment(null);
 
                     otherRow.map((e: any) => {
                         e.name = selectedName
@@ -184,15 +153,17 @@ useEffect(() => {
             default:
                 break;
         }
-       
+
         tableContext.onChange && tableContext.onChange(otherRow[0])
 
     }
- 
+
 
 
     useEffect(() => {
         if (investment) {
+            // //console.log(investment, '======useffect  investment')
+
             otherRow[0].description = investment[0].description
             tableContext.onChange && tableContext.onChange(otherRow[0])
             const initialRowsState = investment.map(() => ({
@@ -240,7 +211,7 @@ useEffect(() => {
 
 
         if (investment) {
-            const newInvestment = investment.map((item: DataType) => ({
+            const newInvestment = investment?.map((item: DataType) => ({
                 ...item,
                 description: [...item.description, newRow],
                 licenseType: [...item.licenseType, newLicense],
@@ -283,11 +254,11 @@ useEffect(() => {
     };
 
 
-    // console.log(investment)
+    // //console.log(investment)
 
 
     const DescriptionChange = (newValue: string, index: number) => {
-        // console.log(newValue, index);
+        // //console.log(newValue, index);
 
         if (investment) {
             const updatedInvestment = investment.map((e: DataType) => ({
@@ -308,12 +279,12 @@ useEffect(() => {
 
 
     const LicenseChange = (newValue: any, index: number) => {
-        // console.log(newValue, index);
+        // //console.log(newValue, index);
         if (investment) {
             const updatedInvestment = investment.map((e: DataType) => ({
                 ...e,
                 licenseType: e.licenseType.map((change: LicenseType, idx: number) => {
-                    // console.log(e)
+                    // //console.log(e)
                     if (idx === index) {
                         return {
                             ...change,
@@ -343,11 +314,11 @@ useEffect(() => {
         const tableRow = event.currentTarget.closest('tr');
 
         if (tableRow && defaultRecord && 'id' in defaultRecord) {
-  
-        tableContext.onRemoved && tableContext.onRemoved(defaultRecord.id);
+
+            tableContext.onRemoved && tableContext.onRemoved(defaultRecord.id);
 
         } else {
-            console.error('Error: Unable to remove row. Default record is not defined or does not have an "id" property.');
+            //console.error('Error: Unable to remove row. Default record is not defined or does not have an "id" property.');
         }
     };
 
@@ -357,6 +328,11 @@ useEffect(() => {
 
 
     const DescriptionSelect = ({ item, onRemove, id, index, onDescriptionChange }: { item: string, onRemove: () => void, id: number, index: number, onDescriptionChange: (newValue: string, index: number) => void }) => {
+        // //console.log(item, investment, isFilterDescription)
+        // setIsFilterDescription(otherRow)
+        // //console.log(defaultRecord,otherRow )
+        console.log(investment)
+
         useEffect(() => {
             if (selectRef.current) {
                 const height = selectRef.current.offsetHeight;
@@ -364,7 +340,7 @@ useEffect(() => {
             }
         }, []);
         const handleDescriptionChange = (event: SelectChangeEvent<string>, index: number) => {
-            // console.log(event, index)
+            // //console.log('description', description, )
             const newValue = event.target.value;
             onDescriptionChange(newValue, index);
         }
@@ -399,16 +375,20 @@ useEffect(() => {
                         value={updateValue ?? item}
                         onChange={(event) => handleDescriptionChange(event, index)}
                     >
-                        {isFilterDescription.map((description: any, index: number) => (
-                            description.map((e: DescriptionType, idx: number) => (
-                                <MenuItem key={idx} value={e.value}>{e.value}</MenuItem>
+
+                        {
+
+                            isFilterDescription.map((description: any, index: number) => (
+                                description.map((e: DescriptionType, idx: number) => (
+                                    <MenuItem key={idx} value={e.value}>{e.value}</MenuItem>
+                                ))
                             ))
-                        ))}
+                        }
                     </Select>
                 </FormControl>
                 {/* <Button variant='contained' 
                     sx={{ bgcolor: "#a91f1f" }}> */}
-                <DeleteIcon onClick={onRemove} sx={{ color: '#a91f1f', cursor:'pointer' }} />
+                <DeleteIcon onClick={onRemove} sx={{ color: '#a91f1f', cursor: 'pointer' }} />
                 {/* </Button> */}
 
             </TableRow>
@@ -477,7 +457,7 @@ useEffect(() => {
     const PriceSelect = ({ item, id, index, onPriceChange }: { item: string, id: number, index: number, onPriceChange: (newValue: string, index: number) => void }) => {
 
         const handlePriceChange = (event: SelectChangeEvent<string>) => {
-            // console.log(index)
+            // //console.log(index)
             const newValue = event.target.value;
             onPriceChange(newValue, index);
         };
@@ -523,6 +503,7 @@ useEffect(() => {
 
         );
     };
+console.log(investment, defaultRecord)
 
     return (
 
@@ -580,18 +561,23 @@ useEffect(() => {
             <TableCell sx={{ padding: 0, }} >
                 {
                     investment ? (
-                        investment.map((e: DataType, index: number) => (
-                            e.description.map((item: DescriptionType, idx: number) => (
-                                <DescriptionSelect
-                                    key={idx}
-                                    item={item.value}
-                                    id={e.id}
-                                    index={idx}
-                                    onRemove={() => removeItem(item, idx)}
-                                    onDescriptionChange={DescriptionChange}
-                                />
-                            ))
-                        ))
+                        investment.map((e: DataType, index: number) => {
+                            return (
+                                e.description.map((item: DescriptionType, idx: number) => {
+
+                                    return (
+                                        <DescriptionSelect
+                                            key={idx}
+                                            item={item.value}
+                                            id={e.id}
+                                            index={idx}
+                                            onRemove={() => removeItem(item, idx)}
+                                            onDescriptionChange={DescriptionChange}
+                                        />
+                                    )
+                                })
+                            )
+                        })
                     ) :
                         <FormControl fullWidth>
                             {
@@ -707,27 +693,31 @@ useEffect(() => {
                 {
                     investment ?
                         (
-                            investment.map((e: DataType, index: number) => (
+                            investment?.map((e: DataType, index: number) => {
 
-                                e.description.map((item: DescriptionType, idx: number) => {
-                                    // console.log(idx)
-                                    return (
-                                        <TableRow key={idx}>
-                                            <TextField
-                                                key={idx}
-                                                id="outlined-basic"
-                                                variant="outlined"
-                                                value={rowsState[idx]?.count}
-                                                name='count'
-                                                onChange={(e) => handleInputs(e, 'count', idx)}
-                                            />
+                                return (
 
-                                        </TableRow>
-                                    )
-                                })
+                                    e.description.map((item: DescriptionType, idx: number) => {
+                                        // //console.log(idx)
+                                        return (
+                                            <TableRow key={idx}>
+                                                <TextField
+                                                    key={idx}
+                                                    id="outlined-basic"
+                                                    variant="outlined"
+                                                    value={rowsState[idx]?.count}
+                                                    name='count'
+                                                    onChange={(e) => handleInputs(e, 'count', idx)}
+                                                />
+
+                                            </TableRow>
+                                        )
+                                    })
+                                )
+                            }
                             )
-                            )
-                        ) : <TextField
+                        )
+                        : <TextField
                             id="outlined-basic"
                             // label="Outlined"
                             variant="outlined"
