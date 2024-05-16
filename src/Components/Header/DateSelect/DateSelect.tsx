@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -8,27 +9,26 @@ import { Box } from '@mui/material';
 
 export default function DateSelect() {
     const date = new Date()
-    const [value, setValue] = React.useState<Dayjs | null>(dayjs(date));
+    const [starting, setStarting] = useState<Dayjs | null>(dayjs(date))
+    const [finishing, setFinishing] = useState<Dayjs | null>(dayjs(date))
+
+    console.log(starting)
 
     return (
-        // <Box sx={{
-        //     height:50,
-        // color:'rgba(0,0,0,0.54)',
-        // }}>
 
-        
         <LocalizationProvider dateAdapter={AdapterDayjs} >
             <DemoContainer components={['DatePicker', 'DatePicker']}
-         
-            >
-                <DatePicker label="Սկսած" defaultValue={dayjs(date)} 
-                 slotProps={{ textField: { size: 'small' } }}
 
-               />
+            >
+                <DatePicker label="Սկսած"
+                    defaultValue={dayjs(date)}
+                    slotProps={{ textField: { size: 'small' } }}
+                    onChange={(newValue) => setStarting(newValue)}
+                />
                 <DatePicker
                     label="Մինչև"
-                    value={value}
-                    onChange={(newValue) => setValue(newValue)}
+                    value={finishing}
+                    onChange={(newValue) => setFinishing(newValue)}
                     slotProps={{ textField: { size: 'small' } }}
 
                 />

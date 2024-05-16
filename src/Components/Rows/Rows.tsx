@@ -8,6 +8,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { useRef } from 'react';
 import { useTableContext } from '../Tables/Tables';
+import { constants } from 'os';
 const styles = {
     tableCell: {
         padding: 0,
@@ -20,11 +21,12 @@ const styles = {
     }
 };
 
-const Rows = ({ defaultRecord, index, databaseData }:
+const Rows = ({ defaultRecord, index, databaseData, recordsDataTable }:
     {
         defaultRecord: DataType,
         index: number,
-        databaseData: any
+        databaseData: any,
+        recordsDataTable: any
     }) => {
     const [records, setRecords] = useState<DataType[]>(data)
     const [value, setValue] = useState<string | undefined>(undefined)
@@ -36,9 +38,6 @@ const Rows = ({ defaultRecord, index, databaseData }:
     const [showAddButton, setShowAddButton] = useState(false);
     // const [investment, setInvestment] = useState<any>()
     const [investment, setInvestment] = useState<any | any[]>();
-
-    const [investment1, setInvestment1] = useState<any>()
-
     const [updateValue, setUpdateValue] = useState<string | undefined>(undefined)
     const [rowsState, setRowsState] = useState<RowState[]>(data.map(() => ({
         count: undefined,
@@ -48,50 +47,37 @@ const Rows = ({ defaultRecord, index, databaseData }:
     const [selectHeight, setSelectHeight] = useState<number>(0);
     const [otherRow, setOtherRow] = useState<any[]>([defaultRecord])
     const [name, setName] = useState<string>('')
-    const [description, setDescription] = useState<any>()
-    const [descriptionInvestment, setDescriptionInvestment] = useState<any[]>([])
+    const [description, setDescription] = useState<string | undefined>(undefined)
 
-    let def:DataType[] = []
-    def.push(defaultRecord)
-    // //console.log(defaultRecord, onComeData)
-    // //console.log(otherRow)
+
     useEffect(() => {
-        if (defaultRecord) {
-            databaseData((prevOtherRow: any) => [...prevOtherRow, defaultRecord]);
-            setName(defaultRecord.name)
-            // //console.log(defaultRecord)
-            // //console.log(name)
+        //console.log(defaultRecord)
+        setName(defaultRecord.name)
+        if (typeof defaultRecord.description !== 'object') {
+            setDescription(defaultRecord.description)
+            //console.log(records)
+            const onFilterrecords = records.filter(f => f.name === name)
+            const getfilterDescription: any = onFilterrecords.map(f => f.description)
+            //console.log(getfilterDescription)
+            setIsFilterDescription(getfilterDescription)
 
-            // ====================================================
-        
-            console.log(defaultRecord);
-            console.log(records, 'records')
-            const getFilterAllElements = records.filter(e => e.name === defaultRecord.name)
+        }
+        else {
+            defaultRecord.description.map((e: any) => {
+                // //console.log(e.value)
+                setDescription(e.value)
 
-            const getFilterDescription = getFilterAllElements.filter(e => e.description !== defaultRecord.description)
-            console.log(getFilterAllElements, getFilterDescription, '==========')
-            console.log(def, 'def')
-
-            console.log(typeof investment)
-            const selectedName = name;
-            if (name === 'LIS-A ներդնում') {
-                setDescriptionInvestment(defaultRecord.description)
-                otherRow.map((e: any) => {
-                    e.name = selectedName
-                })
-            }
-            else {
-
-                //console.log(defaultRecord)
-                setDescription(defaultRecord.description)
-                setInvestment(null);
-                // setDescription(defaultRecord.description)
-                setShowAddButton(false);
-            }
+            })
+            const onFilterrecords = records.filter(f => f.name === name)
+            const getfilterDescription: any = onFilterrecords.map(f => f.description)
+            //console.log(getfilterDescription)
+            setIsFilterDescription(getfilterDescription)
 
 
         }
-    }, [defaultRecord]);
+        //   defaultrecordy-y talis e hertakanutyamb datan
+
+    }, [recordsDataTable])
 
     const tableContext = useTableContext()
 
@@ -112,7 +98,7 @@ const Rows = ({ defaultRecord, index, databaseData }:
                 setPrice(price)
                 const selectedName = event.target.value;
                 if (selectedName === 'LIS-A ներդնում') {
-                    console.log(selectedRecords)
+                    //////console.log(selectedRecords)
                     setInvestment(selectedRecords);
                     otherRow.map((e: any) => {
                         e.name = selectedName
@@ -162,7 +148,7 @@ const Rows = ({ defaultRecord, index, databaseData }:
 
     useEffect(() => {
         if (investment) {
-            // //console.log(investment, '======useffect  investment')
+            // ////////console.log(investment, '======useffect  investment')
 
             otherRow[0].description = investment[0].description
             tableContext.onChange && tableContext.onChange(otherRow[0])
@@ -254,11 +240,11 @@ const Rows = ({ defaultRecord, index, databaseData }:
     };
 
 
-    // //console.log(investment)
+    // ////////console.log(investment)
 
 
     const DescriptionChange = (newValue: string, index: number) => {
-        // //console.log(newValue, index);
+        // ////////console.log(newValue, index);
 
         if (investment) {
             const updatedInvestment = investment.map((e: DataType) => ({
@@ -279,12 +265,12 @@ const Rows = ({ defaultRecord, index, databaseData }:
 
 
     const LicenseChange = (newValue: any, index: number) => {
-        // //console.log(newValue, index);
+        // ////////console.log(newValue, index);
         if (investment) {
             const updatedInvestment = investment.map((e: DataType) => ({
                 ...e,
                 licenseType: e.licenseType.map((change: LicenseType, idx: number) => {
-                    // //console.log(e)
+                    // ////////console.log(e)
                     if (idx === index) {
                         return {
                             ...change,
@@ -318,7 +304,7 @@ const Rows = ({ defaultRecord, index, databaseData }:
             tableContext.onRemoved && tableContext.onRemoved(defaultRecord.id);
 
         } else {
-            //console.error('Error: Unable to remove row. Default record is not defined or does not have an "id" property.');
+            ////////console.error('Error: Unable to remove row. Default record is not defined or does not have an "id" property.');
         }
     };
 
@@ -328,10 +314,10 @@ const Rows = ({ defaultRecord, index, databaseData }:
 
 
     const DescriptionSelect = ({ item, onRemove, id, index, onDescriptionChange }: { item: string, onRemove: () => void, id: number, index: number, onDescriptionChange: (newValue: string, index: number) => void }) => {
-        // //console.log(item, investment, isFilterDescription)
+        // ////////console.log(item, investment, isFilterDescription)
         // setIsFilterDescription(otherRow)
-        // //console.log(defaultRecord,otherRow )
-        console.log(investment)
+        // ////////console.log(defaultRecord,otherRow )
+        //////console.log(investment)
 
         useEffect(() => {
             if (selectRef.current) {
@@ -340,7 +326,7 @@ const Rows = ({ defaultRecord, index, databaseData }:
             }
         }, []);
         const handleDescriptionChange = (event: SelectChangeEvent<string>, index: number) => {
-            // //console.log('description', description, )
+            // ////////console.log('description', description, )
             const newValue = event.target.value;
             onDescriptionChange(newValue, index);
         }
@@ -457,7 +443,7 @@ const Rows = ({ defaultRecord, index, databaseData }:
     const PriceSelect = ({ item, id, index, onPriceChange }: { item: string, id: number, index: number, onPriceChange: (newValue: string, index: number) => void }) => {
 
         const handlePriceChange = (event: SelectChangeEvent<string>) => {
-            // //console.log(index)
+            // ////////console.log(index)
             const newValue = event.target.value;
             onPriceChange(newValue, index);
         };
@@ -503,7 +489,7 @@ const Rows = ({ defaultRecord, index, databaseData }:
 
         );
     };
-console.log(investment, defaultRecord)
+    ////console.log(description, isFilterDescription)
 
     return (
 
@@ -562,6 +548,7 @@ console.log(investment, defaultRecord)
                 {
                     investment ? (
                         investment.map((e: DataType, index: number) => {
+                            ////console.log(investment)
                             return (
                                 e.description.map((item: DescriptionType, idx: number) => {
 
@@ -579,16 +566,16 @@ console.log(investment, defaultRecord)
                             )
                         })
                     ) :
+
                         <FormControl fullWidth>
                             {
-                                value ? '' :
+                                description ? '' :
                                     <InputLabel id="demo-simple-select-label">Նկարագրություն</InputLabel>
 
                             }
                             <Select
                                 labelId="description"
                                 id="description"
-                                // label="description" 
 
                                 sx={{
                                     width: '100%',
@@ -607,15 +594,24 @@ console.log(investment, defaultRecord)
                                 }}
                                 name='description'
                                 // value={value}
-                                value={description}
+                                value={description ?? name}
                                 //   onChange={handleSelectChange}
                                 onChange={(e) => handleChange(e as SelectChangeEvent, 'description')}
                             >
-                                {isFilterDescription.map((description: any, index: number) => (
+                                {/* {isFilterDescription.map((description: any, index: number) => (
                                     description.map((e: DescriptionType) => (
-                                        <MenuItem key={e.value} value={e.value}>{e.value}</MenuItem>
+                                        <MenuItem key={e.value} value={e.value}>{e.value }{description} </MenuItem>
                                     ))
-                                ))}
+                                ))} */}
+                                {isFilterDescription.map((ds: any, index: number) => {
+                                    ////console.log(ds, description)
+                                    return (
+                                        ds.map((e: DescriptionType) => (
+                                            <MenuItem key={e.value} value={e.value}>{e.value} </MenuItem>
+                                        ))
+                                    )
+                                }
+                                )}
 
                             </Select>
                         </FormControl>
@@ -698,7 +694,7 @@ console.log(investment, defaultRecord)
                                 return (
 
                                     e.description.map((item: DescriptionType, idx: number) => {
-                                        // //console.log(idx)
+                                        // ////////console.log(idx)
                                         return (
                                             <TableRow key={idx}>
                                                 <TextField
