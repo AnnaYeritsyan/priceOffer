@@ -6,15 +6,14 @@ import DateSelect from './DateSelect/DateSelect';
 import Version from './Version/Version';
 
 interface CustomerSelectHeader {
-    selectCustomerValue: (data: { client: string; version: string }) => void;
+    selectCustomerValue: (data: { client: string; version: string , }) => void;
+    onDate:(dateTime:any)=>void
 }
 
-const Header: React.FC<CustomerSelectHeader> = ({selectCustomerValue}) => {
-    // const onCustomerSelect = (item:string) =>{
-    //     console.log(item)
-    //     selectCustomerValue(item)
-    // }
-    const [selection, setSelection] = React.useState<{ client: string; version: string }>({ client: '', version: '' });
+const Header: React.FC<CustomerSelectHeader> = ({selectCustomerValue, onDate}) => {
+    
+    const [selection, setSelection] = React.useState<{ client: string;
+         version: string }>({ client: '', version: '' });
 
     const onCustomerSelect = (item: string) => {
         setSelection(prevState => ({
@@ -31,6 +30,10 @@ const Header: React.FC<CustomerSelectHeader> = ({selectCustomerValue}) => {
         }));
         selectCustomerValue({ ...selection, version: item });
     };
+    const onDateTime = (item:any)=>{
+        onDate(item)
+        
+    }
 
     return (
         <Box width={'90%'} sx={{
@@ -48,7 +51,7 @@ const Header: React.FC<CustomerSelectHeader> = ({selectCustomerValue}) => {
         }}>
             <Customer onCustomerSelect={onCustomerSelect} />
             <Version onVersionSelect={onVersionSelect} />
-            <DateSelect/>
+            <DateSelect onDateTime = {onDateTime}/>
             
         </Box>
         </Box>

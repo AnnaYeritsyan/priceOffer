@@ -22,17 +22,21 @@ const Tables = () => {
     const [getValues, setGetValues] = useState<any[]>([])
     const [remain, setRemain] = useState<any[]>([])
     const [otherRow, setOtherRow] = useState<DataType[]>([]);
-//console.log(records)
+    const [start, setStart] = useState<any>('')
+    const [end, setEnd] = useState<any>('')
+    //console.log(records)
 
     const selectCustomerValue = (items: any) => {
-        // //console.log(items)
         setCustomer(items.client)
         setVersion(items.version)
     }
-    const onRemoved = (tablerow: number) => {
-        // //console.log('Removed', tablerow);
-        // //console.log(records)
+    const onDate = (items: any) => {
+        setStart(items.startDate)
+        setEnd(items.endDate)
 
+    }
+
+    const onRemoved = (tablerow: number) => {
         //amboxj datan avelacvac- idin stugel ete havasar e durs hanel datan toxel miayn
         // nranq vory vor havasar chi 
 
@@ -40,8 +44,6 @@ const Tables = () => {
         // //console.log('=======A Remaining Records:', remainingRecords);
 
         setRecords(remainingRecords);
-
-
     };
     // //console.log(remain)
     const handleAddRow = () => {
@@ -65,11 +67,15 @@ const Tables = () => {
             const newClientRecord = {
                 client: customer,
                 version: version,
+                date: {
+                    start: start,
+                    end: end
+                },
                 records
             };
             try {
                 const response = await axios.post('http://localhost:3004/', { newClientRecord });
-                //console.log(response.data.message);
+                console.log(newClientRecord);
             } catch (error) {
                 //console.error('Failed to save data:', error);
             }
@@ -87,7 +93,7 @@ const Tables = () => {
     }, [records])
 
     useEffect(() => {
- // TODO: Call API to get current saved JSON data, and update records state as initial state.
+        // TODO: Call API to get current saved JSON data, and update records state as initial state.
         // ...
         setRecords([])
         const fetchData = async () => {
@@ -104,7 +110,7 @@ const Tables = () => {
 
         // Clean up function to cancel any pending requests if the component unmounts
         // return () => { };
-       
+
     }, [])
 
     return (
@@ -122,8 +128,8 @@ const Tables = () => {
 
                 const recordIndex = records.findIndex(record => record.id === value.id)
                 if (recordIndex >= 0) {
-                  
-                                       records[recordIndex] = value
+
+                    records[recordIndex] = value
                     setRecords([...records])
                     // //console.log(records)
                 }
@@ -133,7 +139,7 @@ const Tables = () => {
         }}>
             <Box >
                 <Box sx={{ display: 'flex', alignItems: 'center', margin: '25px 0px' }}>
-                    <Header selectCustomerValue={selectCustomerValue} />
+                    <Header selectCustomerValue={selectCustomerValue} onDate={onDate} />
                     <Button variant='contained' onClick={handleAddRow}>+</Button>
                 </Box>
 
@@ -192,25 +198,25 @@ const Tables = () => {
                         </TableHead>
 
                         <TableBody>
-                                 {
-                            records.map((data, idx) =>{
-                                //console.log(records)
-                              
+                            {
+                                records.map((data, idx) => {
+                                    //console.log(records)
 
-                                return (
-                                  <Rows
-                                    defaultRecord={data}
-                                    key={idx}
-                                    index={idx}
-                                    databaseData={setOtherRow}
-                                    recordsDataTable={records}
 
-                                    />
-                            )  
-                                
-                            }
-                              )  }
-                           
+                                    return (
+                                        <Rows
+                                            defaultRecord={data}
+                                            key={idx}
+                                            index={idx}
+                                            databaseData={setOtherRow}
+                                            recordsDataTable={records}
+
+                                        />
+                                    )
+
+                                }
+                                )}
+
 
                         </TableBody>
                     </Table>
