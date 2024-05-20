@@ -38,8 +38,8 @@ export type PriceType = {
     value: string;
 };
 export type RowState = {
-    count: number | undefined;
-    disCount: number | undefined;
+    count:  undefined|string ;
+    disCount:   undefined|string;
 };
 
 
@@ -66,3 +66,10 @@ export interface ModalTextInformation {
     content: string;
   }
 
+ export  interface HeaderDataType {
+    id: number;
+    name: string;
+    description: string | string[];
+    type: string;
+    price: number;
+}

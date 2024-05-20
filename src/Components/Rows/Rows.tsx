@@ -8,7 +8,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { useRef } from 'react';
 import { useTableContext } from '../Tables/Tables';
-import { constants } from 'os';
+
 const styles = {
     tableCell: {
         padding: 0,
@@ -48,7 +48,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable }:
     const [otherRow, setOtherRow] = useState<any[]>([defaultRecord])
     const [name, setName] = useState<string>('')
     const [description, setDescription] = useState<string | undefined>(undefined)
-
+    // const { onChange } = useTableContext();
 
     useEffect(() => {
         //console.log(defaultRecord)

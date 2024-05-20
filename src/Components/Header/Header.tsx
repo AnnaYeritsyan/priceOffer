@@ -6,9 +6,11 @@ import DateSelect from './DateSelect/DateSelect';
 import Version from './Version/Version';
 
 interface CustomerSelectHeader {
-    selectCustomerValue: (data: { client: string; version: string , }) => void;
-    onDate:(dateTime:any)=>void
+    selectCustomerValue: (items: { client: string; version: string }) => void;
+    // selectCustomerValue: (data: { client: string; version: string , }) => void;
+    onDate:(dateTime:{start:string, end:string})=>void
 }
+
 
 const Header: React.FC<CustomerSelectHeader> = ({selectCustomerValue, onDate}) => {
     

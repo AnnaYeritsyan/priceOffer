@@ -5,6 +5,9 @@ import { useState, createContext, useContext, useEffect } from 'react';
 import { DataRow, DataSchema, DataType } from '../dataType';
 import Header from '../Header/Header';
 import axios from 'axios'
+
+
+
 const TableContext = createContext<{
     onChange?: (value: any) => void;
     onRemoved?: (tablerow: any) => void;
@@ -53,7 +56,10 @@ const Tables = () => {
             name: '',
             description: '',
             type: '',
-            price: 0
+            price: 0, 
+            disCount:0,
+            count:0,
+            disCountPrice:0
         };
 
         setRecords((prevRecords: any) => [...prevRecords, newRow]);
@@ -66,14 +72,18 @@ const Tables = () => {
         if (records.length > 0) {
             const newClientRecord = {
                 client: customer,
-                version: version,
-                date: {
+                versiondata: {
+                    version,
+                    date: {
                     start: start,
                     end: end
                 },
                 records
+                }
+                  
             };
-            try {
+            console.log(newClientRecord)  
+                      try {
                 const response = await axios.post('http://localhost:3004/', { newClientRecord });
                 console.log(newClientRecord);
             } catch (error) {
@@ -115,7 +125,7 @@ const Tables = () => {
 
     return (
         <TableContext.Provider value={{
-            onRemoved: onRemoved,
+            onRemoved,
             onChange: (value) => {
 
                 // //console.log(value, records)
