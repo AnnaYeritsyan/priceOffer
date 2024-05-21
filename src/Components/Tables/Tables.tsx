@@ -39,6 +39,8 @@ const Tables = () => {
 
     }
 
+console.log(customer, version)
+
     const onRemoved = (tablerow: number) => {
         //amboxj datan avelacvac- idin stugel ete havasar e durs hanel datan toxel miayn
         // nranq vory vor havasar chi 
@@ -67,62 +69,127 @@ const Tables = () => {
     }
 
 
-    const handleSave = async () => {
+    // const handleSave = async () => {
 
-        if (records.length > 0) {
+    //     if (records.length > 0) {
+    //         const newClientRecord = {
+    //             client: customer,
+    //             versiondata: {
+    //                 version,
+    //                 date: {
+    //                 start: start,
+    //                 end: end
+    //             },
+    //             records
+    //             }
+                  
+    //         };
+    //         console.log(newClientRecord)  
+    //                   try {
+    //             const response = await axios.post('http://localhost:3004/', { newClientRecord });
+    //             console.log(newClientRecord);
+    //         } catch (error) {
+    //             //console.error('Failed to save data:', error);
+    //         }
+    //     }
+    //     else {
+    //         //console.log('else ', records);
+
+    //     }
+
+
+    // };
+
+    // useEffect(() => {
+    //     //console.log('======C', records)
+    // }, [records])
+
+    // useEffect(() => {
+    //     // TODO: Call API to get current saved JSON data, and update records state as initial state.
+    //     // ...
+    //     setRecords([])
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await axios.get('http://localhost:3004/');
+    //             console.log(response.data.clients)    // ստանում եմ բեք-ից տվյալները 
+    //             const clientsData = response.data.data;
+                
+    //             if (customer && version) {
+    //                 const clientData = clientsData[customer];
+    //                 console.log(clientData)
+    //                 if (clientData) {
+    //                     const versionData = clientData.versions.find((v: any) => v.version === version);
+    //                     if (versionData) {
+    //                         setRecords(versionData.records);
+    //                     } else {
+    //                         setRecords([]);
+    //                     }
+    //                 } else {
+    //                     setRecords([]);
+    //                 }
+    //             }
+
+    //                 // setRecords(response.data.data.records);
+    //             // setOtherRow([response.data.data.defaultRecord]);
+    //         } catch (error) {
+    //             //console.error('Failed to fetch data:', error);
+    //         }
+    //     };
+
+    //     fetchData();
+
+    //     // Clean up function to cancel any pending requests if the component unmounts
+    //     // return () => { };
+
+    // }, [])
+    const handleSave = async () => {
+        if (records.length > 0 && customer && version) {
             const newClientRecord = {
-                client: customer,
+                name: customer,
                 versiondata: {
                     version,
                     date: {
-                    start: start,
-                    end: end
-                },
-                records
+                        start: start,
+                        end: end
+                    },
+                    records
                 }
-                  
             };
-            console.log(newClientRecord)  
-                      try {
+            console.log(newClientRecord)
+            try {
                 const response = await axios.post('http://localhost:3004/', { newClientRecord });
-                console.log(newClientRecord);
+                console.log(response.data);
             } catch (error) {
-                //console.error('Failed to save data:', error);
+                console.error('Failed to save data:', error);
             }
         }
-        else {
-            //console.log('else ', records);
-
-        }
-
-
     };
 
     useEffect(() => {
-        //console.log('======C', records)
-    }, [records])
-
-    useEffect(() => {
-        // TODO: Call API to get current saved JSON data, and update records state as initial state.
-        // ...
-        setRecords([])
         const fetchData = async () => {
             try {
                 const response = await axios.get('http://localhost:3004/');
-                setRecords(response.data.data.records);
-                setOtherRow([response.data.data.defaultRecord]);
+                const clientsData = response.data.data;
+                console.log(clientsData)
+                if (customer && version) {
+                    const clientData = clientsData[customer];
+                    for(let i in clientsData){
+                        console.log(i)
+                        if(i === customer){
+                            console.log(clientData.versiondata)
+                       const versionData = clientData.versions.find((v: any) => v.version === version);
+                       setRecords(versionData.records);
+
+                        }
+                    }
+                    
+                }
             } catch (error) {
-                //console.error('Failed to fetch data:', error);
+                console.error('Failed to fetch data:', error);
             }
         };
-
         fetchData();
-
-        // Clean up function to cancel any pending requests if the component unmounts
-        // return () => { };
-
-    }, [])
-
+    }, [customer, version]);
     return (
         <TableContext.Provider value={{
             onRemoved,
