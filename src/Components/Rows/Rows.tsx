@@ -49,10 +49,74 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable }:
     const [name, setName] = useState<string>('')
     const [description, setDescription] = useState<string | undefined>(undefined)
     // const { onChange } = useTableContext();
+    const [isInvestmentDescription, setIsInvesmentDescription] = useState<boolean>(false)
+
+
+console.log(databaseData)
+
+const InvestmentData = () =>{
+
+    return (
+        <Box>
+            {
+                databaseData.map((e:any)=>{
+                    return (
+                      
+                           <TableRow>
+                           <FormControl fullWidth>
+                
+                            <InputLabel id={`license-select-label`}>Նկարագրություն</InputLabel>
+
+                    <Select
+                        labelId="description"
+                        id="description"
+                        sx={{
+                            width: '100%',
+                            '& .MuiSelect-select': {
+                                whiteSpace: 'wrap',
+                            },
+                            ".MuiOutlinedInput-notchedOutline": { border: 0 },
+                            "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                            {
+                                border: 0,
+                            },
+                            "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+                            {
+                                border: 0,
+                            },
+                        }}
+                        name='description'
+                        value={e.value}
+                    >
+
+                        {
+
+                            isFilterDescription.map((description: any, index: number) => (
+                                description.map((e: DescriptionType, idx: number) => (
+                                    <MenuItem key={idx} value={e.value}>{e.value}</MenuItem>
+                                ))
+                            ))
+                        }
+                    </Select>
+                </FormControl>
+                          
+                   
+            
+                <DeleteIcon  sx={{ color: '#a91f1f', cursor: 'pointer' }} />
+
+            </TableRow>
+                    )
+                })
+            }
+        </Box>
+    )
+}
+
 
     useEffect(() => {
         //console.log(defaultRecord)
         setName(defaultRecord.name)
+        console.log(name)
         if (typeof defaultRecord.description !== 'object') {
             setDescription(defaultRecord.description)
             //console.log(records)
@@ -63,21 +127,48 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable }:
 
         }
         else {
+            setIsInvesmentDescription(true)
             defaultRecord.description.map((e: any) => {
-                // //console.log(e.value)
+                console.log(e.value)
                 setDescription(e.value)
-
             })
-            const onFilterrecords = records.filter(f => f.name === name)
-            const getfilterDescription: any = onFilterrecords.map(f => f.description)
-            //console.log(getfilterDescription)
-            setIsFilterDescription(getfilterDescription)
+           
+           console.log(databaseData, defaultRecord)
+        
+            const onFilterrecords = records.filter(f => f.name === defaultRecord.name)
+            console.log(onFilterrecords)
+            // const onFilterdescription = 
+            // onFilterrecords.map((f)=>{
+            //     console.log(f.description)
+            //     f.description.map((a)=>{
+            //         console.log(a.value, databaseData[0].value)
+            //         if(a.value === databaseData[0].value){
+            //             console.log(a.value, f.description)
+            //         }
+            //     })
+            // })
+            onFilterrecords.forEach((f) => {
+                console.log(f.description);
+                f.description.forEach((a) => {
+                    console.log(a.value, databaseData[0].value);
+                    if (a.value === databaseData[0].value) {
+                        console.log('Match found:', a);
+                    }
+                });
+            });
 
+
+            const getfilterDescription: any = onFilterrecords.map(f => f.description )
+            console.log(getfilterDescription)
+            setIsFilterDescription(getfilterDescription)
+            console.log(investment)
 
         }
         //   defaultrecordy-y talis e hertakanutyamb datan
 
     }, [recordsDataTable])
+
+    console.log(description , '======description nerdrum')
 
     const tableContext = useTableContext()
 
@@ -98,8 +189,9 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable }:
                 setPrice(price)
                 const selectedName = event.target.value;
                 if (selectedName === 'LIS-A ներդնում') {
-                    //////console.log(selectedRecords)
+
                     setInvestment(selectedRecords);
+                    console.log(investment)
                     otherRow.map((e: any) => {
                         e.name = selectedName
                     })
@@ -317,7 +409,8 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable }:
         // ////////console.log(item, investment, isFilterDescription)
         // setIsFilterDescription(otherRow)
         // ////////console.log(defaultRecord,otherRow )
-        //////console.log(investment)
+        console.log(description)
+
 
         useEffect(() => {
             if (selectRef.current) {
@@ -626,6 +719,12 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable }:
                         <AddBoxIcon />
                     </Button>
                 )}
+            </TableCell>
+            {/* {
+                isInvestmentDescription ? <InvestmentData/>:null
+            } */}
+            <TableCell>
+
             </TableCell>
             {/* --------------------------- license type */}
             <TableCell sx={{ padding: 0, }} >
