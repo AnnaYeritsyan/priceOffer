@@ -1,6 +1,6 @@
 
 import { Button, Table, TableCell, TableContainer, TableHead, TableRow, TextField, Paper, Select, MenuItem, SelectChangeEvent, FormControl, Box, InputLabel, TableBody, Typography } from '@mui/material';
-import { DataKV, DataSchema, DataType, DescriptionType, LicenseType, PriceType, RowState } from '../dataType';
+import { DataKV, DataSchema, DataType, DescriptionType, LicenseType, NewObjType, PriceType, RowState } from '../dataType';
 import { v4 } from 'uuid';
 import data from '../data.json'
 import { ChangeEvent, useState, useEffect, useContext } from 'react';
@@ -8,18 +8,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { useRef } from 'react';
 import { useTableContext } from '../Tables/Tables';
+import { styles } from '../style';
 
-const styles = {
-    tableCell: {
-        padding: 0,
-        height: 'auto',
-        borderBottom: '1px solid #828282'
-    },
-    tableRow: {
-        height: 'auto',
-        borderBottom: '1px solid #828282'
-    }
-};
+
 
 const Rows = ({ defaultRecord, index, databaseData, recordsDataTable }:
     {
@@ -28,150 +19,108 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable }:
         databaseData: any,
         recordsDataTable: any
     }) => {
+
     const [records, setRecords] = useState<DataType[]>(data)
     const [value, setValue] = useState<string | undefined>(undefined)
     const [isFilterDescription, setIsFilterDescription] = useState<string[]>([])
     const [licenseState, setLicenseState] = useState<string[]>([])
     const [price, setPrice] = useState<string[]>([])
-    const [isPricing, setIsPricing] = useState<number | undefined>()
     const [finalyPrice, setFinalyPrice] = useState<number | undefined>()
     const [showAddButton, setShowAddButton] = useState(false);
-    // const [investment, setInvestment] = useState<any>()
     const [investment, setInvestment] = useState<any | any[]>();
+    //   const [investment, setInvestment] = useState<NewObjType[]>([]);
     const [updateValue, setUpdateValue] = useState<string | undefined>(undefined)
-    const [rowsState, setRowsState] = useState<RowState[]>(data.map(() => ({
+    const [rowsState, setRowsState] = useState<RowState[]>([{
         count: undefined,
         disCount: undefined,
-    })));
+    }]);
     const selectRef = useRef<HTMLSelectElement>(null);
     const [selectHeight, setSelectHeight] = useState<number>(0);
     const [otherRow, setOtherRow] = useState<any[]>([defaultRecord])
     const [name, setName] = useState<string>('')
     const [description, setDescription] = useState<string | undefined>(undefined)
-    // const { onChange } = useTableContext();
     const [isInvestmentDescription, setIsInvesmentDescription] = useState<boolean>(false)
-
-
-console.log(databaseData)
-
-const InvestmentData = () =>{
-
-    return (
-        <Box>
-            {
-                databaseData.map((e:any)=>{
-                    return (
-                      
-                           <TableRow>
-                           <FormControl fullWidth>
-                
-                            <InputLabel id={`license-select-label`}>Նկարագրություն</InputLabel>
-
-                    <Select
-                        labelId="description"
-                        id="description"
-                        sx={{
-                            width: '100%',
-                            '& .MuiSelect-select': {
-                                whiteSpace: 'wrap',
-                            },
-                            ".MuiOutlinedInput-notchedOutline": { border: 0 },
-                            "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
-                            {
-                                border: 0,
-                            },
-                            "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                            {
-                                border: 0,
-                            },
-                        }}
-                        name='description'
-                        value={e.value}
-                    >
-
-                        {
-
-                            isFilterDescription.map((description: any, index: number) => (
-                                description.map((e: DescriptionType, idx: number) => (
-                                    <MenuItem key={idx} value={e.value}>{e.value}</MenuItem>
-                                ))
-                            ))
-                        }
-                    </Select>
-                </FormControl>
-                          
-                   
-            
-                <DeleteIcon  sx={{ color: '#a91f1f', cursor: 'pointer' }} />
-
-            </TableRow>
-                    )
-                })
-            }
-        </Box>
-    )
-}
+    const [keepFilterObject, setKeepFilterObject] = useState<any>([])   // when select get customer and version
+    const [license, setLicense] = useState<string | undefined>()
+    const [ count, setCount] = useState<number | undefined>()
+    const [disCount, setDisCount] = useState<number | undefined>()
+    const [isPricing, setIsPricing] = useState<number | undefined>()
 
 
     useEffect(() => {
-        //console.log(defaultRecord)
         setName(defaultRecord.name)
-        console.log(name)
+
         if (typeof defaultRecord.description !== 'object') {
             setDescription(defaultRecord.description)
-            //console.log(records)
+            console.log(defaultRecord)
+           
             const onFilterrecords = records.filter(f => f.name === name)
             const getfilterDescription: any = onFilterrecords.map(f => f.description)
-            //console.log(getfilterDescription)
             setIsFilterDescription(getfilterDescription)
-
         }
         else {
             setIsInvesmentDescription(true)
             defaultRecord.description.map((e: any) => {
-                console.log(e.value)
                 setDescription(e.value)
             })
-           
-           console.log(databaseData, defaultRecord)
-        
+
             const onFilterrecords = records.filter(f => f.name === defaultRecord.name)
-            console.log(onFilterrecords)
-            // const onFilterdescription = 
-            // onFilterrecords.map((f)=>{
-            //     console.log(f.description)
-            //     f.description.map((a)=>{
-            //         console.log(a.value, databaseData[0].value)
-            //         if(a.value === databaseData[0].value){
-            //             console.log(a.value, f.description)
-            //         }
-            //     })
-            // })
+            let newobj: NewObjType = {
+                id: '',
+                name: '',
+                description: [],
+                licenseType: [],
+                price: [],
+                count:1,
+                discount:0,
+                finallyPrice:0
+            };
             onFilterrecords.forEach((f) => {
-                console.log(f.description);
                 f.description.forEach((a) => {
-                    console.log(a.value, databaseData[0].value);
-                    if (a.value === databaseData[0].value) {
-                        console.log('Match found:', a);
-                    }
+                    newobj.id = f.id
+                    newobj.name = f.name
+                    newobj.description = databaseData
+                    newobj.licenseType = databaseData
+                    newobj.price = databaseData
+                    newobj.finallyPrice = 2
+                    setDescription(databaseData)
                 });
             });
-
-
-            const getfilterDescription: any = onFilterrecords.map(f => f.description )
-            console.log(getfilterDescription)
+            setKeepFilterObject(newobj)
+      
+            console.log(investment, databaseData)
+            const getfilterDescription: any = onFilterrecords.map(f => f.description)
             setIsFilterDescription(getfilterDescription)
-            console.log(investment)
 
         }
-        //   defaultrecordy-y talis e hertakanutyamb datan
+
+        recordsDataTable.map((e:any)=>{
+            console.log(e)
+            if(e.name !== 'LIS-A ներդնում'){
+                setDescription(e.description)
+                setLicense(e.licenseType)
+                setIsPricing(e.price)
+                setCount(e.count)
+                setDisCount(e.disCount)
+                setFinalyPrice(e.disCountPrice)
+                
+            }
+           
+        })
+
 
     }, [recordsDataTable])
+    console.log(recordsDataTable)
+   
 
-    console.log(description , '======description nerdrum')
+useEffect(()=>{
+    if(keepFilterObject.description){
+        // setInvestment([keepFilterObject])
+
+    }
+},[keepFilterObject])
 
     const tableContext = useTableContext()
-
     const rowColor = index % 2 === 0 ? '#ffffff' : '#EBFAF1';
 
     const handleChange = (event: SelectChangeEvent<string>, columnType: 'name' | 'description' | 'licenseType' | 'price' | 'disCount',) => {
@@ -191,20 +140,17 @@ const InvestmentData = () =>{
                 if (selectedName === 'LIS-A ներդնում') {
 
                     setInvestment(selectedRecords);
-                    console.log(investment)
+                    //console.log(investment)
                     otherRow.map((e: any) => {
                         e.name = selectedName
                     })
 
                 } else {
-                    // setInvestment(null);
-
                     otherRow.map((e: any) => {
                         e.name = selectedName
                     })
                     setShowAddButton(false);
                 }
-
                 setShowAddButton(selectedName === 'LIS-A ներդնում');
                 break;
             case 'description':
@@ -213,7 +159,6 @@ const InvestmentData = () =>{
                 otherRow.map((e: any) => {
                     e.description = event.target.value
                 })
-
                 break;
             case 'licenseType':
                 setValue(event.target.value)
@@ -226,7 +171,6 @@ const InvestmentData = () =>{
                 otherRow.map((e: any) => {
                     e.price = event.target.value
                 })
-                // 
                 break;
             default:
                 break;
@@ -236,32 +180,25 @@ const InvestmentData = () =>{
 
     }
 
-
-
     useEffect(() => {
         if (investment) {
-            // ////////console.log(investment, '======useffect  investment')
-
             otherRow[0].description = investment[0].description
             tableContext.onChange && tableContext.onChange(otherRow[0])
             const initialRowsState = investment.map(() => ({
                 count: undefined,
                 disCount: undefined,
             }));
+
             setRowsState(initialRowsState);
             setShowAddButton(true);
-
-
         }
     }, [investment]);
 
+ 
     // ==========================================================
-
-    // ============================
-
     const handleInputs = (e: any, nameElemnt: 'count' | 'disCount', rowIndex: number) => {
-
         const newValue = e.target.value;
+        console.log(newValue, rowsState)
 
         setRowsState(prevState => {
             const newState = [...prevState];
@@ -269,9 +206,38 @@ const InvestmentData = () =>{
                 ...newState[rowIndex],
                 [nameElemnt]: newValue,
             };
+            console.log(newState)
             return newState;
         });
+        setOtherRow(prev => {
+            const updatedOtherRow = [...prev];
+            updatedOtherRow[rowIndex] = {
+                ...updatedOtherRow[rowIndex],
+                [nameElemnt]: newValue,
+            };
+            console.log(updatedOtherRow);
+            return updatedOtherRow;
+        });
+        console.log(otherRow)
+
+
     };
+    useEffect(()=>{
+        otherRow.map((e:any)=>{
+            console.log(e.price)
+            const prices = e.price
+            const count = e.count
+            const disCount = e.disCount
+            let discountpersent = disCount/100 
+            console.log(prices, count, disCount, discountpersent)
+        e.disCountPrice = (prices * count) * discountpersent;
+        setFinalyPrice(e.disCountPrice)
+        })
+        console.log(otherRow)
+    }, [otherRow])
+           
+
+
 
     const addinRow = () => {
         const newRow: DescriptionType = {
@@ -286,7 +252,15 @@ const InvestmentData = () =>{
             value: '',
             type: ''
         };
-
+        // const newCount: any = {
+        //    count:1
+        // };
+        // const newDisCount: any = {
+        //     disCount:0
+        //  };
+        //  const newFinallyPrice: any = {
+        //     finnalyPrice:null
+        //  };
 
         if (investment) {
             const newInvestment = investment?.map((item: DataType) => ({
@@ -295,19 +269,14 @@ const InvestmentData = () =>{
                 licenseType: [...item.licenseType, newLicense],
                 price: [...item.price, newPrice],
 
+
             }));
+
             setInvestment(newInvestment);
             setRowsState(prevState => [...prevState, { count: undefined, disCount: undefined }]);
 
         }
     };
-
-
-    useEffect(() => {
-        if (investment) {
-            setShowAddButton(true);
-        }
-    }, [investment]);
 
 
     const removeItem = (idToRemove: DescriptionType, idx: number) => {
@@ -319,7 +288,6 @@ const InvestmentData = () =>{
                 price: item.price.filter((price: PriceType, index: number) => index !== idx),
             }));
             setInvestment(updatedInvestment);
-
             setRowsState(prevState => {
                 const newState = [...prevState];
                 newState[idx] = {
@@ -331,12 +299,7 @@ const InvestmentData = () =>{
         }
     };
 
-
-    // ////////console.log(investment)
-
-
     const DescriptionChange = (newValue: string, index: number) => {
-        // ////////console.log(newValue, index);
 
         if (investment) {
             const updatedInvestment = investment.map((e: DataType) => ({
@@ -357,12 +320,10 @@ const InvestmentData = () =>{
 
 
     const LicenseChange = (newValue: any, index: number) => {
-        // ////////console.log(newValue, index);
         if (investment) {
             const updatedInvestment = investment.map((e: DataType) => ({
                 ...e,
                 licenseType: e.licenseType.map((change: LicenseType, idx: number) => {
-                    // ////////console.log(e)
                     if (idx === index) {
                         return {
                             ...change,
@@ -377,7 +338,6 @@ const InvestmentData = () =>{
     };
 
     const PriceChange = (newValue: string, index: number) => {
-
         const updatedInvestment = investment.map((e: DataType) => ({
             ...e,
             price: e.price.map((item: PriceType, idx: number) => (
@@ -387,39 +347,29 @@ const InvestmentData = () =>{
         setInvestment(updatedInvestment);
     };
 
-
     const removeAllRow = (event: React.MouseEvent<HTMLButtonElement>) => {
         const tableRow = event.currentTarget.closest('tr');
-
         if (tableRow && defaultRecord && 'id' in defaultRecord) {
-
             tableContext.onRemoved && tableContext.onRemoved(defaultRecord.id);
-
         } else {
-            ////////console.error('Error: Unable to remove row. Default record is not defined or does not have an "id" property.');
+            //console.error('Error: Unable to remove row. Default record is not defined or does not have an "id" property.');
         }
     };
 
-
-
-
-
-
-    const DescriptionSelect = ({ item, onRemove, id, index, onDescriptionChange }: { item: string, onRemove: () => void, id: number, index: number, onDescriptionChange: (newValue: string, index: number) => void }) => {
-        // ////////console.log(item, investment, isFilterDescription)
-        // setIsFilterDescription(otherRow)
-        // ////////console.log(defaultRecord,otherRow )
-        console.log(description)
-
-
+    const DescriptionSelect = (
+        { item, onRemove, id, index, onDescriptionChange }: 
+        { item: string, onRemove: () => void, id: number, index: number, onDescriptionChange:
+             (newValue: string, index: number) => void }) => {
         useEffect(() => {
             if (selectRef.current) {
                 const height = selectRef.current.offsetHeight;
                 setSelectHeight(height);
             }
         }, []);
+
+
         const handleDescriptionChange = (event: SelectChangeEvent<string>, index: number) => {
-            // ////////console.log('description', description, )
+           //console.log(event, 'handledescriptiononChange')
             const newValue = event.target.value;
             onDescriptionChange(newValue, index);
         }
@@ -536,7 +486,7 @@ const InvestmentData = () =>{
     const PriceSelect = ({ item, id, index, onPriceChange }: { item: string, id: number, index: number, onPriceChange: (newValue: string, index: number) => void }) => {
 
         const handlePriceChange = (event: SelectChangeEvent<string>) => {
-            // ////////console.log(index)
+            // //////////console.log(index)
             const newValue = event.target.value;
             onPriceChange(newValue, index);
         };
@@ -582,8 +532,7 @@ const InvestmentData = () =>{
 
         );
     };
-    ////console.log(description, isFilterDescription)
-
+  //console.log(investment)
     return (
 
         <TableRow sx={{ bgcolor: rowColor }}>
@@ -639,9 +588,9 @@ const InvestmentData = () =>{
 
             <TableCell sx={{ padding: 0, }} >
                 {
-                    investment ? (
+                     investment ? (
                         investment.map((e: DataType, index: number) => {
-                            ////console.log(investment)
+                            console.log(investment, ' in component investment')
                             return (
                                 e.description.map((item: DescriptionType, idx: number) => {
 
@@ -691,13 +640,9 @@ const InvestmentData = () =>{
                                 //   onChange={handleSelectChange}
                                 onChange={(e) => handleChange(e as SelectChangeEvent, 'description')}
                             >
-                                {/* {isFilterDescription.map((description: any, index: number) => (
-                                    description.map((e: DescriptionType) => (
-                                        <MenuItem key={e.value} value={e.value}>{e.value }{description} </MenuItem>
-                                    ))
-                                ))} */}
+                                
                                 {isFilterDescription.map((ds: any, index: number) => {
-                                    ////console.log(ds, description)
+                                    //console.log(investment, 'else ')
                                     return (
                                         ds.map((e: DescriptionType) => (
                                             <MenuItem key={e.value} value={e.value}>{e.value} </MenuItem>
@@ -720,12 +665,7 @@ const InvestmentData = () =>{
                     </Button>
                 )}
             </TableCell>
-            {/* {
-                isInvestmentDescription ? <InvestmentData/>:null
-            } */}
-            <TableCell>
-
-            </TableCell>
+           
             {/* --------------------------- license type */}
             <TableCell sx={{ padding: 0, }} >
                 {
@@ -793,7 +733,7 @@ const InvestmentData = () =>{
                                 return (
 
                                     e.description.map((item: DescriptionType, idx: number) => {
-                                        // ////////console.log(idx)
+                                        // //////////console.log(idx)
                                         return (
                                             <TableRow key={idx}>
                                                 <TextField

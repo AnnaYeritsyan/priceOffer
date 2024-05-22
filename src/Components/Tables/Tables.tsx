@@ -1,4 +1,4 @@
-import { Button, Table, TableCell, TableContainer, TableHead, TableRow, Paper, Select, MenuItem, SelectChangeEvent, FormControl, Box, InputLabel, TableBody } from '@mui/material';
+import { Button, Table, TableCell, TableContainer, TableHead, TableRow, Paper, Select, MenuItem, SelectChangeEvent, FormControl, Box, InputLabel, TableBody, Alert } from '@mui/material';
 import Rows from '../Rows/Rows';
 import data from '../data.json';
 import { useState, createContext, useContext, useEffect } from 'react';
@@ -27,7 +27,8 @@ const Tables = () => {
     const [otherRow, setOtherRow] = useState<DataType[]>([]);
     const [start, setStart] = useState<any>('')
     const [end, setEnd] = useState<any>('')
-    //console.log(records)
+    const [showAlert, setShowAlert] = useState<boolean>(false)
+    ////////console.log(records)
 
     const selectCustomerValue = (items: any) => {
         setCustomer(items.client)
@@ -47,7 +48,7 @@ const Tables = () => {
         const remainingRecords = records.filter((e: any) => e.id !== tablerow);
         setRecords(remainingRecords);
     };
-// //console.log(remain)
+// ////////console.log(remain)
 const handleAddRow = () => {
 
     const newRow = {
@@ -57,7 +58,7 @@ const handleAddRow = () => {
         type: '',
         price: 0,
         disCount: 0,
-        count: 0,
+        count: 1,
         disCountPrice: 0
     };
 
@@ -82,7 +83,9 @@ const handleSave = async () => {
         };
         try {
             const response = await axios.post('http://localhost:3004/', { newClientRecord });
-            console.log(response.data);
+            //////console.log(response.data);
+            setShowAlert(true); 
+            setTimeout(() => setShowAlert(false), 2000);
         } catch (error) {
             console.error('Failed to save data:', error);
         }
@@ -98,12 +101,10 @@ useEffect(() => {
             if (customer && version) {
                 const clientData = clientsData[customer];
                 for (let i in clientsData) {
-                    console.log(i)
+                    ////console.log(i)
                     if (i === customer) {
-                        console.log(clientData.versiondata)
                         const versionData = clientData.versions.find((v: any) => v.version === version);
                         setRecords(versionData.records);
-                        console.log(versionData.records)
                         let versionDataDescription = versionData.records
                         versionDataDescription.map((e:any)=>{
                             console.log(e)
@@ -123,24 +124,17 @@ return (
     <TableContext.Provider value={{
         onRemoved,
         onChange: (value) => {
-
-            // //console.log(value, records)
             if (!value) {
-                //console.error('Value is undefined.');
                 return;
             }
-
-            // //console.log(value, records)
 
             const recordIndex = records.findIndex(record => record.id === value.id)
             if (recordIndex >= 0) {
 
                 records[recordIndex] = value
                 setRecords([...records])
-                // //console.log(records)
             }
             //setRecords((prevRecords: any) => [...prevRecords, value]);
-            // Write something to update
         }
     }}>
         <Box >
@@ -206,7 +200,7 @@ return (
                     <TableBody>
                         {
                             records.map((data, idx) => {
-                                //console.log(records)
+                                ////////console.log(records)
 
 
                                 return (
@@ -227,8 +221,21 @@ return (
                     </TableBody>
                 </Table>
             </TableContainer>
-            <Button variant='contained' onClick={handleSave}>Պահպանել</Button>
+            <Box sx={{marginTop:'25px'}}>
+            <Button variant='contained' onClick={handleSave} sx={{marginLeft:'90%', bgcolor:'green'}}>Պահպանել</Button>
+            </Box>
         </Box>
+        {showAlert && (
+                    <Alert variant="filled" severity="success"
+                     sx={{ width: '20%', 
+                     position: 'fixed', 
+                     bottom: 0,
+                     left: 0,
+                     animation: showAlert ? 'slideIn 1s forwards' : 'slideOut 1s forwards'
+                     }}>
+                        This is a filled success Alert.
+                    </Alert>
+                )}
     </TableContext.Provider>
 );
 };

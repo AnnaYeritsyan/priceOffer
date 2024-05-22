@@ -20,6 +20,9 @@ export interface DataRow {
     description: string;
     licenseType: string;
     price: string;
+    count:number;
+    disCount:number;
+    finallyPrice:number;
 }
 
 // ------------------
@@ -49,6 +52,8 @@ export type DataType = {
     description: DescriptionType[];
     licenseType: LicenseTypeType[];
     price: PriceType[];
+    
+
 };
 
 export type MenuItems={
@@ -72,4 +77,19 @@ export interface ModalTextInformation {
     description: string | string[];
     type: string;
     price: number;
+    count:number;
+    disCount:number;
+    finallyPrice:number;
 }
+export type NewObjType = {
+    id: string | number;
+    name: string;
+    description: any[];
+    licenseType: any[];
+    price: any[];
+    count:number,
+    discount:number,
+    finallyPrice:number
+}
+
+
