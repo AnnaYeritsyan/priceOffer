@@ -75,7 +75,7 @@ export interface ModalTextInformation {
     id: number;
     name: string;
     description: string | string[];
-    type: string;
+    licenseType: string;
     price: number;
     count:number;
     disCount:number;

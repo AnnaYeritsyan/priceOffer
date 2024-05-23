@@ -28,6 +28,12 @@ const Tables = () => {
     const [start, setStart] = useState<any>('')
     const [end, setEnd] = useState<any>('')
     const [showAlert, setShowAlert] = useState<boolean>(false)
+    const [headerData, setHeaderDate] = useState<any>(
+        {
+            customer:'',
+            version:''
+        }
+    )
     ////////console.log(records)
 
     const selectCustomerValue = (items: any) => {
@@ -40,7 +46,10 @@ const Tables = () => {
 
     }
 
+useEffect(()=>{
+    setHeaderDate({customer:customer, version:version})
 
+},[customer, version])
 
     const onRemoved = (tablerow: number) => {
         //amboxj datan avelacvac- idin stugel ete havasar e durs hanel datan toxel miayn
@@ -55,7 +64,7 @@ const handleAddRow = () => {
         id: Math.floor(new Date().getTime() * Math.random()),
         name: '',
         description: '',
-        type: '',
+        licenseType: '',
         price: 0,
         disCount: 0,
         count: 1,
@@ -63,12 +72,14 @@ const handleAddRow = () => {
     };
 
     setRecords((prevRecords: any) => [...prevRecords, newRow]);
+    console.log(records)
     setDates(prevDates => [...prevDates, getValues]);
 }
 
 
 
 const handleSave = async () => {
+    console.log(records)
     if (customer && version) {
         const newClientRecord = {
             name: customer,
@@ -81,6 +92,7 @@ const handleSave = async () => {
                 records
             }
         };
+        console.log(newClientRecord)
         try {
             const response = await axios.post('http://localhost:3004/', { newClientRecord });
             //////console.log(response.data);
@@ -107,9 +119,11 @@ useEffect(() => {
                         setRecords(versionData.records);
                         let versionDataDescription = versionData.records
                         versionDataDescription.map((e:any)=>{
-                            console.log(e)
                             setOtherRow(e.description)
+                            console.log(e.licenseType)
                         })
+                        console.log(otherRow, versionData)
+
                     }
                 }
             }
@@ -130,7 +144,7 @@ return (
 
             const recordIndex = records.findIndex(record => record.id === value.id)
             if (recordIndex >= 0) {
-
+                console.log(records, 'onchange records')
                 records[recordIndex] = value
                 setRecords([...records])
             }
@@ -210,7 +224,7 @@ return (
                                         index={idx}
                                         databaseData={otherRow}
                                         recordsDataTable={records}
-
+                                        headerData={headerData}
                                     />
                                 )
 
@@ -228,12 +242,12 @@ return (
         {showAlert && (
                     <Alert variant="filled" severity="success"
                      sx={{ width: '20%', 
-                     position: 'fixed', 
+                     position: 'absolute', 
                      bottom: 0,
                      left: 0,
                      animation: showAlert ? 'slideIn 1s forwards' : 'slideOut 1s forwards'
                      }}>
-                        This is a filled success Alert.
+                        Փոփոխությունը պահպանված է
                     </Alert>
                 )}
     </TableContext.Provider>

@@ -12,12 +12,13 @@ import { styles } from '../style';
 
 
 
-const Rows = ({ defaultRecord, index, databaseData, recordsDataTable }:
+const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData }:
     {
         defaultRecord: DataType,
         index: number,
         databaseData: any,
-        recordsDataTable: any
+        recordsDataTable: any,
+        headerData: any
     }) => {
 
     const [records, setRecords] = useState<DataType[]>(data)
@@ -40,85 +41,103 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable }:
     const [name, setName] = useState<string>('')
     const [description, setDescription] = useState<string | undefined>(undefined)
     const [isInvestmentDescription, setIsInvesmentDescription] = useState<boolean>(false)
-    const [keepFilterObject, setKeepFilterObject] = useState<any>([])   // when select get customer and version
+    const [keepFilterObject, setKeepFilterObject] = useState<NewObjType | null>(null)   // when select get customer and version
     const [license, setLicense] = useState<string | undefined>()
-    const [ count, setCount] = useState<number | undefined>()
+    const [count, setCount] = useState<number | undefined>()
     const [disCount, setDisCount] = useState<number | undefined>()
     const [isPricing, setIsPricing] = useState<number | undefined>()
 
+     //console.log(recordsDataTable, licenseState)
+    useEffect(() => {
+        // it created description object , if commented lis-A investment also be string 
+        if (investment) {
+            otherRow[0].description = investment[0].description
+            tableContext.onChange && tableContext.onChange(otherRow[0])
+            const initialRowsState = investment.map(() => ({
+                count: undefined,
+                disCount: undefined,
+            }));
+
+            setRowsState(initialRowsState);
+            setShowAddButton(true);
+        }
+    }, [investment]);
 
     useEffect(() => {
-        setName(defaultRecord.name)
 
+        setName(defaultRecord.name);
+         //console.log(recordsDataTable, 'useeffecti mej================')
         if (typeof defaultRecord.description !== 'object') {
-            setDescription(defaultRecord.description)
-            console.log(defaultRecord)
-           
-            const onFilterrecords = records.filter(f => f.name === name)
-            const getfilterDescription: any = onFilterrecords.map(f => f.description)
-            setIsFilterDescription(getfilterDescription)
+             //console.log(recordsDataTable)
+            setDescription(defaultRecord.description);
+            const onFilterRecords = records.filter(f => f.name === name);
+            const getFilterDescription: any = onFilterRecords.map(f => f.description);
+            setIsFilterDescription(getFilterDescription);
+             //console.log(otherRow)
         }
         else {
-            setIsInvesmentDescription(true)
-            defaultRecord.description.map((e: any) => {
-                setDescription(e.value)
-            })
-
-            const onFilterrecords = records.filter(f => f.name === defaultRecord.name)
-            let newobj: NewObjType = {
+            const onFilterRecords = records.filter(f => f.name === defaultRecord.name);
+            let newObj: NewObjType = {
                 id: '',
                 name: '',
                 description: [],
                 licenseType: [],
                 price: [],
-                count:1,
-                discount:0,
-                finallyPrice:0
+                count: 1,
+                discount: 0,
+                finallyPrice: 0,
             };
-            onFilterrecords.forEach((f) => {
+
+            onFilterRecords.forEach((f) => {
+                 //console.log(f, databaseData)
                 f.description.forEach((a) => {
-                    newobj.id = f.id
-                    newobj.name = f.name
-                    newobj.description = databaseData
-                    newobj.licenseType = databaseData
-                    newobj.price = databaseData
-                    newobj.finallyPrice = 2
-                    setDescription(databaseData)
+                    newObj.id = f.id;
+                    newObj.name = f.name;
+                    newObj.description = databaseData;
+                    newObj.licenseType = databaseData;
+                    newObj.price = databaseData;
+                    newObj.finallyPrice = 1;
+                    setDescription(databaseData);
                 });
             });
-            setKeepFilterObject(newobj)
-      
-            console.log(investment, databaseData)
-            const getfilterDescription: any = onFilterrecords.map(f => f.description)
-            setIsFilterDescription(getfilterDescription)
 
-        }
-
-        recordsDataTable.map((e:any)=>{
-            console.log(e)
-            if(e.name !== 'LIS-A ներդնում'){
-                setDescription(e.description)
-                setLicense(e.licenseType)
-                setIsPricing(e.price)
-                setCount(e.count)
-                setDisCount(e.disCount)
-                setFinalyPrice(e.disCountPrice)
-                
+             //console.log(onFilterRecords)
+            recordsDataTable.forEach((e: any) => {
+                if (e.name !== 'LIS-A ներդնում') {
+                    setDescription(e.description);
+                    setLicense(e.licenseType);
+                    setIsPricing(e.price);
+                    setCount(e.count);
+                    setDisCount(e.disCount);
+                    setFinalyPrice(e.disCountPrice);
+                }
+            });
+             //console.log(recordsDataTable)
+            if (JSON.stringify(keepFilterObject) !== JSON.stringify(newObj)) {
+                setKeepFilterObject(newObj);
             }
-           
-        })
+
+            const getFilterDescription: any = onFilterRecords.map(f => f.description);
+            setIsFilterDescription(getFilterDescription);
+        }
+    }, [recordsDataTable]);
 
 
-    }, [recordsDataTable])
-    console.log(recordsDataTable)
-   
-
-useEffect(()=>{
-    if(keepFilterObject.description){
-        // setInvestment([keepFilterObject])
-
-    }
-},[keepFilterObject])
+    useEffect(() => {       
+          //console.log(keepFilterObject, recordsDataTable, '==========')
+        // if (keepFilterObject && Array.isArray(keepFilterObject.description)) {
+          
+        //     setInvestment((prevInvestment:any) => {
+        //         if (JSON.stringify(prevInvestment) !== JSON.stringify([keepFilterObject])) {
+        //             return [keepFilterObject];
+        //         }
+        //         return prevInvestment;
+        //     });
+        // }
+        // else{
+        //      //console.log(keepFilterObject)
+        // }
+    }, [keepFilterObject] );
 
     const tableContext = useTableContext()
     const rowColor = index % 2 === 0 ? '#ffffff' : '#EBFAF1';
@@ -132,6 +151,7 @@ useEffect(()=>{
                 const selectedRecords = records.filter(record => record.name === event.target.value);
                 const descriptions: any = selectedRecords.map(record => record.description);
                 setIsFilterDescription(descriptions);
+              
                 const license: any = selectedRecords.map(record => record.licenseType)
                 setLicenseState(license)
                 const price: any = selectedRecords.map(record => record.price)
@@ -140,10 +160,8 @@ useEffect(()=>{
                 if (selectedName === 'LIS-A ներդնում') {
 
                     setInvestment(selectedRecords);
-                    //console.log(investment)
-                    otherRow.map((e: any) => {
-                        e.name = selectedName
-                    })
+                     //console.log(investment)
+                    otherRow.map((e: any) => { e.name = selectedName })
 
                 } else {
                     otherRow.map((e: any) => {
@@ -155,10 +173,11 @@ useEffect(()=>{
                 break;
             case 'description':
                 setValue(event.target.value)
-                setDescription(event.target.value)
+                // setDescription(event.target.value)
                 otherRow.map((e: any) => {
                     e.description = event.target.value
                 })
+
                 break;
             case 'licenseType':
                 setValue(event.target.value)
@@ -176,29 +195,17 @@ useEffect(()=>{
                 break;
         }
 
+         //console.log(otherRow)
         tableContext.onChange && tableContext.onChange(otherRow[0])
 
     }
 
-    useEffect(() => {
-        if (investment) {
-            otherRow[0].description = investment[0].description
-            tableContext.onChange && tableContext.onChange(otherRow[0])
-            const initialRowsState = investment.map(() => ({
-                count: undefined,
-                disCount: undefined,
-            }));
 
-            setRowsState(initialRowsState);
-            setShowAddButton(true);
-        }
-    }, [investment]);
 
- 
     // ==========================================================
     const handleInputs = (e: any, nameElemnt: 'count' | 'disCount', rowIndex: number) => {
         const newValue = e.target.value;
-        console.log(newValue, rowsState)
+         //console.log(newValue, rowsState)
 
         setRowsState(prevState => {
             const newState = [...prevState];
@@ -206,7 +213,7 @@ useEffect(()=>{
                 ...newState[rowIndex],
                 [nameElemnt]: newValue,
             };
-            console.log(newState)
+             //console.log(newState)
             return newState;
         });
         setOtherRow(prev => {
@@ -215,31 +222,37 @@ useEffect(()=>{
                 ...updatedOtherRow[rowIndex],
                 [nameElemnt]: newValue,
             };
-            console.log(updatedOtherRow);
+             //console.log(updatedOtherRow);
             return updatedOtherRow;
         });
-        console.log(otherRow)
+         //console.log(otherRow)
 
 
     };
-    useEffect(()=>{
-        otherRow.map((e:any)=>{
-            console.log(e.price)
-            const prices = e.price
-            const count = e.count
-            const disCount = e.disCount
-            let discountpersent = disCount/100 
-            console.log(prices, count, disCount, discountpersent)
-        e.disCountPrice = (prices * count) * discountpersent;
-        setFinalyPrice(e.disCountPrice)
-        })
-        console.log(otherRow)
-    }, [otherRow])
-           
+
+    useEffect(() => {
+        const updatedRows = otherRow.map(e => {
+            const prices = Number(e.price);
+            const count = Number(e.count);
+            const disCount = Number(e.disCount);
+            const discountPercent = disCount / 100;
+             //console.log(disCount)
+            if (disCount === 0) {
+                e.disCountPrice = (prices * count);
+            }
+            else {
+                e.disCountPrice = (prices * count) * (1 - discountPercent);
+            }
+            return e;
+        });
+        // setOtherRow(updatedRows);
+        if (updatedRows.length > 0) {
+            setFinalyPrice(updatedRows[0].disCountPrice);
+        }
+    }, [otherRow]);
 
 
-
-    const addinRow = () => {
+    const addinRow = () => {                 //created lis-a investment  row
         const newRow: DescriptionType = {
             value: '',
             type: ''
@@ -252,34 +265,23 @@ useEffect(()=>{
             value: '',
             type: ''
         };
-        // const newCount: any = {
-        //    count:1
-        // };
-        // const newDisCount: any = {
-        //     disCount:0
-        //  };
-        //  const newFinallyPrice: any = {
-        //     finnalyPrice:null
-        //  };
-
         if (investment) {
-            const newInvestment = investment?.map((item: DataType) => ({
+            const newInvestment = investment?.map((item: DataType) => {
+                 return ({
                 ...item,
                 description: [...item.description, newRow],
                 licenseType: [...item.licenseType, newLicense],
                 price: [...item.price, newPrice],
-
-
-            }));
-
+            }
+        )
+            });
             setInvestment(newInvestment);
             setRowsState(prevState => [...prevState, { count: undefined, disCount: undefined }]);
-
         }
     };
 
 
-    const removeItem = (idToRemove: DescriptionType, idx: number) => {
+    const removeItem = (idToRemove: DescriptionType, idx: number) => {  //removed lis-a investment  row
         if (investment) {
             const updatedInvestment = investment.map((item: DataType) => ({
                 ...item,
@@ -357,19 +359,22 @@ useEffect(()=>{
     };
 
     const DescriptionSelect = (
-        { item, onRemove, id, index, onDescriptionChange }: 
-        { item: string, onRemove: () => void, id: number, index: number, onDescriptionChange:
-             (newValue: string, index: number) => void }) => {
+        { item, onRemove, id, index, onDescriptionChange }:
+            {
+                item: string, onRemove: () => void, id: number, index: number, onDescriptionChange:
+                (newValue: string, index: number) => void
+            }) => {
         useEffect(() => {
             if (selectRef.current) {
                 const height = selectRef.current.offsetHeight;
                 setSelectHeight(height);
+                 //console.log(selectHeight)
             }
         }, []);
 
 
         const handleDescriptionChange = (event: SelectChangeEvent<string>, index: number) => {
-           //console.log(event, 'handledescriptiononChange')
+            // //console.log(event, 'handledescriptiononChange')
             const newValue = event.target.value;
             onDescriptionChange(newValue, index);
         }
@@ -486,7 +491,7 @@ useEffect(()=>{
     const PriceSelect = ({ item, id, index, onPriceChange }: { item: string, id: number, index: number, onPriceChange: (newValue: string, index: number) => void }) => {
 
         const handlePriceChange = (event: SelectChangeEvent<string>) => {
-            // //////////console.log(index)
+            // ////////// //console.log(index)
             const newValue = event.target.value;
             onPriceChange(newValue, index);
         };
@@ -532,7 +537,7 @@ useEffect(()=>{
 
         );
     };
-  //console.log(investment)
+    // //console.log(investment)
     return (
 
         <TableRow sx={{ bgcolor: rowColor }}>
@@ -588,9 +593,9 @@ useEffect(()=>{
 
             <TableCell sx={{ padding: 0, }} >
                 {
-                     investment ? (
+                    investment ? (
                         investment.map((e: DataType, index: number) => {
-                            console.log(investment, ' in component investment')
+                             //console.log(investment, ' in component investment')
                             return (
                                 e.description.map((item: DescriptionType, idx: number) => {
 
@@ -640,9 +645,9 @@ useEffect(()=>{
                                 //   onChange={handleSelectChange}
                                 onChange={(e) => handleChange(e as SelectChangeEvent, 'description')}
                             >
-                                
+
                                 {isFilterDescription.map((ds: any, index: number) => {
-                                    //console.log(investment, 'else ')
+                                    // //console.log(investment, 'else ')
                                     return (
                                         ds.map((e: DescriptionType) => (
                                             <MenuItem key={e.value} value={e.value}>{e.value} </MenuItem>
@@ -665,7 +670,7 @@ useEffect(()=>{
                     </Button>
                 )}
             </TableCell>
-           
+
             {/* --------------------------- license type */}
             <TableCell sx={{ padding: 0, }} >
                 {
@@ -733,7 +738,7 @@ useEffect(()=>{
                                 return (
 
                                     e.description.map((item: DescriptionType, idx: number) => {
-                                        // //////////console.log(idx)
+                                        // ////////// //console.log(idx)
                                         return (
                                             <TableRow key={idx}>
                                                 <TextField
