@@ -24,7 +24,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
     const [records, setRecords] = useState<DataType[]>(data)
     const [value, setValue] = useState<string | undefined>(undefined)
     const [isFilterDescription, setIsFilterDescription] = useState<string[]>([])
-    const [licenseState, setLicenseState] = useState<string[]>([])
+    const [licenseState, setLicenseState] = useState<string | string[]>('')
     const [price, setPrice] = useState<string[]>([])
     const [finalyPrice, setFinalyPrice] = useState<number | undefined>()
     const [showAddButton, setShowAddButton] = useState(false);
@@ -46,6 +46,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
     const [count, setCount] = useState<number | undefined>()
     const [disCount, setDisCount] = useState<number | undefined>()
     const [isPricing, setIsPricing] = useState<number | undefined>()
+    const [licenseData, setLicenseData] = useState<string[]>([]);
 
      //console.log(recordsDataTable, licenseState)
     useEffect(() => {
@@ -157,11 +158,22 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                 const price: any = selectedRecords.map(record => record.price)
                 setPrice(price)
                 const selectedName = event.target.value;
+                setLicenseData(databaseData); // Update the license data for 'LIS-A ներդնում'
+
+                const licenses = selectedRecords.flatMap(record => 
+                   Array.isArray(record.licenseType) ? record.licenseType : [record.licenseType]
+               ).map(license => license.toString());
+
+               setLicenseState(licenses);
                 if (selectedName === 'LIS-A ներդնում') {
 
                     setInvestment(selectedRecords);
                      //console.log(investment)
-                    otherRow.map((e: any) => { e.name = selectedName })
+                    
+                    setLicenseState(licenses);
+
+                                         otherRow.forEach(e => { e.name = value; });
+                     otherRow.map((e: any) => { e.name = selectedName })
 
                 } else {
                     otherRow.map((e: any) => {
@@ -322,6 +334,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
 
 
     const LicenseChange = (newValue: any, index: number) => {
+
         if (investment) {
             const updatedInvestment = investment.map((e: DataType) => ({
                 ...e,
@@ -337,6 +350,11 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
             }));
             setInvestment(updatedInvestment);
         }
+        setOtherRow(prevRows => {
+            const updatedRows = [...prevRows];
+            updatedRows[index].licenseType = newValue;
+            return updatedRows;
+        });
     };
 
     const PriceChange = (newValue: string, index: number) => {
@@ -440,6 +458,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
         const handleLicenseChange = (event: SelectChangeEvent<string>) => {
             const newValue = event.target.value;
             onLicenseChange(newValue, index);
+            console.log(newValue)
         };
 
         return (
