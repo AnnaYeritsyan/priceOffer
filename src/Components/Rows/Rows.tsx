@@ -12,19 +12,20 @@ import { styles } from '../style';
 
 
 
-const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData }:
+const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, }:
     {
         defaultRecord: DataType,
         index: number,
         databaseData: any,
         recordsDataTable: any,
-        headerData: any
+
     }) => {
 
     const [records, setRecords] = useState<DataType[]>(data)
     const [value, setValue] = useState<string | undefined>(undefined)
     const [isFilterDescription, setIsFilterDescription] = useState<string[]>([])
-    const [licenseState, setLicenseState] = useState<string | string[]>('')
+    const [isFilterLicense, setIsFilterLicense] = useState<string[]>([])
+    const [licenseState, setLicenseState] = useState<string[]>([])
     const [price, setPrice] = useState<string[]>([])
     const [finalyPrice, setFinalyPrice] = useState<number | undefined>()
     const [showAddButton, setShowAddButton] = useState(false);
@@ -42,17 +43,22 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
     const [description, setDescription] = useState<string | undefined>(undefined)
     const [isInvestmentDescription, setIsInvesmentDescription] = useState<boolean>(false)
     const [keepFilterObject, setKeepFilterObject] = useState<NewObjType | null>(null)   // when select get customer and version
-    const [license, setLicense] = useState<string | undefined>()
+    const [license, setLicense] = useState<any>()
     const [count, setCount] = useState<number | undefined>()
     const [disCount, setDisCount] = useState<number | undefined>()
     const [isPricing, setIsPricing] = useState<number | undefined>()
-    const [licenseData, setLicenseData] = useState<string[]>([]);
 
-     //console.log(recordsDataTable, licenseState)
+    //console.log(recordsDataTable, licenseState)
     useEffect(() => {
         // it created description object , if commented lis-A investment also be string 
         if (investment) {
             otherRow[0].description = investment[0].description
+            otherRow[0].licenseType = investment[0].licenseType
+            otherRow[0].price = investment[0].price
+            otherRow[0].count = investment[0].count
+            otherRow[0].disCountPrice= investment[0].finallyPrice
+            otherRow[0].disCount= investment[0].discount
+            console.log(recordsDataTable)
             tableContext.onChange && tableContext.onChange(otherRow[0])
             const initialRowsState = investment.map(() => ({
                 count: undefined,
@@ -67,14 +73,17 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
     useEffect(() => {
 
         setName(defaultRecord.name);
-         //console.log(recordsDataTable, 'useeffecti mej================')
+        //console.log(recordsDataTable, 'useeffecti mej================')
         if (typeof defaultRecord.description !== 'object') {
-             //console.log(recordsDataTable)
+            console.log(recordsDataTable)
             setDescription(defaultRecord.description);
             const onFilterRecords = records.filter(f => f.name === name);
             const getFilterDescription: any = onFilterRecords.map(f => f.description);
             setIsFilterDescription(getFilterDescription);
-             //console.log(otherRow)
+            const getFileterLicense:any = onFilterRecords.map(f => f.licenseType);
+            setLicense(defaultRecord.licenseType)
+            
+            console.log(defaultRecord.licenseType)
         }
         else {
             const onFilterRecords = records.filter(f => f.name === defaultRecord.name);
@@ -84,27 +93,51 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                 description: [],
                 licenseType: [],
                 price: [],
-                count: 1,
-                discount: 0,
-                finallyPrice: 0,
+                count: [],
+                discount: [],
+                finallyPrice: [],
             };
+console.log(databaseData)
+if(databaseData.length <1){
 
-            onFilterRecords.forEach((f) => {
-                 //console.log(f, databaseData)
-                f.description.forEach((a) => {
-                    newObj.id = f.id;
-                    newObj.name = f.name;
-                    newObj.description = databaseData;
-                    newObj.licenseType = databaseData;
-                    newObj.price = databaseData;
-                    newObj.finallyPrice = 1;
-                    setDescription(databaseData);
-                });
-            });
+    onFilterRecords.forEach((f) => {
+        console.log(f, databaseData)
+        f.description.forEach((a) => {
+            newObj.id = f.id;
+            newObj.name = f.name;
+            newObj.description = f.description;
+            newObj.licenseType = f.licenseType;
+            newObj.price = f.price;
+            newObj.finallyPrice = f.price;
+            setDescription(databaseData);
+            setLicense(databaseData)
+        });
+    });
 
-             //console.log(onFilterRecords)
+}
+else{
+    
+    onFilterRecords.forEach((f) => {
+        const correspondingRecord = recordsDataTable.find((record:any) => record.name === f.name);
+
+        if (correspondingRecord) {
+            newObj.id = f.id;
+            newObj.name = f.name;
+            newObj.description = correspondingRecord.description;
+            newObj.licenseType = correspondingRecord.licenseType;
+            newObj.price = correspondingRecord.price;
+            newObj.finallyPrice = correspondingRecord.finallyPrice;
+            setDescription(correspondingRecord.description);
+            setLicense(correspondingRecord.licenseType);
+        }
+    });
+
+}
+            console.log(onFilterRecords)
             recordsDataTable.forEach((e: any) => {
+                // console.log(e.licenseType)
                 if (e.name !== 'LIS-A ներդնում') {
+            
                     setDescription(e.description);
                     setLicense(e.licenseType);
                     setIsPricing(e.price);
@@ -112,38 +145,43 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                     setDisCount(e.disCount);
                     setFinalyPrice(e.disCountPrice);
                 }
+                else{
+                    setLicense([])
+                 
+                }
             });
-             //console.log(recordsDataTable)
+          
             if (JSON.stringify(keepFilterObject) !== JSON.stringify(newObj)) {
                 setKeepFilterObject(newObj);
             }
 
             const getFilterDescription: any = onFilterRecords.map(f => f.description);
             setIsFilterDescription(getFilterDescription);
+          
         }
     }, [recordsDataTable]);
 
 
-    useEffect(() => {       
-          //console.log(keepFilterObject, recordsDataTable, '==========')
-        // if (keepFilterObject && Array.isArray(keepFilterObject.description)) {
-          
-        //     setInvestment((prevInvestment:any) => {
-        //         if (JSON.stringify(prevInvestment) !== JSON.stringify([keepFilterObject])) {
-        //             return [keepFilterObject];
-        //         }
-        //         return prevInvestment;
-        //     });
-        // }
-        // else{
-        //      //console.log(keepFilterObject)
-        // }
-    }, [keepFilterObject] );
+    useEffect(() => {
+      
+        if (keepFilterObject && Array.isArray(keepFilterObject.description)) {
+
+            setInvestment((prevInvestment: any) => {
+                if (JSON.stringify(prevInvestment) !== JSON.stringify([keepFilterObject])) {
+                    return [keepFilterObject];
+                }
+                return prevInvestment;
+            });
+        }
+        else {
+       
+        }
+    }, [keepFilterObject]);
 
     const tableContext = useTableContext()
     const rowColor = index % 2 === 0 ? '#ffffff' : '#EBFAF1';
 
-    const handleChange = (event: SelectChangeEvent<string>, columnType: 'name' | 'description' | 'licenseType' | 'price' | 'disCount',) => {
+    const handleChange = (event: SelectChangeEvent<string>, columnType: 'name' | 'description' | 'licenseType' | 'price' | 'disCount') => {
         setValue(event.target.value)
 
         switch (columnType) {
@@ -152,28 +190,15 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                 const selectedRecords = records.filter(record => record.name === event.target.value);
                 const descriptions: any = selectedRecords.map(record => record.description);
                 setIsFilterDescription(descriptions);
-              
                 const license: any = selectedRecords.map(record => record.licenseType)
                 setLicenseState(license)
                 const price: any = selectedRecords.map(record => record.price)
                 setPrice(price)
                 const selectedName = event.target.value;
-                setLicenseData(databaseData); // Update the license data for 'LIS-A ներդնում'
-
-                const licenses = selectedRecords.flatMap(record => 
-                   Array.isArray(record.licenseType) ? record.licenseType : [record.licenseType]
-               ).map(license => license.toString());
-
-               setLicenseState(licenses);
                 if (selectedName === 'LIS-A ներդնում') {
 
                     setInvestment(selectedRecords);
-                     //console.log(investment)
-                    
-                    setLicenseState(licenses);
-
-                                         otherRow.forEach(e => { e.name = value; });
-                     otherRow.map((e: any) => { e.name = selectedName })
+                    otherRow.map((e: any) => { e.name = selectedName })
 
                 } else {
                     otherRow.map((e: any) => {
@@ -185,7 +210,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                 break;
             case 'description':
                 setValue(event.target.value)
-                // setDescription(event.target.value)
+               
                 otherRow.map((e: any) => {
                     e.description = event.target.value
                 })
@@ -193,6 +218,12 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                 break;
             case 'licenseType':
                 setValue(event.target.value)
+                if (name === 'LIS-A ներդնում') {
+                    setLicenseState([event.target.value]);
+                } else {
+                    setLicense(event.target.value);
+                }
+               
                 otherRow.map((e: any) => {
                     e.licenseType = event.target.value
                 })
@@ -207,7 +238,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                 break;
         }
 
-         //console.log(otherRow)
+       
         tableContext.onChange && tableContext.onChange(otherRow[0])
 
     }
@@ -217,7 +248,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
     // ==========================================================
     const handleInputs = (e: any, nameElemnt: 'count' | 'disCount', rowIndex: number) => {
         const newValue = e.target.value;
-         //console.log(newValue, rowsState)
+        
 
         setRowsState(prevState => {
             const newState = [...prevState];
@@ -225,7 +256,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                 ...newState[rowIndex],
                 [nameElemnt]: newValue,
             };
-             //console.log(newState)
+            
             return newState;
         });
         setOtherRow(prev => {
@@ -234,12 +265,12 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                 ...updatedOtherRow[rowIndex],
                 [nameElemnt]: newValue,
             };
-             //console.log(updatedOtherRow);
+            updatedOtherRow.map((e: any) => {
+               
+            })
+
             return updatedOtherRow;
         });
-         //console.log(otherRow)
-
-
     };
 
     useEffect(() => {
@@ -248,7 +279,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
             const count = Number(e.count);
             const disCount = Number(e.disCount);
             const discountPercent = disCount / 100;
-             //console.log(disCount)
+
             if (disCount === 0) {
                 e.disCountPrice = (prices * count);
             }
@@ -257,7 +288,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
             }
             return e;
         });
-        // setOtherRow(updatedRows);
+
         if (updatedRows.length > 0) {
             setFinalyPrice(updatedRows[0].disCountPrice);
         }
@@ -279,13 +310,13 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
         };
         if (investment) {
             const newInvestment = investment?.map((item: DataType) => {
-                 return ({
-                ...item,
-                description: [...item.description, newRow],
-                licenseType: [...item.licenseType, newLicense],
-                price: [...item.price, newPrice],
-            }
-        )
+                return ({
+                    ...item,
+                    description: [...item.description, newRow],
+                    licenseType: [...item.licenseType, newLicense],
+                    price: [...item.price, newPrice],
+                }
+                )
             });
             setInvestment(newInvestment);
             setRowsState(prevState => [...prevState, { count: undefined, disCount: undefined }]);
@@ -293,13 +324,15 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
     };
 
 
-    const removeItem = (idToRemove: DescriptionType, idx: number) => {  //removed lis-a investment  row
+    const removeItem = (idToRemove: DescriptionType, idx: number) => {  //created lis-a investment  row
         if (investment) {
             const updatedInvestment = investment.map((item: DataType) => ({
                 ...item,
                 description: item.description.filter((desc: DescriptionType, index: number) => index !== idx),
                 licenseType: item.licenseType.filter((license: LicenseType, index: number) => index !== idx),
                 price: item.price.filter((price: PriceType, index: number) => index !== idx),
+                count: count,
+                disCount:disCount
             }));
             setInvestment(updatedInvestment);
             setRowsState(prevState => {
@@ -334,8 +367,9 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
 
 
     const LicenseChange = (newValue: any, index: number) => {
-
+     
         if (investment) {
+            //console.log(investment)
             const updatedInvestment = investment.map((e: DataType) => ({
                 ...e,
                 licenseType: e.licenseType.map((change: LicenseType, idx: number) => {
@@ -349,12 +383,8 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                 })
             }));
             setInvestment(updatedInvestment);
+          
         }
-        setOtherRow(prevRows => {
-            const updatedRows = [...prevRows];
-            updatedRows[index].licenseType = newValue;
-            return updatedRows;
-        });
     };
 
     const PriceChange = (newValue: string, index: number) => {
@@ -382,34 +412,31 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                 item: string, onRemove: () => void, id: number, index: number, onDescriptionChange:
                 (newValue: string, index: number) => void
             }) => {
-        useEffect(() => {
-            if (selectRef.current) {
-                const height = selectRef.current.offsetHeight;
-                setSelectHeight(height);
-                 //console.log(selectHeight)
-            }
-        }, []);
 
 
         const handleDescriptionChange = (event: SelectChangeEvent<string>, index: number) => {
-            // //console.log(event, 'handledescriptiononChange')
             const newValue = event.target.value;
             onDescriptionChange(newValue, index);
         }
         return (
-            <TableRow style={styles.tableRow} sx={{ display: "flex", alignItems: 'center', justifyContent: 'center', }}>
+            <TableRow style={styles.tableRow}
+                sx={{
+                    display: "flex", alignItems: 'center', justifyContent: 'center',
+                    height: '60px'
+                }}>
 
-                <FormControl fullWidth>
-                    {
+                <FormControl fullWidth >
+                    {/* {
                         value ? '' :
                             <InputLabel id={`license-select-label-${index}`}>Նկարագրություն</InputLabel>
 
-                    }
+                    } */}
                     <Select
                         labelId="description"
                         id="description"
                         sx={{
                             width: '100%',
+                            height: '54px',
                             '& .MuiSelect-select': {
                                 whiteSpace: 'wrap',
                             },
@@ -448,34 +475,30 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
     };
 
     const LicenseSelect = ({ item, id, index, onLicenseChange }: { item: string, id: number, index: number, onLicenseChange: (newValue: string, index: number) => void }) => {
-        useEffect(() => {
-            const height = document.getElementById(`license-select-${index}`)?.clientHeight;
-            if (height) {
-                setSelectHeight(height);
-            }
-        }, [index]);
-
+     
         const handleLicenseChange = (event: SelectChangeEvent<string>) => {
             const newValue = event.target.value;
             onLicenseChange(newValue, index);
-            console.log(newValue)
         };
 
         return (
-            <TableRow sx={{ borderBottom: 1, borderColor: '#828282', height: selectHeight }}  >
+            <TableRow sx={{ borderBottom: 1, borderColor: '#828282', }}  >
                 <TableCell style={styles.tableCell}>
-                    <FormControl fullWidth>
-                        {
+                    <FormControl fullWidth sx={{
+                        height: '54px',
+                    }}>
+                        {/* {
                             value ? '' :
                                 <InputLabel id={`license-select-label-${index}`}>Լիցենզիայի տեսակ</InputLabel>
 
-                        }
+                        } */}
                         <Select
                             labelId="licenseType"
                             id="licenseType"
                             sx={{
                                 width: '100%',
-                                '& .MuiSelect-select': {
+                                height: '54px',
+                                '& .MuiSeect-select': {
                                     whiteSpace: 'wrap',
                                 },
                                 ".MuiOutlinedInput-notchedOutline": { border: 0 },
@@ -489,8 +512,10 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                                 },
                             }}
                             name='licenseType'
-                            value={item}
+                            // value={item}
                             onChange={handleLicenseChange}
+                            value={updateValue ?? item}
+                        // onChange={(event) => handleLicenseChange(event, index)}
                         >
                             <MenuItem value={item} key={id}> {item}</MenuItem>
 
@@ -503,6 +528,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                             )}
                         </Select>
                     </FormControl></TableCell>
+
             </TableRow>
 
         );
@@ -510,18 +536,18 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
     const PriceSelect = ({ item, id, index, onPriceChange }: { item: string, id: number, index: number, onPriceChange: (newValue: string, index: number) => void }) => {
 
         const handlePriceChange = (event: SelectChangeEvent<string>) => {
-            // ////////// //console.log(index)
             const newValue = event.target.value;
             onPriceChange(newValue, index);
         };
         return (
-            <TableRow>
+            <TableRow sx={{ height: '54px' }}>
                 <Select
                     labelId="price"
                     id="price"
                     // label="price"
                     sx={{
                         width: '100%',
+                        height: '54px',
                         '& .MuiSelect-select': {
                             whiteSpace: 'wrap',
                         },
@@ -544,11 +570,9 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                     <MenuItem value={item}> {item}</MenuItem>
 
                     {price.map((e: any) =>
-
                         e.map((a: PriceType, idx: number) => (
                             <MenuItem key={idx} value={a.value}>{a.value}</MenuItem>
                         ))
-
                     )}
                 </Select>
             </TableRow>
@@ -556,7 +580,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
 
         );
     };
-    // //console.log(investment)
+
     return (
 
         <TableRow sx={{ bgcolor: rowColor }}>
@@ -589,13 +613,8 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                             },
                         }}
                         name='name'
-                        // value={value}
                         value={name}
-
-                        //   onChange={handleSelectChange}
                         onChange={(e) => handleChange(e as SelectChangeEvent, 'name')}
-
-
                     >
                         {
                             records.map((e: DataType, idx) =>
@@ -614,7 +633,6 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                 {
                     investment ? (
                         investment.map((e: DataType, index: number) => {
-                             //console.log(investment, ' in component investment')
                             return (
                                 e.description.map((item: DescriptionType, idx: number) => {
 
@@ -666,7 +684,6 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                             >
 
                                 {isFilterDescription.map((ds: any, index: number) => {
-                                    // //console.log(investment, 'else ')
                                     return (
                                         ds.map((e: DescriptionType) => (
                                             <MenuItem key={e.value} value={e.value}>{e.value} </MenuItem>
@@ -691,7 +708,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
             </TableCell>
 
             {/* --------------------------- license type */}
-            <TableCell sx={{ padding: 0, }} >
+            <TableCell sx={{ padding: 0, height: '54px' }} >
                 {
                     investment ?
                         (
@@ -746,6 +763,15 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                             </Select>
                         </FormControl>
                 }
+                {
+                    investment ? <Button variant='contained' onClick={addinRow}
+                        sx={{
+                            bgcolor: '#0b4a0b',
+                            visibility: 'hidden'
+                        }}>
+                        <AddBoxIcon />
+                    </Button> : null
+                }
             </TableCell>
 
             <TableCell sx={{ padding: 0, }} >
@@ -753,11 +779,8 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                     investment ?
                         (
                             investment?.map((e: DataType, index: number) => {
-
                                 return (
-
                                     e.description.map((item: DescriptionType, idx: number) => {
-                                        // ////////// //console.log(idx)
                                         return (
                                             <TableRow key={idx}>
                                                 <TextField
@@ -785,7 +808,15 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                             onChange={(e) => handleInputs(e, 'count', 0)}
                         />
                 }
-
+                {
+                    investment ? <Button variant='contained' onClick={addinRow}
+                        sx={{
+                            bgcolor: '#0b4a0b',
+                            visibility: 'hidden'
+                        }}>
+                        <AddBoxIcon />
+                    </Button> : null
+                }
             </TableCell>
             <TableCell sx={{ padding: 0, }} >
                 {
@@ -847,7 +878,15 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                             </Select>
                         </FormControl>
                 }
-
+                {
+                    investment ? <Button variant='contained' onClick={addinRow}
+                        sx={{
+                            bgcolor: '#0b4a0b',
+                            visibility: 'hidden'
+                        }}>
+                        <AddBoxIcon />
+                    </Button> : null
+                }
             </TableCell>
 
             {/* --------------------------- price */}
@@ -889,6 +928,15 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                             onChange={(e) => handleInputs(e, 'disCount', 0)}
                         />
                 }
+                {
+                    investment ? <Button variant='contained' onClick={addinRow}
+                        sx={{
+                            bgcolor: '#0b4a0b',
+                            visibility: 'hidden'
+                        }}>
+                        <AddBoxIcon />
+                    </Button> : null
+                }
             </TableCell>
             {/* ---------------------------- zexj */}
             <TableCell sx={{ padding: 0, }}>
@@ -897,14 +945,26 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                         (
                             investment.map((e: DataType, index: number) => (
                                 e.description.map((item: DescriptionType, idx: number) => (
-                                    <TableRow key={idx}>
+                                    <TableRow key={idx} sx={{
+                                        height: '56px',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center'
+                                    }}>
                                         {finalyPrice}
                                     </TableRow>
 
                                 ))
                             ))
-                        ) : <> {finalyPrice}
-                        </>
+                        ) : <TableRow sx={{
+                            height: '56px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            {finalyPrice}
+                        </TableRow>
                 }
             </TableCell>
             {/* -----------zexchvac gin */}

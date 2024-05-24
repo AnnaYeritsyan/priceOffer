@@ -95,7 +95,7 @@ const handleSave = async () => {
         console.log(newClientRecord)
         try {
             const response = await axios.post('http://localhost:3004/', { newClientRecord });
-            //////console.log(response.data);
+         //console.log(response.data);
             setShowAlert(true); 
             setTimeout(() => setShowAlert(false), 2000);
         } catch (error) {
@@ -109,7 +109,7 @@ useEffect(() => {
         try {
             const response = await axios.get('http://localhost:3004/');
             const clientsData = response.data.data;
-// stanum em {sgl:{},kean:{}}
+
             if (customer && version) {
                 const clientData = clientsData[customer];
                 for (let i in clientsData) {
@@ -141,7 +141,7 @@ return (
             if (!value) {
                 return;
             }
-
+            
             const recordIndex = records.findIndex(record => record.id === value.id)
             if (recordIndex >= 0) {
                 console.log(records, 'onchange records')
@@ -224,7 +224,6 @@ return (
                                         index={idx}
                                         databaseData={otherRow}
                                         recordsDataTable={records}
-                                        headerData={headerData}
                                     />
                                 )
 

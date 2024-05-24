@@ -87,9 +87,9 @@ export type NewObjType = {
     description: any[];
     licenseType: any[];
     price: any[];
-    count:number,
-    discount:number,
-    finallyPrice:number
+    count:any[],
+    discount:any[],
+    finallyPrice:any[]
 }
 
 
