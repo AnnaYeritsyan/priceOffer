@@ -10,7 +10,8 @@
             { "type": "perpetual", "value": "Անժամկետ լիցենզիա" }
         ],
         "price": [
-            { "type": "price", "value": "1000" }
+            { "type": "price", "value": "1000" },
+            { "type": "price", "value": "2000" }
             
         ]
     },
@@ -60,7 +61,9 @@
             { "type": "annual_3_devices", "value": "Տարեկան լիցենզիա՝ sarqi qanak սարքի համար" }
         ],
         "price": [
-            { "type": "price", "value": "210000" }
+            { "type": "price", "value": "210000" },
+            { "type": "price", "value": "60000" }
+
         ]
     },
     {

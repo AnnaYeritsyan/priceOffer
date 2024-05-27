@@ -22,11 +22,12 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, }:
     }) => {
 
     const [records, setRecords] = useState<DataType[]>(data)
-    const [value, setValue] = useState<string | undefined>(undefined)
+    const [value, setValue] = useState<string | undefined | number>(undefined)
     const [isFilterDescription, setIsFilterDescription] = useState<string[]>([])
     const [isFilterLicense, setIsFilterLicense] = useState<string[]>([])
     const [licenseState, setLicenseState] = useState<string[]>([])
-    const [price, setPrice] = useState<string[]>([])
+    const [price, setPrice] = useState<any[]>([])
+    const [onePrice, setOnePrice] = useState<any | undefined>()
     const [finalyPrice, setFinalyPrice] = useState<number | undefined>()
     const [showAddButton, setShowAddButton] = useState(false);
     const [investment, setInvestment] = useState<any | any[]>();
@@ -60,12 +61,12 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, }:
             otherRow[0].disCount= investment[0].discount
             console.log(recordsDataTable)
             tableContext.onChange && tableContext.onChange(otherRow[0])
-            const initialRowsState = investment.map(() => ({
-                count: undefined,
-                disCount: undefined,
-            }));
+            // const initialRowsState = investment.map(() => ({
+            //     count: undefined,
+            //     disCount: undefined,
+            // }));
 
-            setRowsState(initialRowsState);
+            // setRowsState(initialRowsState);
             setShowAddButton(true);
         }
     }, [investment]);
@@ -75,15 +76,19 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, }:
         setName(defaultRecord.name);
         //console.log(recordsDataTable, 'useeffecti mej================')
         if (typeof defaultRecord.description !== 'object') {
-            console.log(recordsDataTable)
+            // console.log(recordsDataTable)
             setDescription(defaultRecord.description);
             const onFilterRecords = records.filter(f => f.name === name);
             const getFilterDescription: any = onFilterRecords.map(f => f.description);
             setIsFilterDescription(getFilterDescription);
             const getFileterLicense:any = onFilterRecords.map(f => f.licenseType);
             setLicense(defaultRecord.licenseType)
+            setLicenseState(getFileterLicense)
+            const getFilterPrice = onFilterRecords.map(f => f.price);
+            // console.log(getFilterPrice)
+            setPrice(getFilterPrice)
+            setOnePrice(defaultRecord.price)
             
-            console.log(defaultRecord.licenseType)
         }
         else {
             const onFilterRecords = records.filter(f => f.name === defaultRecord.name);
@@ -97,11 +102,11 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, }:
                 discount: [],
                 finallyPrice: [],
             };
-console.log(databaseData)
+
 if(databaseData.length <1){
 
     onFilterRecords.forEach((f) => {
-        console.log(f, databaseData)
+
         f.description.forEach((a) => {
             newObj.id = f.id;
             newObj.name = f.name;
@@ -111,6 +116,7 @@ if(databaseData.length <1){
             newObj.finallyPrice = f.price;
             setDescription(databaseData);
             setLicense(databaseData)
+           
         });
     });
 
@@ -133,24 +139,27 @@ else{
     });
 
 }
-            console.log(onFilterRecords)
+            // console.log(onFilterRecords)
             recordsDataTable.forEach((e: any) => {
-                // console.log(e.licenseType)
+        
                 if (e.name !== 'LIS-A ներդնում') {
+            
             
                     setDescription(e.description);
                     setLicense(e.licenseType);
-                    setIsPricing(e.price);
+                    setOnePrice((e.price));
                     setCount(e.count);
                     setDisCount(e.disCount);
                     setFinalyPrice(e.disCountPrice);
+                
                 }
                 else{
                     setLicense([])
                  
                 }
+               
             });
-          
+
             if (JSON.stringify(keepFilterObject) !== JSON.stringify(newObj)) {
                 setKeepFilterObject(newObj);
             }
@@ -231,7 +240,7 @@ else{
             case 'price':
                 setIsPricing(+event.target.value)
                 otherRow.map((e: any) => {
-                    e.price = event.target.value
+                    e.price = +(event.target.value)
                 })
                 break;
             default:
@@ -248,31 +257,50 @@ else{
     // ==========================================================
     const handleInputs = (e: any, nameElemnt: 'count' | 'disCount', rowIndex: number) => {
         const newValue = e.target.value;
-        
+        console.log(newValue, count)
+       setCount(newValue)
+       
+       
+        if (name === 'LIS-A ներդնում') {
+       console.log(count)
+    //    otherRow.map((e:any)=>{
+    //                 if(rowsState[0].count){
+    //       e.count.push(rowsState)
+    //     }
+            setRowsState(prevState => {
+                const newState = [...prevState];
+                newState[rowIndex] = {
+                    ...newState[rowIndex],
+                    [nameElemnt]: newValue,
+                };
+                return newState;
+            });
+         console.log(rowsState)
+         otherRow.map((e:any)=>{
+            if(rowsState[0].count){
+  e.count.push(rowsState)
+            }
+          
+         })   
 
-        setRowsState(prevState => {
-            const newState = [...prevState];
-            newState[rowIndex] = {
-                ...newState[rowIndex],
-                [nameElemnt]: newValue,
-            };
+            // setOtherRow((prev:any) => {
+
+            //     const updatedOtherRow = [...prev];
+            //     console.log(prev )
+                // updatedOtherRow = {
+            //         ...updatedOtherRow[rowIndex],
+            //         [nameElemnt]: newValue,
+                // };
+            //     return prev;
+            // });    
+     
+        }
+        else{
+            console.log('vochinch');
             
-            return newState;
-        });
-        setOtherRow(prev => {
-            const updatedOtherRow = [...prev];
-            updatedOtherRow[rowIndex] = {
-                ...updatedOtherRow[rowIndex],
-                [nameElemnt]: newValue,
-            };
-            updatedOtherRow.map((e: any) => {
-               
-            })
-
-            return updatedOtherRow;
-        });
+        }
     };
-
+    console.log(otherRow)
     useEffect(() => {
         const updatedRows = otherRow.map(e => {
             const prices = Number(e.price);
@@ -323,7 +351,7 @@ else{
         }
     };
 
-
+// console.log(onePrice, price, isPricing)
     const removeItem = (idToRemove: DescriptionType, idx: number) => {  //created lis-a investment  row
         if (investment) {
             const updatedInvestment = investment.map((item: DataType) => ({
@@ -562,7 +590,8 @@ else{
                         },
                     }}
                     name='price'
-                    value={item}
+                    // value={item}
+                    value={updateValue ?? item}
                     placeholder={item}
                     // onChange={(e) => handleChange(e as SelectChangeEvent, 'price')}
                     onChange={handlePriceChange}
@@ -726,8 +755,8 @@ else{
                         ) :
                         <FormControl fullWidth>
                             {
-                                value ? '' :
-                                    <InputLabel id="demo-simple-select-label">Լիցենզիայի տեսակ</InputLabel>
+                                license ? '' :
+                                    <InputLabel id="demo-simple-select-label">Լիցենզիայի տեսակ </InputLabel>
 
                             }
                             <Select
@@ -750,7 +779,7 @@ else{
                                     },
                                 }}
                                 name='licenseType'
-                                value={value}
+                                value={ license ?? name}
                                 //   onChange={handleSelectChange}
                                 onChange={(e) => handleChange(e as SelectChangeEvent, 'licenseType')}
                             >
@@ -787,7 +816,7 @@ else{
                                                     key={idx}
                                                     id="outlined-basic"
                                                     variant="outlined"
-                                                    value={rowsState[idx]?.count}
+                                                    value={rowsState[idx]?.count || ''}
                                                     name='count'
                                                     onChange={(e) => handleInputs(e, 'count', idx)}
                                                 />
@@ -837,14 +866,14 @@ else{
                         ) :
                         <FormControl fullWidth>
                             {
-                                value ? '' :
+                                onePrice ? '' :
                                     <InputLabel id="demo-simple-select-label">Գին</InputLabel>
 
-                            }
+                            } 
                             <Select
                                 labelId="price"
                                 id="price"
-                                label="գին"
+                                // label="գին"
                                 sx={{
 
                                     width: '100%',
@@ -861,8 +890,8 @@ else{
                                         border: 0,
                                     },
                                 }}
-                                name='count'
-                                value={value}
+                                name='price'
+                                value={  onePrice ??name}
                                 //   onChange={handleSelectChange}
                                 onChange={(e) => handleChange(e as SelectChangeEvent, 'price')}
 
