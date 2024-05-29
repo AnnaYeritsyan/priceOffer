@@ -33,8 +33,10 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, }:
     const [investment, setInvestment] = useState<any | any[]>();
     //   const [investment, setInvestment] = useState<NewObjType[]>([]);
     const [updateValue, setUpdateValue] = useState<string | undefined>(undefined)
-    const [rowsState, setRowsState] = useState<RowState[]>([{
+    const [rowsStateCount, setRowsStateCount] = useState<any[]>([{
         count: undefined,
+    }]);
+    const [rowsStatedisCount, setRowsStatedisCount] = useState<any[]>([{
         disCount: undefined,
     }]);
     const selectRef = useRef<HTMLSelectElement>(null);
@@ -45,20 +47,21 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, }:
     const [isInvestmentDescription, setIsInvesmentDescription] = useState<boolean>(false)
     const [keepFilterObject, setKeepFilterObject] = useState<NewObjType | null>(null)   // when select get customer and version
     const [license, setLicense] = useState<any>()
-    const [count, setCount] = useState<number | undefined>()
+    const [count, setCount] = useState<number | undefined | any[]>()
     const [disCount, setDisCount] = useState<number | undefined>()
     const [isPricing, setIsPricing] = useState<number | undefined>()
 
-    //console.log(recordsDataTable, licenseState)
+    console.log(recordsDataTable)
     useEffect(() => {
         // it created description object , if commented lis-A investment also be string 
         if (investment) {
+            console.log(investment)
             otherRow[0].description = investment[0].description
             otherRow[0].licenseType = investment[0].licenseType
             otherRow[0].price = investment[0].price
-            otherRow[0].count = investment[0].count
-            otherRow[0].disCountPrice= investment[0].finallyPrice
-            otherRow[0].disCount= investment[0].discount
+            // otherRow[0].count = investment[0].count
+            otherRow[0].disCountPrice = investment[0].finallyPrice
+            otherRow[0].disCount = investment[0].discount
             console.log(recordsDataTable)
             tableContext.onChange && tableContext.onChange(otherRow[0])
             // const initialRowsState = investment.map(() => ({
@@ -81,17 +84,18 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, }:
             const onFilterRecords = records.filter(f => f.name === name);
             const getFilterDescription: any = onFilterRecords.map(f => f.description);
             setIsFilterDescription(getFilterDescription);
-            const getFileterLicense:any = onFilterRecords.map(f => f.licenseType);
+            const getFileterLicense: any = onFilterRecords.map(f => f.licenseType);
             setLicense(defaultRecord.licenseType)
             setLicenseState(getFileterLicense)
             const getFilterPrice = onFilterRecords.map(f => f.price);
             // console.log(getFilterPrice)
             setPrice(getFilterPrice)
             setOnePrice(defaultRecord.price)
-            
+
         }
         else {
-            const onFilterRecords = records.filter(f => f.name === defaultRecord.name);
+            const onFilterRecords = otherRow.filter(f => f.name === defaultRecord.name);
+            console.log(otherRow)
             let newObj: NewObjType = {
                 id: '',
                 name: '',
@@ -102,62 +106,64 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, }:
                 discount: [],
                 finallyPrice: [],
             };
+            console.log(newObj, 'newobj')
+// erb lriv datark e linum ayd jamank ashxatuma ays masy 
+            if (databaseData.length < 1) {
+console.log(otherRow)
+                onFilterRecords.forEach((f) => {
 
-if(databaseData.length <1){
+                    f.description.forEach((a:any) => {
+                        newObj.id = f.id;
+                        newObj.name = f.name;
+                        newObj.description = f.description;
+                        newObj.licenseType = f.licenseType;
+                        newObj.price = f.price;
+                        newObj.finallyPrice = f.price;
+                        newObj.count = a.count
+                        setDescription(databaseData);
+                        setLicense(databaseData)
 
-    onFilterRecords.forEach((f) => {
+                    });
+                });
 
-        f.description.forEach((a) => {
-            newObj.id = f.id;
-            newObj.name = f.name;
-            newObj.description = f.description;
-            newObj.licenseType = f.licenseType;
-            newObj.price = f.price;
-            newObj.finallyPrice = f.price;
-            setDescription(databaseData);
-            setLicense(databaseData)
-           
-        });
-    });
+            }
+            else {
 
-}
-else{
-    
-    onFilterRecords.forEach((f) => {
-        const correspondingRecord = recordsDataTable.find((record:any) => record.name === f.name);
+                onFilterRecords.forEach((f) => {
+                    const correspondingRecord = recordsDataTable.find((record: any) => record.name === f.name);
+console.log(correspondingRecord)
+                    if (correspondingRecord) {
+                        newObj.id = f.id;
+                        newObj.name = f.name;
+                        newObj.description = correspondingRecord.description;
+                        newObj.licenseType = correspondingRecord.licenseType;
+                        newObj.price = correspondingRecord.price;
+                        newObj.finallyPrice = correspondingRecord.finallyPrice;
+                        setDescription(correspondingRecord.description);
+                        setLicense(correspondingRecord.licenseType);
+                    }
+                });
 
-        if (correspondingRecord) {
-            newObj.id = f.id;
-            newObj.name = f.name;
-            newObj.description = correspondingRecord.description;
-            newObj.licenseType = correspondingRecord.licenseType;
-            newObj.price = correspondingRecord.price;
-            newObj.finallyPrice = correspondingRecord.finallyPrice;
-            setDescription(correspondingRecord.description);
-            setLicense(correspondingRecord.licenseType);
-        }
-    });
-
-}
+            }
             // console.log(onFilterRecords)
             recordsDataTable.forEach((e: any) => {
-        
+
                 if (e.name !== 'LIS-A ներդնում') {
-            
-            
+
+
                     setDescription(e.description);
                     setLicense(e.licenseType);
                     setOnePrice((e.price));
                     setCount(e.count);
                     setDisCount(e.disCount);
                     setFinalyPrice(e.disCountPrice);
-                
+
                 }
-                else{
+                else {
                     setLicense([])
-                 
+
                 }
-               
+
             });
 
             if (JSON.stringify(keepFilterObject) !== JSON.stringify(newObj)) {
@@ -166,13 +172,13 @@ else{
 
             const getFilterDescription: any = onFilterRecords.map(f => f.description);
             setIsFilterDescription(getFilterDescription);
-          
+
         }
     }, [recordsDataTable]);
 
 
     useEffect(() => {
-      
+
         if (keepFilterObject && Array.isArray(keepFilterObject.description)) {
 
             setInvestment((prevInvestment: any) => {
@@ -183,7 +189,7 @@ else{
             });
         }
         else {
-       
+
         }
     }, [keepFilterObject]);
 
@@ -219,7 +225,7 @@ else{
                 break;
             case 'description':
                 setValue(event.target.value)
-               
+
                 otherRow.map((e: any) => {
                     e.description = event.target.value
                 })
@@ -232,7 +238,7 @@ else{
                 } else {
                     setLicense(event.target.value);
                 }
-               
+
                 otherRow.map((e: any) => {
                     e.licenseType = event.target.value
                 })
@@ -243,11 +249,12 @@ else{
                     e.price = +(event.target.value)
                 })
                 break;
+            
             default:
                 break;
         }
 
-       
+
         tableContext.onChange && tableContext.onChange(otherRow[0])
 
     }
@@ -255,52 +262,40 @@ else{
 
 
     // ==========================================================
-    const handleInputs = (e: any, nameElemnt: 'count' | 'disCount', rowIndex: number) => {
+    const handleInputs = (e: any, nameElement: 'count' | 'disCount', rowIndex: number) => {
         const newValue = e.target.value;
-        console.log(newValue, count)
-       setCount(newValue)
-       
-       
+        console.log(newValue, count, 'rowindex',rowIndex)
+        setCount(newValue)
         if (name === 'LIS-A ներդնում') {
-       console.log(count)
-    //    otherRow.map((e:any)=>{
-    //                 if(rowsState[0].count){
-    //       e.count.push(rowsState)
-    //     }
-            setRowsState(prevState => {
+            otherRow.map((e:any)=>{
+                e.description.map((a:any)=>{
+                    console.log(rowsStateCount)
+                })
+            })
+            setRowsStateCount((prevState:any) => {
                 const newState = [...prevState];
+                console.log(newState) 
+                otherRow.map((e:any)=>{
+         
+                e.count=(newState)
+            })
                 newState[rowIndex] = {
                     ...newState[rowIndex],
-                    [nameElemnt]: newValue,
+                    [nameElement]: newValue,
                 };
+                setCount(newState)
                 return newState;
             });
-         console.log(rowsState)
-         otherRow.map((e:any)=>{
-            if(rowsState[0].count){
-  e.count.push(rowsState)
+            console.log(rowsStateCount)
+           
+          setOtherRow(otherRow)
             }
-          
-         })   
-
-            // setOtherRow((prev:any) => {
-
-            //     const updatedOtherRow = [...prev];
-            //     console.log(prev )
-                // updatedOtherRow = {
-            //         ...updatedOtherRow[rowIndex],
-            //         [nameElemnt]: newValue,
-                // };
-            //     return prev;
-            // });    
-     
-        }
-        else{
-            console.log('vochinch');
-            
-        }
+              console.log(otherRow)
     };
+  
     console.log(otherRow)
+    
+
     useEffect(() => {
         const updatedRows = otherRow.map(e => {
             const prices = Number(e.price);
@@ -347,11 +342,13 @@ else{
                 )
             });
             setInvestment(newInvestment);
-            setRowsState(prevState => [...prevState, { count: undefined, disCount: undefined }]);
+            setRowsStateCount(prevState => [...prevState, { count: undefined }]);
+            setRowsStatedisCount(prevState => [...prevState, { disCount: undefined }]);
+      
         }
     };
 
-// console.log(onePrice, price, isPricing)
+    // console.log(onePrice, price, isPricing)
     const removeItem = (idToRemove: DescriptionType, idx: number) => {  //created lis-a investment  row
         if (investment) {
             const updatedInvestment = investment.map((item: DataType) => ({
@@ -360,13 +357,21 @@ else{
                 licenseType: item.licenseType.filter((license: LicenseType, index: number) => index !== idx),
                 price: item.price.filter((price: PriceType, index: number) => index !== idx),
                 count: count,
-                disCount:disCount
+                disCount: disCount
             }));
             setInvestment(updatedInvestment);
-            setRowsState(prevState => {
+            setRowsStateCount(prevState => {
                 const newState = [...prevState];
                 newState[idx] = {
                     count: undefined,
+
+                };
+                return newState;
+            });
+            setRowsStatedisCount(prevState => {
+                const newState = [...prevState];
+                newState[idx] = {
+
                     disCount: undefined,
                 };
                 return newState;
@@ -395,7 +400,7 @@ else{
 
 
     const LicenseChange = (newValue: any, index: number) => {
-     
+
         if (investment) {
             //console.log(investment)
             const updatedInvestment = investment.map((e: DataType) => ({
@@ -411,7 +416,7 @@ else{
                 })
             }));
             setInvestment(updatedInvestment);
-          
+
         }
     };
 
@@ -503,7 +508,7 @@ else{
     };
 
     const LicenseSelect = ({ item, id, index, onLicenseChange }: { item: string, id: number, index: number, onLicenseChange: (newValue: string, index: number) => void }) => {
-     
+
         const handleLicenseChange = (event: SelectChangeEvent<string>) => {
             const newValue = event.target.value;
             onLicenseChange(newValue, index);
@@ -609,7 +614,7 @@ else{
 
         );
     };
-
+    console.log(otherRow)
     return (
 
         <TableRow sx={{ bgcolor: rowColor }}>
@@ -779,7 +784,7 @@ else{
                                     },
                                 }}
                                 name='licenseType'
-                                value={ license ?? name}
+                                value={license ?? name}
                                 //   onChange={handleSelectChange}
                                 onChange={(e) => handleChange(e as SelectChangeEvent, 'licenseType')}
                             >
@@ -816,7 +821,7 @@ else{
                                                     key={idx}
                                                     id="outlined-basic"
                                                     variant="outlined"
-                                                    value={rowsState[idx]?.count || ''}
+                                                    value={rowsStateCount[idx]?.count || ''}
                                                     name='count'
                                                     onChange={(e) => handleInputs(e, 'count', idx)}
                                                 />
@@ -832,7 +837,7 @@ else{
                             id="outlined-basic"
                             // label="Outlined"
                             variant="outlined"
-                            value={rowsState[index]?.count}
+                            value={rowsStateCount[index]?.count}
                             name='count'
                             onChange={(e) => handleInputs(e, 'count', 0)}
                         />
@@ -869,7 +874,7 @@ else{
                                 onePrice ? '' :
                                     <InputLabel id="demo-simple-select-label">Գին</InputLabel>
 
-                            } 
+                            }
                             <Select
                                 labelId="price"
                                 id="price"
@@ -891,7 +896,7 @@ else{
                                     },
                                 }}
                                 name='price'
-                                value={  onePrice ??name}
+                                value={onePrice ?? name}
                                 //   onChange={handleSelectChange}
                                 onChange={(e) => handleChange(e as SelectChangeEvent, 'price')}
 
@@ -941,7 +946,7 @@ else{
                                             key={idx}
                                             id="outlined-basic"
                                             variant="outlined"
-                                            value={rowsState[idx]?.disCount ?? 0}
+                                            value={rowsStatedisCount[idx]?.disCount ?? 0}
                                             name='disCount'
                                             onChange={(e) => handleInputs(e, 'disCount', idx)}
                                         />
@@ -952,7 +957,7 @@ else{
                             id="outlined-basic"
                             // label="discount"
                             variant="outlined"
-                            value={rowsState[index]?.disCount}
+                            value={rowsStatedisCount[index]?.disCount}
                             name='disCount'
                             onChange={(e) => handleInputs(e, 'disCount', 0)}
                         />
