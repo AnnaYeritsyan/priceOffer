@@ -40,6 +40,9 @@ export type PriceType = {
     type: string;
     value: string;
 };
+export type Counts ={
+    count:string | number
+}
 export type RowState = {
     count:  undefined|string ;
     disCount:   undefined|string;
@@ -52,7 +55,7 @@ export type DataType = {
     description: DescriptionType[];
     licenseType: LicenseTypeType[];
     price: PriceType[];
-    
+    // count:Counts[]
 
 };
 
@@ -88,7 +91,7 @@ export type NewObjType = {
     licenseType: any[];
     price: any[];
     count:any[],
-    discount:any[],
+    disCount:any[],
     finallyPrice:any[]
 }
 

@@ -34,7 +34,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, }:
     //   const [investment, setInvestment] = useState<NewObjType[]>([]);
     const [updateValue, setUpdateValue] = useState<string | undefined>(undefined)
     const [rowsStateCount, setRowsStateCount] = useState<any[]>([{
-        count: undefined,
+        count: 1,
     }]);
     const [rowsStatedisCount, setRowsStatedisCount] = useState<any[]>([{
         disCount: undefined,
@@ -47,29 +47,24 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, }:
     const [isInvestmentDescription, setIsInvesmentDescription] = useState<boolean>(false)
     const [keepFilterObject, setKeepFilterObject] = useState<NewObjType | null>(null)   // when select get customer and version
     const [license, setLicense] = useState<any>()
-    const [count, setCount] = useState<number | undefined | any[]>()
-    const [disCount, setDisCount] = useState<number | undefined>()
+    const [count, setCount] = useState<string | undefined | any[]>()
+    const [countInvestment, setCountInvestment] = useState<any>({})
+    const [disCount, setDisCount] = useState<number | undefined | any[]>()
     const [isPricing, setIsPricing] = useState<number | undefined>()
 
-    console.log(recordsDataTable)
     useEffect(() => {
+
         // it created description object , if commented lis-A investment also be string 
         if (investment) {
-            console.log(investment)
             otherRow[0].description = investment[0].description
             otherRow[0].licenseType = investment[0].licenseType
             otherRow[0].price = investment[0].price
-            // otherRow[0].count = investment[0].count
+            otherRow[0].count = investment[0].count
             otherRow[0].disCountPrice = investment[0].finallyPrice
             otherRow[0].disCount = investment[0].discount
-            console.log(recordsDataTable)
             tableContext.onChange && tableContext.onChange(otherRow[0])
-            // const initialRowsState = investment.map(() => ({
-            //     count: undefined,
-            //     disCount: undefined,
-            // }));
 
-            // setRowsState(initialRowsState);
+            setOtherRow(otherRow)
             setShowAddButton(true);
         }
     }, [investment]);
@@ -77,25 +72,27 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, }:
     useEffect(() => {
 
         setName(defaultRecord.name);
-        //console.log(recordsDataTable, 'useeffecti mej================')
+
         if (typeof defaultRecord.description !== 'object') {
-            // console.log(recordsDataTable)
+
             setDescription(defaultRecord.description);
             const onFilterRecords = records.filter(f => f.name === name);
             const getFilterDescription: any = onFilterRecords.map(f => f.description);
+
             setIsFilterDescription(getFilterDescription);
             const getFileterLicense: any = onFilterRecords.map(f => f.licenseType);
             setLicense(defaultRecord.licenseType)
             setLicenseState(getFileterLicense)
             const getFilterPrice = onFilterRecords.map(f => f.price);
-            // console.log(getFilterPrice)
             setPrice(getFilterPrice)
             setOnePrice(defaultRecord.price)
+            setCount(otherRow[0].count)
+
+            setDisCount(otherRow[0].disCount)
 
         }
         else {
             const onFilterRecords = otherRow.filter(f => f.name === defaultRecord.name);
-            console.log(otherRow)
             let newObj: NewObjType = {
                 id: '',
                 name: '',
@@ -103,23 +100,34 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, }:
                 licenseType: [],
                 price: [],
                 count: [],
-                discount: [],
+                disCount: [],
                 finallyPrice: [],
             };
-            console.log(newObj, 'newobj')
-// erb lriv datark e linum ayd jamank ashxatuma ays masy 
+            // erb lriv datark e linum ayd jamanak ashxatuma ays masy 
             if (databaseData.length < 1) {
-console.log(otherRow)
                 onFilterRecords.forEach((f) => {
-
-                    f.description.forEach((a:any) => {
+                    f.description.forEach((a: any) => {
                         newObj.id = f.id;
                         newObj.name = f.name;
                         newObj.description = f.description;
                         newObj.licenseType = f.licenseType;
                         newObj.price = f.price;
                         newObj.finallyPrice = f.price;
-                        newObj.count = a.count
+                        newObj.count = f.count
+                    
+                        // if (f.count === undefined) {
+                        //    console.log(count)
+                        //     newObj.count = f.description.map(() => ({ count: count }));
+                        // } else {
+
+                        //     newObj.count = f.count ;
+                        // }
+                        // if (f.disCount === undefined) {
+                        //     newObj.disCount = f.description.map(() => ({ disCount: disCount }));
+                        // } else {
+                        //     newObj.disCount = f.disCount;
+                        // }
+                        // newObj.disCount = f.disCount
                         setDescription(databaseData);
                         setLicense(databaseData)
 
@@ -128,29 +136,28 @@ console.log(otherRow)
 
             }
             else {
-
+                // նոր օբյեկտի մեջ ավելացնել փոփոխել տվյալները
                 onFilterRecords.forEach((f) => {
                     const correspondingRecord = recordsDataTable.find((record: any) => record.name === f.name);
-console.log(correspondingRecord)
                     if (correspondingRecord) {
                         newObj.id = f.id;
                         newObj.name = f.name;
                         newObj.description = correspondingRecord.description;
                         newObj.licenseType = correspondingRecord.licenseType;
                         newObj.price = correspondingRecord.price;
+                        newObj.count = correspondingRecord.count
+                        newObj.disCount = correspondingRecord.disCount
                         newObj.finallyPrice = correspondingRecord.finallyPrice;
                         setDescription(correspondingRecord.description);
                         setLicense(correspondingRecord.licenseType);
+                        console.log(correspondingRecord.count)
                     }
                 });
 
             }
-            // console.log(onFilterRecords)
             recordsDataTable.forEach((e: any) => {
 
                 if (e.name !== 'LIS-A ներդնում') {
-
-
                     setDescription(e.description);
                     setLicense(e.licenseType);
                     setOnePrice((e.price));
@@ -169,7 +176,6 @@ console.log(correspondingRecord)
             if (JSON.stringify(keepFilterObject) !== JSON.stringify(newObj)) {
                 setKeepFilterObject(newObj);
             }
-
             const getFilterDescription: any = onFilterRecords.map(f => f.description);
             setIsFilterDescription(getFilterDescription);
 
@@ -249,7 +255,7 @@ console.log(correspondingRecord)
                     e.price = +(event.target.value)
                 })
                 break;
-            
+
             default:
                 break;
         }
@@ -262,39 +268,74 @@ console.log(correspondingRecord)
 
 
     // ==========================================================
-    const handleInputs = (e: any, nameElement: 'count' | 'disCount', rowIndex: number) => {
+
+    const handleInputs = (e: ChangeEvent<{ value: string }>, nameElement: 'count' | 'disCount', rowIndex: number) => {
         const newValue = e.target.value;
-        console.log(newValue, count, 'rowindex',rowIndex)
-        setCount(newValue)
-        if (name === 'LIS-A ներդնում') {
-            otherRow.map((e:any)=>{
-                e.description.map((a:any)=>{
-                    console.log(rowsStateCount)
-                })
-            })
-            setRowsStateCount((prevState:any) => {
-                const newState = [...prevState];
-                console.log(newState) 
-                otherRow.map((e:any)=>{
-         
-                e.count=(newState)
-            })
-                newState[rowIndex] = {
-                    ...newState[rowIndex],
-                    [nameElement]: newValue,
-                };
-                setCount(newState)
-                return newState;
-            });
-            console.log(rowsStateCount)
+          if (name === 'LIS-A ներդնում') {
+                console.log(rowIndex);
+
+                setCountInvestment((prev:any) => {
+                    const updatedCountInvestment = {
+                        ...prev,
+                        [rowIndex]: newValue
+                    };
+
+                //  if (investment) {
+                //     const updatedInvestment = investment.map((e: DataType) => ({
+                //         ...e,
+                //        count: e.description.map((change: DescriptionType, idx: number) => {
            
-          setOtherRow(otherRow)
-            }
-              console.log(otherRow)
+                //             if (idx === rowIndex) {
+                //                 console.log(change, 'change')
+                //                 return {
+                //                     ...change,
+                //                     type:rowIndex,
+                //                     value: newValue
+                //                 };
+                //             }
+                           
+                //             console.log(change)
+                //             return change;
+                //         })
+                //     }));
+                    
+                //   setInvestment(updatedInvestment);
+                // }  
+                
+                    return updatedCountInvestment;  
+                  
+               
+                });
+
+            }  else {
+            setCount(e.target.value)
+
+        }
     };
-  
-    console.log(otherRow)
+
+    console.log(otherRow, investment, countInvestment)
+
+    useEffect(() => {
+        if (investment) {
+          const updatedInvestment = investment.map((e: DataType) => ({
+            ...e,
+            count: e.description.map((change: DescriptionType, idx: number) => {
+              if (countInvestment[idx] !== undefined) {
+                return {
+                  ...change,
+                  type: idx,
+                  value: countInvestment[idx],
+                };
+              }
+              return change;
+            }),
+          }));
     
+          setInvestment(updatedInvestment);
+        }
+      }, [countInvestment]);
+
+      console.log(investment)
 
     useEffect(() => {
         const updatedRows = otherRow.map(e => {
@@ -333,23 +374,22 @@ console.log(correspondingRecord)
         };
         if (investment) {
             const newInvestment = investment?.map((item: DataType) => {
+
                 return ({
                     ...item,
                     description: [...item.description, newRow],
                     licenseType: [...item.licenseType, newLicense],
                     price: [...item.price, newPrice],
+
                 }
                 )
             });
             setInvestment(newInvestment);
-            setRowsStateCount(prevState => [...prevState, { count: undefined }]);
-            setRowsStatedisCount(prevState => [...prevState, { disCount: undefined }]);
-      
+
         }
     };
 
-    // console.log(onePrice, price, isPricing)
-    const removeItem = (idToRemove: DescriptionType, idx: number) => {  //created lis-a investment  row
+    const removeItem = (idToRemove: DescriptionType, idx: number) => {  //removed lis-a investment  row
         if (investment) {
             const updatedInvestment = investment.map((item: DataType) => ({
                 ...item,
@@ -360,22 +400,7 @@ console.log(correspondingRecord)
                 disCount: disCount
             }));
             setInvestment(updatedInvestment);
-            setRowsStateCount(prevState => {
-                const newState = [...prevState];
-                newState[idx] = {
-                    count: undefined,
 
-                };
-                return newState;
-            });
-            setRowsStatedisCount(prevState => {
-                const newState = [...prevState];
-                newState[idx] = {
-
-                    disCount: undefined,
-                };
-                return newState;
-            });
         }
     };
 
@@ -402,7 +427,6 @@ console.log(correspondingRecord)
     const LicenseChange = (newValue: any, index: number) => {
 
         if (investment) {
-            //console.log(investment)
             const updatedInvestment = investment.map((e: DataType) => ({
                 ...e,
                 licenseType: e.licenseType.map((change: LicenseType, idx: number) => {
@@ -488,14 +512,26 @@ console.log(correspondingRecord)
                         onChange={(event) => handleDescriptionChange(event, index)}
                     >
 
-                        {
+                        {/* {
 
                             isFilterDescription.map((description: any, index: number) => (
                                 description.map((e: DescriptionType, idx: number) => (
                                     <MenuItem key={idx} value={e.value}>{e.value}</MenuItem>
                                 ))
                             ))
+
+                        } */}
+                        {
+                            records
+                                .filter((description: any) => description.name === 'LIS-A ներդնում')
+                                .flatMap((description: any) => description.description)
+                                .map((e: DescriptionType, idx: number) => (
+                                    <MenuItem key={idx} value={e.value}>
+                                        {e.value}
+                                    </MenuItem>
+                                ))
                         }
+
                     </Select>
                 </FormControl>
                 {/* <Button variant='contained' 
@@ -614,7 +650,7 @@ console.log(correspondingRecord)
 
         );
     };
-    console.log(otherRow)
+    ////console.log(otherRow)
     return (
 
         <TableRow sx={{ bgcolor: rowColor }}>
@@ -666,7 +702,7 @@ console.log(correspondingRecord)
             <TableCell sx={{ padding: 0, }} >
                 {
                     investment ? (
-                        investment.map((e: DataType, index: number) => {
+                        investment?.map((e: DataType, index: number) => {
                             return (
                                 e.description.map((item: DescriptionType, idx: number) => {
 
@@ -812,20 +848,23 @@ console.log(correspondingRecord)
                 {
                     investment ?
                         (
-                            investment?.map((e: DataType, index: number) => {
+                            investment?.map((e: any, index: number) => {
+                                console.log(count)
+
                                 return (
-                                    e.description.map((item: DescriptionType, idx: number) => {
+                                    e.description.map((item: any, idx: number) => {
+
                                         return (
                                             <TableRow key={idx}>
                                                 <TextField
                                                     key={idx}
                                                     id="outlined-basic"
                                                     variant="outlined"
-                                                    value={rowsStateCount[idx]?.count || ''}
+                                                    // value={countInvestment[0] ?? name}
+                                                         value={item.value ?? ''}
                                                     name='count'
                                                     onChange={(e) => handleInputs(e, 'count', idx)}
                                                 />
-
                                             </TableRow>
                                         )
                                     })
@@ -837,7 +876,7 @@ console.log(correspondingRecord)
                             id="outlined-basic"
                             // label="Outlined"
                             variant="outlined"
-                            value={rowsStateCount[index]?.count}
+                            value={count}
                             name='count'
                             onChange={(e) => handleInputs(e, 'count', 0)}
                         />
@@ -930,10 +969,12 @@ console.log(correspondingRecord)
                 {
                     investment ?
                         (
-                            investment.map((e: DataType, index: number) => (
-                                e.description.map((item: DescriptionType, idx: number) => (
-                                    <TableRow>
-                                        {/* <TextField
+                            investment.map((e: any, index: number) => {
+                                //console.log(e)
+                                return (
+                                    e.description.map((item: any, idx: number) => (
+                                        <TableRow>
+                                            {/* <TextField
                                             key={idx}
                                             id="outlined-basic"
                                             // label="Outlined"
@@ -942,22 +983,23 @@ console.log(correspondingRecord)
                                             name='disCount'
                                         // onChange={(e: any) => handleInputs(e, 'disCount')} 
                                         /> */}
-                                        <TextField
-                                            key={idx}
-                                            id="outlined-basic"
-                                            variant="outlined"
-                                            value={rowsStatedisCount[idx]?.disCount ?? 0}
-                                            name='disCount'
-                                            onChange={(e) => handleInputs(e, 'disCount', idx)}
-                                        />
-                                    </TableRow>
-                                ))
-                            ))
+                                            <TextField
+                                                key={idx}
+                                                id="outlined-basic"
+                                                variant="outlined"
+                                                value={idx ?? name}
+                                                name='disCount'
+                                                onChange={(e) => handleInputs(e, 'disCount', idx)}
+                                            />
+                                        </TableRow>
+                                    ))
+                                )
+                            })
                         ) : <TextField
                             id="outlined-basic"
                             // label="discount"
                             variant="outlined"
-                            value={rowsStatedisCount[index]?.disCount}
+                            value={disCount ?? 0}
                             name='disCount'
                             onChange={(e) => handleInputs(e, 'disCount', 0)}
                         />

@@ -34,7 +34,7 @@ const Tables = () => {
             version:''
         }
     )
-    ////////console.log(records)
+    //////////console.log(records)
 
     const selectCustomerValue = (items: any) => {
         setCustomer(items.client)
@@ -57,7 +57,7 @@ useEffect(()=>{
         const remainingRecords = records.filter((e: any) => e.id !== tablerow);
         setRecords(remainingRecords);
     };
-// ////////console.log(remain)
+// //////////console.log(remain)
 const handleAddRow = () => {
 
     const newRow = {
@@ -72,14 +72,14 @@ const handleAddRow = () => {
     };
 
     setRecords((prevRecords: any) => [...prevRecords, newRow]);
-    console.log(records)
+    //console.log(records)
     setDates(prevDates => [...prevDates, getValues]);
 }
 
 
 
 const handleSave = async () => {
-    console.log(records)
+    //console.log(records)
     if (customer && version) {
         const newClientRecord = {
             name: customer,
@@ -92,10 +92,10 @@ const handleSave = async () => {
                 records
             }
         };
-        console.log(newClientRecord)
+        //console.log(newClientRecord)
         try {
             const response = await axios.post('http://localhost:3004/', { newClientRecord });
-         //console.log(response.data);
+         ////console.log(response.data);
             setShowAlert(true); 
             setTimeout(() => setShowAlert(false), 2000);
         } catch (error) {
@@ -113,16 +113,16 @@ useEffect(() => {
             if (customer && version) {
                 const clientData = clientsData[customer];
                 for (let i in clientsData) {
-                    ////console.log(i)
+                    //////console.log(i)
                     if (i === customer) {
                         const versionData = clientData.versions.find((v: any) => v.version === version);
                         setRecords(versionData.records);
                         let versionDataDescription = versionData.records
                         versionDataDescription.map((e:any)=>{
                             setOtherRow(e.description)
-                            console.log(e.licenseType)
+                            //console.log(e.licenseType)
                         })
-                        console.log(otherRow, versionData)
+                        //console.log(otherRow, versionData)
 
                     }
                 }
@@ -144,7 +144,7 @@ return (
             
             const recordIndex = records.findIndex(record => record.id === value.id)
             if (recordIndex >= 0) {
-                console.log(records, 'onchange records')
+                // //console.log(records, 'onchange records')
                 records[recordIndex] = value
                 setRecords([...records])
             }
@@ -214,7 +214,7 @@ return (
                     <TableBody>
                         {
                             records.map((data, idx) => {
-                                ////////console.log(records)
+                                //////////console.log(records)
 
 
                                 return (
