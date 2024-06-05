@@ -50,7 +50,7 @@ useEffect(()=>{
     setHeaderDate({customer:customer, version:version})
 
 },[customer, version])
-
+// console.log(headerData)
     const onRemoved = (tablerow: number) => {
         //amboxj datan avelacvac- idin stugel ete havasar e durs hanel datan toxel miayn
         // nranq vory vor havasar chi 
@@ -110,21 +110,37 @@ useEffect(() => {
             const response = await axios.get('http://localhost:3004/');
             const clientsData = response.data.data;
 
+            // if (customer && version) {
+            //     const clientData = clientsData[customer];
+            //     for (let i in clientsData) {
+            //         //////console.log(i)
+            //         if (i === customer) {
+                    
+            //             console.log(clientData)
+            //             const versionData = clientData.versions.find((v: any) => v.version === version);
+            //             setRecords(versionData.records);
+            //             let versionDataDescription = versionData.records
+            //             versionDataDescription.map((e:any)=>{
+            //                 setOtherRow(e.description)
+            //                 //console.log(e.licenseType)
+            //             })
+            //             //console.log(otherRow, versionData)
+
+            //         }
+            //     }
+            // }
             if (customer && version) {
                 const clientData = clientsData[customer];
-                for (let i in clientsData) {
-                    //////console.log(i)
-                    if (i === customer) {
-                        const versionData = clientData.versions.find((v: any) => v.version === version);
+                if (clientData) {
+                    const versionData = clientData.versions.find((v: any) => v.version === version);
+                    if (versionData) {
                         setRecords(versionData.records);
-                        let versionDataDescription = versionData.records
-                        versionDataDescription.map((e:any)=>{
-                            setOtherRow(e.description)
-                            //console.log(e.licenseType)
-                        })
-                        //console.log(otherRow, versionData)
-
+                        setOtherRow(versionData.records.map((e: any) => e.description));
+                    } else {
+                        setRecords([]);
                     }
+                } else {
+                    setRecords([]);
                 }
             }
         } catch (error) {
@@ -144,7 +160,6 @@ return (
             
             const recordIndex = records.findIndex(record => record.id === value.id)
             if (recordIndex >= 0) {
-                // //console.log(records, 'onchange records')
                 records[recordIndex] = value
                 setRecords([...records])
             }
@@ -214,9 +229,7 @@ return (
                     <TableBody>
                         {
                             records.map((data, idx) => {
-                                //////////console.log(records)
-
-
+                            
                                 return (
                                     <Rows
                                         defaultRecord={data}
@@ -224,6 +237,7 @@ return (
                                         index={idx}
                                         databaseData={otherRow}
                                         recordsDataTable={records}
+                                        headerData={headerData}
                                     />
                                 )
 

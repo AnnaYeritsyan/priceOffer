@@ -2,7 +2,7 @@ export type DataNameType = 'Lis-A' | 'LIS-A' | 'LIS-A ներդնում' | 'VUID'
 
 export type DataKV = { type: string, value: string }
 export type Description = DataKV
-export type LicenseType = DataKV
+export type License = DataKV
 export type Price = DataKV
 export type Name = string
 
@@ -31,12 +31,16 @@ export type DescriptionType = {
     value: string;
 };
 
-export type LicenseTypeType = {
+export type LicenseType = {
     type: string;
     value: string;
 };
 
 export type PriceType = {
+    type: string;
+    value: string;
+};
+export type CountType = {
     type: string;
     value: string;
 };
@@ -53,9 +57,20 @@ export type DataType = {
     id: number;
     name: string;
     description: DescriptionType[];
-    licenseType: LicenseTypeType[];
+    licenseType: LicenseType[];
     price: PriceType[];
     // count:Counts[]
+
+};
+export type InvestmentType = {
+    id: number;
+    name: string;
+    description: DescriptionType[];
+    licenseType: LicenseType[];
+    price: PriceType[];
+    count:CountType[];
+    disCount:CountType[],
+
 
 };
 
