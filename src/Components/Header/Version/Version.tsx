@@ -37,7 +37,6 @@ const Version: React.FC<CustomerProps> = ({ onVersionSelect }) => {
     onVersionSelect(event.target.value as string)
   };
   const openModal = () => {
-    console.log('open')
     setOpen(true)
   }
 
@@ -46,7 +45,7 @@ const Version: React.FC<CustomerProps> = ({ onVersionSelect }) => {
 
   };
   const addItem = (name: string) => {
-    console.log(name)
+
     onVersionSelect(name)
     setChangeName(name)
 

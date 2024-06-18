@@ -34,11 +34,12 @@ const Tables = () => {
             version:''
         }
     )
-    //////////console.log(records)
+
 
     const selectCustomerValue = (items: any) => {
         setCustomer(items.client)
         setVersion(items.version)
+        //console.log(otherRow)
     }
     const onDate = (items: any) => {
         setStart(items.startDate)
@@ -48,16 +49,16 @@ const Tables = () => {
 
 useEffect(()=>{
     setHeaderDate({customer:customer, version:version})
-
+setRecords([])
 },[customer, version])
-// console.log(headerData)
+
     const onRemoved = (tablerow: number) => {
         //amboxj datan avelacvac- idin stugel ete havasar e durs hanel datan toxel miayn
         // nranq vory vor havasar chi 
         const remainingRecords = records.filter((e: any) => e.id !== tablerow);
         setRecords(remainingRecords);
     };
-// //////////console.log(remain)
+
 const handleAddRow = () => {
 
     const newRow = {
@@ -72,14 +73,13 @@ const handleAddRow = () => {
     };
 
     setRecords((prevRecords: any) => [...prevRecords, newRow]);
-    //console.log(records)
+
     setDates(prevDates => [...prevDates, getValues]);
 }
 
 
 
 const handleSave = async () => {
-    //console.log(records)
     if (customer && version) {
         const newClientRecord = {
             name: customer,
@@ -92,10 +92,8 @@ const handleSave = async () => {
                 records
             }
         };
-        //console.log(newClientRecord)
         try {
-            const response = await axios.post('http://localhost:3004/', { newClientRecord });
-         ////console.log(response.data);
+       await axios.post('http://localhost:3004/', { newClientRecord });
             setShowAlert(true); 
             setTimeout(() => setShowAlert(false), 2000);
         } catch (error) {
@@ -109,26 +107,6 @@ useEffect(() => {
         try {
             const response = await axios.get('http://localhost:3004/');
             const clientsData = response.data.data;
-
-            // if (customer && version) {
-            //     const clientData = clientsData[customer];
-            //     for (let i in clientsData) {
-            //         //////console.log(i)
-            //         if (i === customer) {
-                    
-            //             console.log(clientData)
-            //             const versionData = clientData.versions.find((v: any) => v.version === version);
-            //             setRecords(versionData.records);
-            //             let versionDataDescription = versionData.records
-            //             versionDataDescription.map((e:any)=>{
-            //                 setOtherRow(e.description)
-            //                 //console.log(e.licenseType)
-            //             })
-            //             //console.log(otherRow, versionData)
-
-            //         }
-            //     }
-            // }
             if (customer && version) {
                 const clientData = clientsData[customer];
                 if (clientData) {
