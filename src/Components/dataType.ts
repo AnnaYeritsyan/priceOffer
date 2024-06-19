@@ -70,7 +70,7 @@ export type InvestmentType = {
     price: PriceType[];
     count:CountType[];
     disCount:CountType[],
-    finallyPrice:CountType[],
+   disCountPrice:CountType[],
 
 };
 

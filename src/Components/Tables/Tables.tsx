@@ -56,7 +56,10 @@ setRecords([])
         //amboxj datan avelacvac- idin stugel ete havasar e durs hanel datan toxel miayn
         // nranq vory vor havasar chi 
         const remainingRecords = records.filter((e: any) => e.id !== tablerow);
-        setRecords(remainingRecords);
+      console.log(records)
+    
+         setRecords(remainingRecords);
+        
     };
 
 const handleAddRow = () => {
