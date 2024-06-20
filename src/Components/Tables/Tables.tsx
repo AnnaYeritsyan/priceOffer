@@ -5,8 +5,11 @@ import { useState, createContext, useContext, useEffect } from 'react';
 import { DataRow, DataSchema, DataType } from '../dataType';
 import Header from '../Header/Header';
 import axios from 'axios'
-
-
+import Alerts from './Alerts';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import ReactToPrint from 'react-to-print';
+import { useRef } from 'react';
+import Blank_Generator from '../Blank-Generator/Blank-Generator';
 
 const TableContext = createContext<{
     onChange?: (value: any) => void;
@@ -30,221 +33,234 @@ const Tables = () => {
     const [showAlert, setShowAlert] = useState<boolean>(false)
     const [headerData, setHeaderDate] = useState<any>(
         {
-            customer:'',
-            version:''
+            customer: '',
+            version: ''
         }
     )
-
 
     const selectCustomerValue = (items: any) => {
         setCustomer(items.client)
         setVersion(items.version)
-        //console.log(otherRow)
     }
     const onDate = (items: any) => {
         setStart(items.startDate)
         setEnd(items.endDate)
-
     }
 
-useEffect(()=>{
-    setHeaderDate({customer:customer, version:version})
-setRecords([])
-},[customer, version])
+    useEffect(() => {
+        setHeaderDate({ customer: customer, version: version })
+        setRecords([])
+    }, [customer, version])
 
     const onRemoved = (tablerow: number) => {
         //amboxj datan avelacvac- idin stugel ete havasar e durs hanel datan toxel miayn
         // nranq vory vor havasar chi 
         const remainingRecords = records.filter((e: any) => e.id !== tablerow);
-      console.log(records)
-    
-         setRecords(remainingRecords);
-        
+        setRecords([]);
+        setTimeout(() => {
+            setRecords(remainingRecords);
+        }, 0);
+
     };
 
-const handleAddRow = () => {
+    const handleAddRow = () => {
 
-    const newRow = {
-        id: Math.floor(new Date().getTime() * Math.random()),
-        name: '',
-        description: '',
-        licenseType: '',
-        price: 0,
-        disCount: 0,
-        count: 1,
-        disCountPrice: 0
-    };
-
-    setRecords((prevRecords: any) => [...prevRecords, newRow]);
-
-    setDates(prevDates => [...prevDates, getValues]);
-}
-
-
-
-const handleSave = async () => {
-    if (customer && version) {
-        const newClientRecord = {
-            name: customer,
-            versiondata: {
-                version,
-                date: {
-                    start: start,
-                    end: end
-                },
-                records
-            }
+        const newRow = {
+            id: Math.floor(new Date().getTime() * Math.random()),
+            name: '',
+            description: '',
+            licenseType: '',
+            price: 0,
+            disCount: 0,
+            count: 1,
+            disCountPrice: 0
         };
-        try {
-       await axios.post('http://localhost:3004/', { newClientRecord });
-            setShowAlert(true); 
-            setTimeout(() => setShowAlert(false), 2000);
-        } catch (error) {
-            console.error('Failed to save data:', error);
-        }
-    }
-};
 
-useEffect(() => {
-    const fetchData = async () => {
-        try {
-            const response = await axios.get('http://localhost:3004/');
-            const clientsData = response.data.data;
-            if (customer && version) {
-                const clientData = clientsData[customer];
-                if (clientData) {
-                    const versionData = clientData.versions.find((v: any) => v.version === version);
-                    if (versionData) {
-                        setRecords(versionData.records);
-                        setOtherRow(versionData.records.map((e: any) => e.description));
+        setRecords((prevRecords: any) => [...prevRecords, newRow]);
+
+        setDates(prevDates => [...prevDates, getValues]);
+    }
+
+
+
+    const handleSave = async () => {
+        if (customer && version) {
+            const newClientRecord = {
+                name: customer,
+                versiondata: {
+                    version,
+                    date: {
+                        start: start,
+                        end: end
+                    },
+                    records
+                }
+            };
+            try {
+                await axios.post('http://localhost:3004/', { newClientRecord });
+                setShowAlert(true);
+                setTimeout(() => setShowAlert(false), 2000);
+            } catch (error) {
+                console.error('Failed to save data:', error);
+            }
+        }
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:3004/');
+                const clientsData = response.data.data;
+                if (customer && version) {
+                    const clientData = clientsData[customer];
+                    if (clientData) {
+                        const versionData = clientData.versions.find((v: any) => v.version === version);
+                        if (versionData) {
+                            setRecords(versionData.records);
+                            setOtherRow(versionData.records.map((e: any) => e.description));
+                        } else {
+                            setRecords([]);
+                        }
                     } else {
                         setRecords([]);
                     }
-                } else {
-                    setRecords([]);
                 }
+            } catch (error) {
+                console.error('Failed to fetch data:', error);
             }
-        } catch (error) {
-            console.error('Failed to fetch data:', error);
-        }
-    };
-    fetchData();
-}, [customer, version]);
+        };
+        fetchData();
+    }, [customer, version]);
 
-return (
-    <TableContext.Provider value={{
-        onRemoved,
-        onChange: (value) => {
-            if (!value) {
-                return;
+
+// const handlePdf=()=>{
+//     console.log('click pdf')
+//     window.print()
+// }
+const componentRef = useRef(null);
+
+    return (
+        <TableContext.Provider value={{
+            onRemoved,
+            onChange: (value) => {
+                if (!value) {
+                    return;
+                }
+
+                const recordIndex = records.findIndex(record => record.id === value.id)
+                if (recordIndex >= 0) {
+                    records[recordIndex] = value
+                    setRecords([...records])
+                }
+                //setRecords((prevRecords: any) => [...prevRecords, value]);
             }
-            
-            const recordIndex = records.findIndex(record => record.id === value.id)
-            if (recordIndex >= 0) {
-                records[recordIndex] = value
-                setRecords([...records])
-            }
-            //setRecords((prevRecords: any) => [...prevRecords, value]);
-        }
-    }}>
-        <Box >
-            <Box sx={{ display: 'flex', alignItems: 'center', margin: '25px 0px' }}>
-                <Header selectCustomerValue={selectCustomerValue} onDate={onDate} />
-                <Button variant='contained' onClick={handleAddRow}>+</Button>
+        }}>
+            <Box >
+                <Box sx={{ display: 'flex', alignItems: 'center', margin: '25px 0px' }}>
+                    <Header selectCustomerValue={selectCustomerValue} onDate={onDate} />
+                    {/* <Button variant='contained' onClick={handlePdf}>
+                                    <PictureAsPdfIcon/>
+                                </Button> */}
+                                 <ReactToPrint
+                        trigger={() => <Button variant='contained'><PictureAsPdfIcon /></Button>}
+                        content={() => componentRef.current}
+                    />
+                    <Box sx={{display:'none'}}>
+                         <Box ref={componentRef} >
+                    <Blank_Generator />
+                </Box>
+                    </Box>
+                    
+                </Box>
+
+                <TableContainer component={Paper} sx={{ display: "flex", justifyContent: 'center', }} >
+                    <Table>
+                        <TableHead>
+                            <TableRow >
+                            <TableCell align='center'
+                                    sx={{
+                                        fontWeight: 'bold',
+                                        padding: '0px'
+                                    }}></TableCell>
+                                <TableCell align='center'
+                                    sx={{
+                                        fontWeight: 'bold',
+                                        borderRight: '1px solid  #DEDEDE',
+                                        padding: '0px'
+                                    }}
+                                >Անվանում</TableCell>
+                                <TableCell align='center'
+                                    sx={{
+                                        fontWeight: 'bold',
+                                        borderRight: '1px solid  #DEDEDE',
+                                        padding: '0px'
+                                    }}>Նկարագրություն</TableCell>
+                                <TableCell align='center'
+                                    sx={{
+                                        fontWeight: 'bold',
+                                        borderRight: '1px solid  #DEDEDE',
+                                        padding: '0px'
+                                    }}>Լիցենզիայի տեսակ</TableCell>
+                                <TableCell align='center'
+                                    sx={{
+                                        fontWeight: 'bold',
+                                        borderRight: '1px solid  #DEDEDE',
+                                        padding: '0px'
+                                    }}>Քանակ</TableCell>
+                                <TableCell align='center'
+                                    sx={{
+                                        fontWeight: 'bold',
+                                        borderRight: '1px solid  #DEDEDE',
+                                        padding: '0px'
+                                    }}>Գին (ՀՀ Դրամ)</TableCell>
+                                <TableCell align='center'
+                                    sx={{
+                                        fontWeight: 'bold',
+                                        borderRight: '1px solid #DEDEDE',
+                                    }}>Զեղչ</TableCell>
+                                <TableCell align='center'
+                                    sx={{
+                                        fontWeight: 'bold',
+                                        borderRight: '1px solid #DEDEDE',
+                                        padding: '0px'
+                                    }}>Զեղչված գին (ՀՀ Դրամ)</TableCell>
+                              
+                            </TableRow>
+                        </TableHead>
+
+                        <TableBody>
+                            {
+                                records.map((data, idx) => {
+
+                                    return (
+                                        <Rows
+                                            defaultRecord={data}
+                                            key={idx}
+                                            index={idx}
+                                            databaseData={otherRow}
+                                            recordsDataTable={records}
+                                            headerData={headerData}
+                                        />
+                                    )
+
+                                }
+                                )}
+
+
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                <Box sx={{ marginTop: '25px', display:'flex', justifyContent:'flex-end' }}>
+                <Button variant='outlined' onClick={handleAddRow} sx={{mr:'5px'}} >Ստեղծել նորը</Button>
+                    <Button variant='contained' onClick={handleSave} >Պահպանել</Button>
+                </Box>
             </Box>
+            {showAlert && (
+             <Alerts showAlert={showAlert}/>
+            )}
+                                
 
-            <TableContainer component={Paper} sx={{ display: "flex", justifyContent: 'center', }} >
-                <Table>
-                    <TableHead>
-                        <TableRow >
-                            <TableCell align='center'
-                                sx={{
-                                    fontWeight: 'bold',
-                                    borderRight: '1px solid  #DEDEDE',
-                                    padding: '0px'
-                                }}
-                            >Անվանում</TableCell>
-                            <TableCell align='center'
-                                sx={{
-                                    fontWeight: 'bold',
-                                    borderRight: '1px solid  #DEDEDE',
-                                    padding: '0px'
-                                }}>Նկարագրություն</TableCell>
-                            <TableCell align='center'
-                                sx={{
-                                    fontWeight: 'bold',
-                                    borderRight: '1px solid  #DEDEDE',
-                                    padding: '0px'
-                                }}>Լիցենզիայի տեսակ</TableCell>
-                            <TableCell align='center'
-                                sx={{
-                                    fontWeight: 'bold',
-                                    borderRight: '1px solid  #DEDEDE',
-                                    padding: '0px'
-                                }}>Քանակ</TableCell>
-                            <TableCell align='center'
-                                sx={{
-                                    fontWeight: 'bold',
-                                    borderRight: '1px solid  #DEDEDE',
-                                    padding: '0px'
-                                }}>Գին (ՀՀ Դրամ)</TableCell>
-                            <TableCell align='center'
-                                sx={{
-                                    fontWeight: 'bold',
-                                    borderRight: '1px solid #DEDEDE',
-                                }}>Զեղչ</TableCell>
-                            <TableCell align='center'
-                                sx={{
-                                    fontWeight: 'bold',
-                                    borderRight: '1px solid #DEDEDE',
-                                    padding: '0px'
-                                }}>Զեղչված գին (ՀՀ Դրամ)</TableCell>
-                            <TableCell align='center'
-                                sx={{
-                                    fontWeight: 'bold',
-                                    padding: '0px'
-                                }}>Խմբագրել</TableCell>
-                        </TableRow>
-                    </TableHead>
-
-                    <TableBody>
-                        {
-                            records.map((data, idx) => {
-                            
-                                return (
-                                    <Rows
-                                        defaultRecord={data}
-                                        key={idx}
-                                        index={idx}
-                                        databaseData={otherRow}
-                                        recordsDataTable={records}
-                                        headerData={headerData}
-                                    />
-                                )
-
-                            }
-                            )}
-
-
-                    </TableBody>
-                </Table>
-            </TableContainer>
-            <Box sx={{marginTop:'25px'}}>
-            <Button variant='contained' onClick={handleSave} sx={{marginLeft:'90%', bgcolor:'green'}}>Պահպանել</Button>
-            </Box>
-        </Box>
-        {showAlert && (
-                    <Alert variant="filled" severity="success"
-                     sx={{ width: '20%', 
-                     position: 'absolute', 
-                     bottom: 0,
-                     left: 0,
-                     animation: showAlert ? 'slideIn 1s forwards' : 'slideOut 1s forwards'
-                     }}>
-                        Փոփոխությունը պահպանված է
-                    </Alert>
-                )}
-    </TableContext.Provider>
-);
+        </TableContext.Provider>
+    );
 };
 export default Tables;

@@ -27,9 +27,7 @@ export default function ModalWindow({open,
 
   return (
     <React.Fragment>
-      {/* <Button variant="outlined" onClick={handleClickOpen}>
-        Open form dialog
-      </Button> */}
+ 
       <Dialog
         open={open}
         onClose={closeModal}
@@ -40,8 +38,7 @@ export default function ModalWindow({open,
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries((formData as any).entries());
             const name = formJson.name;
-            console.log(name);
-            // setNewItem(name)
+           
             addItem(name)
           },
         }}

@@ -6,7 +6,7 @@ import Tables from './Components/Tables/Tables';
 
 function App() {
   return (
-    <Box>
+    <Box sx={{margin:'25px'}}>
       <Tables/>
     </Box>
   );

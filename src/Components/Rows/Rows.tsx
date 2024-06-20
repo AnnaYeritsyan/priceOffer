@@ -10,6 +10,17 @@ import { useRef } from 'react';
 import { useTableContext } from '../Tables/Tables';
 import { styles } from '../style';
 
+const ButtonAdds = () => {
+    return (
+        <Button variant='contained'
+            sx={{
+                bgcolor: '#0b4a0b',
+                visibility: 'hidden'
+            }}>
+            <AddBoxIcon />
+        </Button>
+    )
+}
 
 
 const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData }:
@@ -21,8 +32,8 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
         headerData: any
     }) => {
 
-    // const [records, setRecords] = useState<DataType[]>(data)
-    const records = data
+    const [records, setRecords] = useState<DataType[]>(data)
+    // const records = data
     const [value, setValue] = useState<string | undefined | number>(undefined)
     const [isFilterDescription, setIsFilterDescription] = useState<string[]>([])
     const [isFilterLicense, setIsFilterLicense] = useState<string[]>([])
@@ -46,29 +57,22 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
 
     const [updateCountInvetsment, setUpdateCountInvestment] = useState<any>()
     const [updatedisCountInvetsment, setUpdatedisCountInvestment] = useState<any>()
-    const [updatefinallyPriceInvetsment, setupdatefinallyPriceInvetsment] = useState<any>()
-       
-  
+
+
     useEffect(() => {
-   console.log(otherRow, recordsDataTable)
-  
-   if(otherRow.length === 0){
-     setOtherRow(recordsDataTable)
-     console.log(otherRow)
-   }
-        if (investment ) {
-         console.log(investment, otherRow)
+        if (otherRow.length === 0) {
+            setOtherRow(recordsDataTable)
+        }
+        if (investment) {
             otherRow[0].description = investment[0].description;
             otherRow[0].licenseType = investment[0].licenseType;
             otherRow[0].price = investment[0].price;
             otherRow[0].count = investment[0].count?.length > 0
                 ? investment[0].count.map((a: any, index: number) => {
-               
+
                     if (countInvestment[index]) {
-                        // const key = Object.keys(countInvestment[index])[0];
                         return {
                             ...a,
-                            // type: key, 
                             type: countInvestment[index],
                             value: countInvestment[index]
                         };
@@ -91,37 +95,37 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                             ...a,
                             type: disCountInvestment[index],
                             value: disCountInvestment[index]
-                        
+
                         };
                     } else {
                         if (a.type === undefined && a.value === undefined) {
                             return { ...a, type: 0, value: 0 };
                         } else {
-                            return { ...a, type:0, value: 0};
+                            return { ...a, type: 0, value: 0 };
                         }
                     }
                 })
-                : 
+                :
                 Array.from(Array(investment[0].description.length)?.keys()).map(
                     () => ({ type: 1, value: 1 }),
                 );
 
-            otherRow[0].disCountPrice =investment[0].count?.length > 0
-            ? investment[0].count.map((item: any, index: number) => {
-                const price = investment[0].price[index]?.value || 0;
-                const count = item.value || 0;
-                const totalPrice = price * count;
-                const discount = investment[0].disCount[index]?.value || 0;
-                const discountPercent = discount / 100;
-                const discountedPrice = totalPrice * (1 - discountPercent);
-                return discountedPrice;
-            }):Array.from(Array(investment[0].description.length)?.keys()).map(
-                () => ({ type: 1, value: 1 }),
-            );
+            otherRow[0].disCountPrice = investment[0].count?.length > 0
+                ? investment[0].count.map((item: any, index: number) => {
+                    const price = investment[0].price[index]?.value || 0;
+                    const count = item.value || 0;
+                    const totalPrice = price * count;
+                    const discount = investment[0].disCount[index]?.value || 0;
+                    const discountPercent = discount / 100;
+                    const discountedPrice = totalPrice * (1 - discountPercent);
+                    return discountedPrice;
+                }) : Array.from(Array(investment[0].description.length)?.keys()).map(
+                    () => ({ type: 1, value: 0 }),
+                );
             setFinallyPrice(otherRow[0].discountPrice)
             setShowAddButton(true)
         }
-    }, [investment, countInvestment, disCountInvestment, otherRow, name]);
+    }, [investment, countInvestment, disCountInvestment, otherRow, name, recordsDataTable]);
 
 
     useEffect(() => {
@@ -140,85 +144,84 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
             setCount(defaultRecord.count)
             setDisCount(defaultRecord.disCount)
             setFinallyPrice(defaultRecord.disCountPrice)
-            
+
         }
         else {
-            console.log(otherRow, "&&&&&&&&&&&&&&&&&&&&&&&")
-          
-            otherRow.map((a:any)=>{
-                     if(typeof a.description === 'object'){
-                     
-            const onFilterRecords = otherRow.filter(f => f.name === defaultRecord.name);
-            let newObj: NewObjType = {
-                id: '',
-                name: '',
-                description: [],
-                licenseType: [],
-                price: [],
-                count: [],
-                disCount: [],
-                finallyPrice: [],
-            };
-            onFilterRecords.forEach((f, idx) => {
+            //    setOtherRow(defaultRecord)
+        
+            otherRow.map((a: any) => {
+                if (typeof a.description === 'object') {
 
-                f.description.forEach((a: any) => {
-                    newObj.id = f.id;
-                    newObj.name = f.name;
-                    newObj.description = f.description;
-                    newObj.licenseType = f.licenseType;
-                    newObj.price = f.price;
-                    newObj.finallyPrice = f.price;
-                   
-                    if (count) {
-                        newObj.count = f.count
-                    }
-                    else {
-                        if (f.price && Array.isArray(f.price)) {
-                            if (countInvestment !== undefined) {
-                                newObj.count = f.price.map((d: any, idx: number) => {
-                                    return {
-                                        ...d,
-                                        type: 1,
-                                        value: 1
-                                    };
-                                });
+                    const onFilterRecords = otherRow.filter(f => f.name === defaultRecord.name);
+                    let newObj: NewObjType = {
+                        id: '',
+                        name: '',
+                        description: [],
+                        licenseType: [],
+                        price: [],
+                        count: [],
+                        disCount: [],
+                        finallyPrice: [],
+                    };
+                    onFilterRecords.forEach((f, idx) => {
+
+                        f.description.forEach((a: any) => {
+                            newObj.id = f.id;
+                            newObj.name = f.name;
+                            newObj.description = f.description;
+                            newObj.licenseType = f.licenseType;
+                            newObj.price = f.price;
+                            newObj.finallyPrice = f.price;
+
+                            if (count) {
+                                newObj.count = f.count
                             }
                             else {
-                                newObj.count = f.price.map((d: any, idx: number) => {
-                                    return {
-                                        ...d,
-                                        type: countInvestment.type,
-                                        value: countInvestment.value
-                                    };
-                                });
+                                if (f.price && Array.isArray(f.price)) {
+                                    if (countInvestment !== undefined) {
+                                        newObj.count = f.price.map((d: any, idx: number) => {
+                                            return {
+                                                ...d,
+                                                type: 1,
+                                                value: 1
+                                            };
+                                        });
+                                    }
+                                    else {
+                                        newObj.count = f.price.map((d: any, idx: number) => {
+                                            return {
+                                                ...d,
+                                                type: countInvestment.type,
+                                                value: countInvestment.value
+                                            };
+                                        });
+                                    }
+                                }
                             }
-                        }
-                    }
-                    if (countInvestment.length > 0) {
-                        newObj.count = f.disCount
-                    }
-                    else {
-                        if (f.price && Array.isArray(f.price)) {
-                            newObj.disCount = f.price.map((d: any) => {
-                                return {
-                                    ...d,
-                                    type: countInvestment.type,
-                                    value: countInvestment.value
-                                };
-                            });
-                        }
-                    }
-                })
-            })    
-            setInvestment(otherRow)
-                     }
-                     else{
-                        console.log("else=============", otherRow)
-                     }
+                            if (countInvestment.length > 0) {
+                                newObj.count = f.disCount
+                            }
+                            else {
+                                if (f.price && Array.isArray(f.price)) {
+                                    newObj.disCount = f.price.map((d: any) => {
+                                        return {
+                                            ...d,
+                                            type: countInvestment.type,
+                                            value: countInvestment.value
+                                        };
+                                    });
+                                }
+                            }
+                        })
+                    })
+                    setInvestment(otherRow)
+                }
+                else {
+                }
             })
-   
 
-           
+
+
         }
     }, [recordsDataTable, otherRow, investment, name])
 
@@ -246,26 +249,24 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                     otherRow.map((e: any) => { e.name = selectedName })
 
                 } else {
-                    console.log(selectedRecords)
-                    selectedRecords.map((e:any)=>{
-                        e.description.map((a:any)=>{
-                            
+                    selectedRecords.map((e: any) => {
+                        e.description.map((a: any) => {
+
                             setDescription(a.value)
                         })
                     })
                     otherRow.map((e: any) => {
-                        console.log(e)
                         e.name = selectedName
                         e.description = description
                         e.licenseType = selectedRecords.map(record => record.licenseType)[0]
-                        e.price =  selectedRecords.map(record => record.price)[0]
+                        e.price = selectedRecords.map(record => record.price)[0]
                         e.count = price
-                        e.disCount = '1'
+                        e.disCount = '0'
                         e.disCountPrice = price
                     })
                     setInvestment(null)
                     // setDescription()
-                    
+
                     setShowAddButton(false);
                     // setShowAddButton(selectedName === 'LIS-A ներդնում');
                 }
@@ -275,9 +276,9 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                 setValue(event.target.value)
 
                 if (name !== 'LIS-A ներդնում') {
-               setDescription(event.target.value);
+                    setDescription(event.target.value);
                 }
-              
+
                 otherRow.map((e: any) => {
                     e.description = event.target.value
                 })
@@ -298,8 +299,8 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
             case 'price':
 
                 if (name !== 'LIS-A ներդնում') {
-                     setIsPricing(+event.target.value)
-                } 
+                    setIsPricing(+event.target.value)
+                }
                 otherRow.map((e: any) => {
                     e.price = +(event.target.value)
                 })
@@ -360,18 +361,18 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
         }
     };
 
-  useEffect(()=>{
-    otherRow.map((e:any)=>{
-        const counts = e.count
-        const prices = e.price
-        const discounts = e.disCount
-        const totalPrices = prices*counts
-        const discountPercent = discounts / 100
-        const discountedPrice = totalPrices * (1 - discountPercent)
-        setFinallyPrice(discountedPrice)
-        e.disCountPrice = discountedPrice
-    })
-  },[otherRow,count, disCount, price])
+    useEffect(() => {
+        otherRow.map((e: any) => {
+            const counts = e.count
+            const prices = e.price
+            const discounts = e.disCount
+            const totalPrices = prices * counts
+            const discountPercent = discounts / 100
+            const discountedPrice = totalPrices * (1 - discountPercent)
+            setFinallyPrice(discountedPrice)
+            e.disCountPrice = discountedPrice
+        })
+    }, [otherRow, count, disCount, price])
 
 
     useEffect(() => {
@@ -448,7 +449,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
             const updatedInvestment = investment.map((e: InvestmentType) => ({
                 ...e,
 
-               disCountPrice: e.disCountPrice ? e.disCountPrice.map((change: CountType, idx: number) => {
+                disCountPrice: e.disCountPrice ? e.disCountPrice.map((change: CountType, idx: number) => {
                     if (finallyPriceInvestment[idx] !== undefined) {
 
                         return {
@@ -476,7 +477,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
         }
     }, [countInvestment, disCountInvestment, investment, otherRow]);
 
-   
+
     const addinRow = () => {                 //created lis-a investment  row
         const newRow: DescriptionType = {
             value: '',
@@ -494,7 +495,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
             value: '',
             type: ''
         };
-        
+
         if (investment) {
             const newInvestment = investment?.map((item: InvestmentType) => {
 
@@ -583,11 +584,10 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
         setInvestment(updatedInvestment);
     };
 
-const removeRowById = (id: number) => {
-    setOtherRow((prevRows) => prevRows.filter((_, i) => i !== index));
-    tableContext.onRemoved && tableContext.onRemoved(otherRow[0].id)
-};
- 
+    const removeRowById = (id: number,) => {
+        setOtherRow((prevRows) => prevRows.filter((_, i) => i !== index));
+        tableContext.onRemoved && tableContext.onRemoved(otherRow[0].id)
+    };
     const removeAllRow = (event: React.MouseEvent<HTMLButtonElement>) => {
         const rowIndex = Number(event.currentTarget.getAttribute('data-index'));
         removeRowById(rowIndex);
@@ -653,7 +653,7 @@ const removeRowById = (id: number) => {
                     </Select>
                 </FormControl>
 
-                <DeleteIcon onClick={onRemove} sx={{ color: '#a91f1f', cursor: 'pointer' }} />
+                {/* <DeleteIcon onClick={onRemove} sx={{ color: '#a91f1f', cursor: 'pointer' }} /> */}
 
             </TableRow>
         );
@@ -667,10 +667,10 @@ const removeRowById = (id: number) => {
         };
 
         return (
-            <TableRow sx={styles.tableRow}  >
-                <TableCell style={styles.tableCell}>
+            <TableRow style={styles.tableRow} sx={{ display: 'flex', }}  >
+                <TableCell style={styles.tableCell} sx={{ border: 0 }}>
                     <FormControl fullWidth sx={{
-                        height: '53px',
+                        height: '54px',
                     }}>
 
                         <Select
@@ -678,7 +678,6 @@ const removeRowById = (id: number) => {
                             id="licenseType"
                             sx={{
                                 width: '100%',
-                                height: '54px',
                                 '& .MuiSeect-select': {
                                     whiteSpace: 'wrap',
                                 },
@@ -693,20 +692,18 @@ const removeRowById = (id: number) => {
                                 },
                             }}
                             name='licenseType'
-                            // value={item}
                             onChange={handleLicenseChange}
                             value={updateValue ?? item}
-                        // onChange={(event) => handleLicenseChange(event, index)}
                         >
                             <MenuItem value={item} key={(new Date().getMilliseconds())}> {item}</MenuItem>
-
-                            {licenseState.map((e: any) =>
-                                e.map((a: LicenseType, idx: number) => (
-                                    <MenuItem key={idx} value={a.value} >{a.value}</MenuItem>
-                                ))
-
-
-                            )}
+                            {records
+                                .filter((license: any) => license.name === 'LIS-A ներդնում')
+                                .flatMap((license: any) => license.licenseType)
+                                .map((e: DescriptionType, idx: number) => (
+                                    <MenuItem key={idx} value={e.value}>
+                                        {e.value}
+                                    </MenuItem>
+                                ))}
                         </Select>
                     </FormControl></TableCell>
 
@@ -721,7 +718,7 @@ const removeRowById = (id: number) => {
             onPriceChange(newValue, index);
         };
         return (
-            <TableRow sx={{ height: '54px' }}>
+            <TableRow sx={{ height: '54px' }} style={styles.tableRow}>
                 <Select
                     labelId="price"
                     id="price"
@@ -743,19 +740,22 @@ const removeRowById = (id: number) => {
                         },
                     }}
                     name='price'
-                    // value={item}
                     value={updateValue ?? item}
                     placeholder={item}
-                    // onChange={(e) => handleChange(e as SelectChangeEvent, 'price')}
                     onChange={handlePriceChange}
                 >
                     <MenuItem value={item}> {item}</MenuItem>
 
-                    {price.map((e: any) =>
-                        e.map((a: PriceType, idx: number) => (
-                            <MenuItem key={idx} value={a.value}>{a.value}</MenuItem>
-                        ))
-                    )}
+                    {
+                        records
+                            .filter((price: any) => price.name === 'LIS-A ներդնում')
+                            .flatMap((prices: any) => prices.price)
+                            .map((e: DescriptionType, idx: number) => (
+                                <MenuItem key={idx} value={e.value}>
+                                    {e.value}
+                                </MenuItem>
+                            ))
+                    }
                 </Select>
             </TableRow>
 
@@ -766,6 +766,18 @@ const removeRowById = (id: number) => {
     return (
 
         <TableRow sx={{ bgcolor: rowColor }}>
+            {/* delete checkbox */}
+
+            <TableCell sx={{ padding: 0 }}>
+                <Button onClick={removeAllRow}
+                    data-index={index}
+
+                >
+                    <DeleteIcon sx={{ color: 'red' }} /></Button>
+
+            </TableCell>
+
+
             {/* --------------------------- name */}
             <TableCell sx={{ padding: 0, }} >
                 <FormControl fullWidth>
@@ -814,11 +826,11 @@ const removeRowById = (id: number) => {
             <TableCell sx={{ padding: 0, }} >
                 {
                     investment && investment.length > 0 ? (
-                        investment.map((e: DataType, index: number) => {
+                        investment?.map((e: any, index: number) => {
                             return (
-                                e.description.map((item: DescriptionType, idx: number) => {
+                                e?.description.map((item: DescriptionType, idx: number) => {
                                     return (
-                                        <TableHead sx={{width:'100%', display:'flex'}}>
+                                        <TableHead sx={{ width: '100%', display: 'flex' }}>
                                             <DescriptionSelect
                                                 key={idx}
                                                 item={item.value}
@@ -836,7 +848,7 @@ const removeRowById = (id: number) => {
 
                         <FormControl fullWidth>
                             {
-                                description ?'' :
+                                description ? '' :
                                     <InputLabel id="demo-simple-select-label">Նկարագրություն</InputLabel>
 
                             }
@@ -865,7 +877,7 @@ const removeRowById = (id: number) => {
 
                                 {isFilterDescription.map((ds: any, index: number) => {
                                     return (
-                                        ds.map((e: DescriptionType, idx:number) => (
+                                        ds.map((e: DescriptionType, idx: number) => (
                                             <MenuItem key={idx} value={e.value}>{e.value} </MenuItem>
                                         ))
                                     )
@@ -878,32 +890,35 @@ const removeRowById = (id: number) => {
 
 
                 {
-                showAddButton && (
-                    <Button variant='contained' onClick={addinRow}
-                        sx={{
-                            bgcolor: '#0b4a0b',
-                        }}>
-                        <AddBoxIcon />
-                    </Button>
-                )
+                    showAddButton && (
+                        <Button variant='contained' onClick={addinRow}
+                            sx={{
+                                bgcolor: 'primary.main',
+                                ':hover': {
+                                    bgcolor: 'green'
+                                }
+                            }}>
+                            <AddBoxIcon />
+                        </Button>
+                    )
                 }
             </TableCell>
 
             {/* --------------------------- license type */}
-            <TableCell sx={{ padding: 0, height: '54px' }} >
+            <TableCell sx={{ padding: 0, }} >
                 {
                     investment ?
                         (
                             investment.map((e: DataType, index: number) => (
                                 e.licenseType.map((item: LicenseType, idx: number) => (
-                                    <TableHead sx={{width:'100%', display:'flex'}}>
-                                    <LicenseSelect
-                                        key={idx}
-                                        item={item.value}
-                                        id={e.id}
-                                        index={idx}
-                                        onLicenseChange={LicenseChange}
-                                    />
+                                    <TableHead sx={{ width: '100%', display: 'flex', border: 0, }}>
+                                        <LicenseSelect
+                                            key={idx}
+                                            item={item.value}
+                                            id={e.id}
+                                            index={idx}
+                                            onLicenseChange={LicenseChange}
+                                        />
                                     </TableHead>
                                 ))
                             ))
@@ -937,22 +952,18 @@ const removeRowById = (id: number) => {
                                 onChange={(e) => handleChange(e as SelectChangeEvent, 'licenseType')}
                             >
 
-                                {isFilterLicense.map((li: any, index: number) => (
-                                    li.map((e: LicenseType, idx:number) => (
-                                        <MenuItem key={idx} value={e.value}>{e.value}</MenuItem>
-                                    ))
-                                ))}
+                                {isFilterLicense.map((li: any, index: number) => {
+                                    return (
+                                        li.map((e: LicenseType, idx: number) => (
+                                            <MenuItem key={idx} value={e.value}>{e.value}</MenuItem>
+                                        )))
+                                }
+                                )}
                             </Select>
                         </FormControl>
                 }
                 {
-                    investment ? <Button variant='contained' onClick={addinRow}
-                        sx={{
-                            bgcolor: '#0b4a0b',
-                            visibility: 'hidden'
-                        }}>
-                        <AddBoxIcon />
-                    </Button> : null
+                    investment ? <ButtonAdds /> : null
                 }
             </TableCell>
             <TableCell sx={{ padding: 0 }} >
@@ -960,7 +971,7 @@ const removeRowById = (id: number) => {
                     investment.map((e: any, index: number) => (
                         e.count && e.count.length !== 0 ? (
                             e.count.map((item: any, idx: number) => (
-                                <TableRow key={idx}>
+                                <TableRow key={idx} style={styles.tableRow} sx={{}}>
                                     <TextField
                                         key={idx}
                                         id="outlined-basic"
@@ -969,12 +980,17 @@ const removeRowById = (id: number) => {
                                         value={countInvestment[idx] !== undefined ? countInvestment[idx] : (item?.value)}
                                         name='count'
                                         onChange={(event) => handleInputs(event, 'count', idx)}
+                                        sx={{
+                                            border: 'none',
+                                            "& fieldset": { border: 'none' },
+                                            height: '54px'
+                                        }}
                                     />
                                 </TableRow>
                             ))
                         ) : (
                             e.description.map((item: any, idx: number) => (
-                                <TableRow key={idx}>
+                                <TableRow key={idx} style={styles.tableRow}>
                                     <TextField
                                         key={idx}
                                         id="outlined-basic"
@@ -983,6 +999,11 @@ const removeRowById = (id: number) => {
                                         value={countInvestment[idx] !== undefined ? countInvestment[idx] : '1'}
                                         name='count'
                                         onChange={(event) => handleInputs(event, 'count', idx)}
+                                        sx={{
+                                            border: 'none',
+                                            "& fieldset": { border: 'none' },
+                                            height: '54px'
+                                        }}
                                     />
 
                                 </TableRow>
@@ -997,12 +1018,15 @@ const removeRowById = (id: number) => {
                         value={count ?? 1}
                         name='count'
                         onChange={(event) => handleInputs(event, 'count', 0)}
+                        sx={{
+                            border: 'none',
+                            "& fieldset": { border: 'none' },
+                            height: '54px'
+                        }}
                     />
                 )}
                 {investment && (
-                    <Button variant='contained' onClick={addinRow} sx={{ bgcolor: '#0b4a0b', visibility: 'hidden' }}>
-                        <AddBoxIcon />
-                    </Button>
+                    <ButtonAdds />
                 )}
             </TableCell>
 
@@ -1019,6 +1043,7 @@ const removeRowById = (id: number) => {
                                         id={e.id}
                                         index={idx}
                                         onPriceChange={PriceChange}
+
                                     />
                                 ))
                             ))
@@ -1061,13 +1086,7 @@ const removeRowById = (id: number) => {
                         </FormControl>
                 }
                 {
-                    investment ? <Button variant='contained' onClick={addinRow}
-                        sx={{
-                            bgcolor: '#0b4a0b',
-                            visibility: 'hidden'
-                        }}>
-                        <AddBoxIcon />
-                    </Button> : null
+                    investment ? <ButtonAdds /> : null
                 }
             </TableCell>
 
@@ -1080,7 +1099,7 @@ const removeRowById = (id: number) => {
                         return (
                             e.disCount && e.disCount.length !== 0 ? (
                                 e.disCount.map((item: any, idx: number) => (
-                                    <TableRow key={idx}>
+                                    <TableRow key={idx} style={styles.tableRow}>
                                         <TextField
                                             id="outlined-basic"
                                             variant="outlined"
@@ -1088,6 +1107,11 @@ const removeRowById = (id: number) => {
                                             name='disCount'
                                             type='number'
                                             onChange={(event) => handleInputs(event, 'disCount', idx)}
+                                            sx={{
+                                                border: 'none',
+                                                "& fieldset": { border: 'none' },
+                                                height: '54px'
+                                            }}
                                         />
                                     </TableRow>
                                 ))
@@ -1101,6 +1125,11 @@ const removeRowById = (id: number) => {
                                             name='disCount'
                                             type='number'
                                             onChange={(event) => handleInputs(event, 'disCount', idx)}
+                                            sx={{
+                                                border: 'none',
+                                                "& fieldset": { border: 'none' },
+                                                height: '54px'
+                                            }}
                                         />
                                     </TableRow>
                                 ))
@@ -1115,72 +1144,78 @@ const removeRowById = (id: number) => {
                         type='number'
                         name='disCount'
                         onChange={(event) => handleInputs(event, 'disCount', 0)}
+                        sx={{
+                            border: 'none',
+                            "& fieldset": { border: 'none' },
+                            height: '54px'
+                        }}
                     />
                 )}
                 {investment ? (
-                    <Button
-                        variant='contained'
-                        onClick={addinRow}
-                        sx={{
-                            bgcolor: '#0b4a0b',
-                            visibility: 'hidden'
-                        }}
-                    >
-                        <AddBoxIcon />
-                    </Button>
+                    <ButtonAdds />
                 ) : null}
             </TableCell>
             {/* ---------------------------- zexj */}
-         
-    <TableCell sx={{ padding: 0 }}>
-          {investment ? (
-            investment.map((e: any, index: number) => (
-              e.disCountPrice ? (
-                e.disCountPrice.map((item:any, idx:number) => (
-                  <TableRow
-                    key={idx}
-                    sx={{
-                      height: '56px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center'
-                    }}
-                  >
-                    {typeof item === 'string' || typeof item === 'number' ? (
-                      item
-                    ) : (
-                      <span>Invalid Data</span>
-                    )}
-                  </TableRow>
-                ))
-              ) : null
-            ))
-          ) : (
-            <TableRow
-              sx={{
-                height: '56px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              {typeof finallyPrice === 'string' || typeof finallyPrice === 'number' ? (
-                finallyPrice
-              ) : (
-                <span>Invalid Data</span>
-              )}
-            </TableRow>
-          )}
-        </TableCell>
-            {/* --------------------------- price */}
 
             <TableCell sx={{ padding: 0 }}>
-                <Button onClick={removeAllRow}
-                 data-index={index}
-                ><DeleteIcon sx={{ color: 'black' }} /></Button>
+                {investment ? (
+                    investment.map((e: any, index: number) => (
+                        e.disCountPrice ? (
+                            e.disCountPrice.map((item: any, idx: number) => (
+                                <TableRow
+                                    sx={{ display: 'flex', alignItems: 'center', }}
+                                    key={idx}
+                                    style={styles.tableRow}>
+                                    <TextField
+                                        id="outlined-basic"
+                                        variant="outlined"
+                                        value={typeof item === 'string' || typeof item === 'number' ? (
+                                            item
+                                        ) : (
+                                            <span>Invalid Data</span>
+                                        )}
+                                       
+                                      
+                                      
+                                        sx={{
+                                            border: 'none',
+                                            "& fieldset": { border: 'none' },
+                                            height: '54px'
+                                        }}
+                                    />
+                                    <DeleteIcon onClick={() => removeItem(item, idx)}
+                                        sx={{ color: 'black', cursor: 'pointer' }} />
+                                </TableRow>
+                            ))
+                        ) : 0))
+                ) : (
+                    <TableRow
+                        sx={{
 
+                            height: '56px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}
+                    >
+
+                        {typeof finallyPrice === 'string' || typeof finallyPrice === 'number' ? (
+                            finallyPrice
+                        ) : (
+                            <span>Invalid Data</span>
+                        )}
+
+                    </TableRow>
+
+                )}
+                {investment ? (
+                    <ButtonAdds />
+                ) : null}
             </TableCell>
+            {/* --------------------------- price */}
+
+         
 
         </TableRow>
 
