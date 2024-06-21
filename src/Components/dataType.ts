@@ -111,3 +111,8 @@ export type NewObjType = {
 }
 
 
+export interface HeaderDataType {
+    customer: string;
+    version: string;
+  }
+  

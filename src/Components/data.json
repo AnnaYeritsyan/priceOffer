@@ -8,11 +8,11 @@
         ],
         "licenseType": [
             { "type": "perpetual", "value": "Անժամկետ լիցենզիա" },
-            { "type": "perpetual", "value": "ժամկետ լիցենզիա" }
+            { "type": "perpetual", "value": "Անժամկետ լիցենզիա" }
         ],
         "price": [
-            { "type": "price", "value": "1000" },
-            { "type": "price", "value": "2000" }
+            { "type": "price", "value": "800000" },
+            { "type": "price", "value": "100000" }
             
         ]
     },
@@ -59,11 +59,11 @@
             { "type": "software_integration", "value": "Սարքի և ցանկացած ծրագրային ապահովման հետ տվյալների փոխանակման ծրագրաշար" }
         ],
         "licenseType": [
-            { "type": "annual_3_devices", "value": "Տարեկան լիցենզիա՝ sarqi qanak սարքի համար" }
+            { "type": "annual_3_devices", "value": "Տարեկան լիցենզիա՝ " }
         ],
         "price": [
-            { "type": "price", "value": "210000" },
-            { "type": "price", "value": "60000" }
+            { "type": "price", "value": "210000" }
+        
 
         ]
     },
@@ -74,7 +74,7 @@
             { "type": "system_upgrade", "value": "Սարքերի ﬕացում համակարգչին, ծրագրաշարերի տեղադրում, սարքերի ﬕացման կարգաբերում, տվյալների բազայի ﬕացում և թեսթավորում" }
         ],
         "licenseType": [
-            { "type": "devices", "value": "sarqi qanak սարքի համար" }
+            { "type": "devices", "value": "Լիցենզիա՝" }
         ],
         "price": [
             { "type": "price", "value": "780000" }

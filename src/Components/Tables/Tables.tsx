@@ -31,6 +31,7 @@ const Tables = () => {
     const [start, setStart] = useState<any>('')
     const [end, setEnd] = useState<any>('')
     const [showAlert, setShowAlert] = useState<boolean>(false)
+    const [isPrinting, setIsPrinting] = useState<boolean>(false);
     const [headerData, setHeaderDate] = useState<any>(
         {
             customer: '',
@@ -105,13 +106,14 @@ const Tables = () => {
             }
         }
     };
-
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await axios.get('http://localhost:3004/');
                 const clientsData = response.data.data;
-                if (customer && version) {
+               
+
+     if (customer && version) {
                     const clientData = clientsData[customer];
                     if (clientData) {
                         const versionData = clientData.versions.find((v: any) => v.version === version);
@@ -132,11 +134,14 @@ const Tables = () => {
         fetchData();
     }, [customer, version]);
 
+    const handlePrint = () => {
+        setIsPrinting(true);
+        setTimeout(() => {
+            // window.print();
+            setIsPrinting(false);
+        }, 1000); 
+    };
 
-// const handlePdf=()=>{
-//     console.log('click pdf')
-//     window.print()
-// }
 const componentRef = useRef(null);
 
     return (
@@ -158,19 +163,19 @@ const componentRef = useRef(null);
             <Box >
                 <Box sx={{ display: 'flex', alignItems: 'center', margin: '25px 0px' }}>
                     <Header selectCustomerValue={selectCustomerValue} onDate={onDate} />
-                    {/* <Button variant='contained' onClick={handlePdf}>
+                    {/* <Button variant='contained' onClick={handlePrint}>
                                     <PictureAsPdfIcon/>
                                 </Button> */}
                                  <ReactToPrint
                         trigger={() => <Button variant='contained'><PictureAsPdfIcon /></Button>}
                         content={() => componentRef.current}
                     />
-                    <Box sx={{display:'none'}}>
-                         <Box ref={componentRef} >
-                    <Blank_Generator />
-                </Box>
+                   
                     </Box>
-                    
+                     <Box sx={{display:'none'}}>
+                         <Box ref={componentRef} >
+                    <Blank_Generator headerData ={headerData}/>
+                    </Box>
                 </Box>
 
                 <TableContainer component={Paper} sx={{ display: "flex", justifyContent: 'center', }} >
@@ -250,16 +255,20 @@ const componentRef = useRef(null);
                         </TableBody>
                     </Table>
                 </TableContainer>
+                </Box>
                 <Box sx={{ marginTop: '25px', display:'flex', justifyContent:'flex-end' }}>
                 <Button variant='outlined' onClick={handleAddRow} sx={{mr:'5px'}} >Ստեղծել նորը</Button>
                     <Button variant='contained' onClick={handleSave} >Պահպանել</Button>
                 </Box>
-            </Box>
+            {/*  */}
             {showAlert && (
              <Alerts showAlert={showAlert}/>
             )}
                                 
-
+                                <Box width={'210mm' } height={'30cm'}>
+                                       <Blank_Generator headerData ={headerData}/> 
+                                </Box>
+                             
         </TableContext.Provider>
     );
 };
