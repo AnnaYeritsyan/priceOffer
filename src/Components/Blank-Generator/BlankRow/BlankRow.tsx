@@ -10,7 +10,7 @@ const cellStyle = {
   justifyContent: 'center',
   boxSizing: 'border-box',
   width: '100%',
-  padding: '8px',
+  padding: '6px',
   fontSize: '13px',
 };
 
@@ -20,6 +20,17 @@ const tableCellStyle = {
 };
 
 const BlankRow: React.FC<Props> = ({ tableData }) => {
+ 
+  const totalPriceSum = tableData?.reduce((acc, data) => {
+    const prices = Array.isArray(data.disCountPrice) ? data.disCountPrice : [data.disCountPrice];
+    const sum = prices.reduce((sumAcc:any, price:any) => {
+      const parsedPrice = parseFloat(price);
+      return sumAcc + (isNaN(parsedPrice) ? 0 : parsedPrice);
+    }, 0);
+    return acc + sum;
+  }, 0);
+
+  const formattedTotalPrice = new Intl.NumberFormat().format(totalPriceSum);
   return (
     <>
       {tableData?.map((data, index) => (
@@ -82,6 +93,15 @@ const BlankRow: React.FC<Props> = ({ tableData }) => {
           </TableCell>
         </TableRow>
       ))}
+      {/* Additional rows displayed only once at the end */}
+      <TableRow sx={{ border: '1px solid black' }}>
+        <TableCell colSpan={3} sx={{ border: '1px solid black',textAlign:'end',padding:0 , pr:'5px'  }}>(Օգտագործման լիցենզիա) Տարեկան լիցենզիայի վճարը՝</TableCell>
+        <TableCell sx={{ border: '1px solid black',padding:0, textAlign:'center'  }}>210.000</TableCell>
+      </TableRow>
+      <TableRow sx={{ border: '1px solid black',  }}>
+        <TableCell colSpan={3}sx={{ border: '1px solid black', textAlign:'end',padding:0 , pr:'5px'}}>(Ներդրման պայմանագիր) Միանվագ վճարը՝</TableCell>
+        <TableCell sx={{ border: '1px solid black',padding:0 , textAlign:'center' }} >{formattedTotalPrice}</TableCell>
+      </TableRow>
     </>
   );
 };

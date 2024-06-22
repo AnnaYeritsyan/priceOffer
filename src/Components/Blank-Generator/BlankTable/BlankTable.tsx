@@ -36,16 +36,7 @@ const BlankTable = ({ tableData }: { tableData: any }) => {
 
           <TableBody>
             <BlankRow tableData={tableData} />
-            <TableRow> 
-              {/* <TableCell sx={{width:"100%"}}> */}
-                (Օգտագործման լիցենզիա) Տարեկան լիցենզիայի  վճարը՝
-                 {/* </TableCell> */}
-              <TableCell>210.000</TableCell>
-              </TableRow>
-         <TableRow>
-          <TableCell>(Ներդրման պայմանագիր) Միանվագ վճարը՝</TableCell>
-          <TableCell>210.000</TableCell>
-          </TableRow>
+          
           </TableBody>
         </Table>
       </TableContainer>

@@ -265,9 +265,9 @@ const componentRef = useRef(null);
              <Alerts showAlert={showAlert}/>
             )}
                                 
-                                <Box width={'210mm' } height={'30cm'}>
+                                {/* <Box width={'210mm' } height={'30cm'}>
                                        <Blank_Generator headerData ={headerData}/> 
-                                </Box>
+                                </Box> */}
                              
         </TableContext.Provider>
     );

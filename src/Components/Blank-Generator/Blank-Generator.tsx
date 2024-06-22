@@ -21,20 +21,7 @@ const Blank_Generator = ({ headerData }: { headerData: HeaderDataType }) => {
   const [dataTime, setDataTime] = useState<{ start: string, end: string }>()
   const [tableData, setTableData] = useState<any>()
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response: AxiosResponse<ApiResponse> = await axios.get('http://localhost:3004/');
-  //       const responseData = response.data;
-  //       setRecords(responseData.data);
-  //       console.log(responseData.data)
-  //     } catch (error) {
-  //       console.error('Error fetching data:', error);
-  //     }
-  //   };
 
-  //   fetchData();
-  // }, []);
   const fetchData = async () => {
     try {
       const response: AxiosResponse<ApiResponse> = await axios.get('http://localhost:3004/');
@@ -53,7 +40,7 @@ const Blank_Generator = ({ headerData }: { headerData: HeaderDataType }) => {
   useEffect(() => {
     const interval = setInterval(() => {
       fetchData();
-    }, 5000); 
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
@@ -66,23 +53,29 @@ const Blank_Generator = ({ headerData }: { headerData: HeaderDataType }) => {
         if (key === headerData.customer) {
           records[key].versions.map((e: any) => {
             if (e.version === headerData.version) {
-              setTableData(e.records)
-              setDataTime({ start: e.date.start, end: e.date.end });
+              setTableData(e.records);
+              setDataTime({
+                start: formatDate(e.date.start),
+                end: formatDate(e.date.end)
+              });
             }
-          })
-
+          });
           break;
         }
       }
     }
   }, [headerData, records]);
 
+  const formatDate = (dateStr: string) => {
+    const [year, month, day] = dateStr.split('-');
+    return `${day}.${month}.${year}`;
+  };
 
 
 
 
   return (
-    <Box sx={{ margin: '90px' }}>
+    <Box sx={{ margin: '70px' }}>
       <Box>
         <Box sx={{ display: 'flex', width: '100%', }}>
 
@@ -133,8 +126,29 @@ const Blank_Generator = ({ headerData }: { headerData: HeaderDataType }) => {
         </Box>
 
       </Box>
+<Box sx={{display: "flex", flexDirection: 'column', justifyContent: 'space-between', }}>
 
-      <BlankTable tableData={tableData}/>
+
+      <BlankTable tableData={tableData} />
+      <Box sx={{mt:'1cm'}}>
+
+
+        <Box fontSize={'13px'} >
+          <b> Ներդրման աշխատանքների տևողություն՝</b>առավելագույնը 2 աﬕս:  </Box>
+        <Box fontSize={'13px'}>
+          <b>Սույն գնային առաջարկի ﬔջ ներառված չեն՝</b> անխափան սնուցման սարքեր, համակարգիչներ, տպիչներ, սերվեր, բարկոդ սկաներներ:
+        </Box>
+
+      </Box>
+      <Box sx={{ position: 'absolute', top: '90%', width: '83%', }}>
+        <Box sx={{
+          border: '2px solid #2C3F54', display: 'flex',
+          justifyContent: 'center'
+        }}>
+        </Box>
+        <Typography color={'#2C3F54'}>www.amas.am </Typography>
+      </Box>
+      </Box>
     </Box>
   );
 };
