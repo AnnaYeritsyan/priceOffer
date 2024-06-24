@@ -80,7 +80,7 @@ const Header: React.FC<CustomerSelectHeader> = ({ selectCustomerValue, onDate })
     setSelection(prevState => ({
       ...prevState,
       client: item,
-      version: '' // Reset version when customer changes
+      version: '' 
     }));
     selectCustomerValue({ client: item, version: '' });
   };
@@ -96,6 +96,7 @@ const Header: React.FC<CustomerSelectHeader> = ({ selectCustomerValue, onDate })
   const onDateTime = (item: any) => {
     onDate(item);
   };
+
 
   return (
     <Box width={'90%'} sx={{

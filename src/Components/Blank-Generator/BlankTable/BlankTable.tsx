@@ -15,12 +15,10 @@ const tableHeadStyle = {
 };
 
 const tableContainerStyle = {
-  // display: "flex",
-  // justifyContent: 'center',
   border: '1px solid black'
 };
 
-const BlankTable = ({ tableData }: { tableData: any }) => {
+const BlankTable = ({ tableData, headerData }: { tableData: any, headerData:any }) => {
   return (
     <div>
       <TableContainer component={Paper} sx={{ border: 'none', boxShadow: 'none' }} >
@@ -35,7 +33,7 @@ const BlankTable = ({ tableData }: { tableData: any }) => {
           </TableHead>
 
           <TableBody>
-            <BlankRow tableData={tableData} />
+            <BlankRow tableData={tableData} headerData={headerData}/>
           
           </TableBody>
         </Table>

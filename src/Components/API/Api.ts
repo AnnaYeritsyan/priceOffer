@@ -33,7 +33,7 @@ export const getFiltersCustomerVersion = async () => {
 
         if (response.ok) {
             const data = await response.json();
-            console.log(data)
+        
             return data;
         } else {
             console.error('Failed to fetch filtered customer version data');

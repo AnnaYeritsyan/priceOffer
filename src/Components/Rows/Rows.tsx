@@ -1,6 +1,6 @@
 
 import { Button, Table, TableCell, TableContainer, TableHead, TableRow, TextField, Paper, Select, MenuItem, SelectChangeEvent, FormControl, Box, InputLabel, TableBody, Typography } from '@mui/material';
-import { CountType, DataKV, DataSchema, DataType, DescriptionType, InvestmentType, LicenseType, NewObjType, PriceType, RowState } from '../dataType';
+import { CountType, DataKV, DataSchema, DataType, DescriptionType, HeaderDataType, HeaderDataTypeInvestment, InvestmentType, LicenseType, NewObjType, PriceType, } from '../dataType';
 import { v4 } from 'uuid';
 import data from '../data.json'
 import { ChangeEvent, useState, useEffect, useContext } from 'react';
@@ -23,17 +23,16 @@ const ButtonAdds = () => {
 }
 
 
-const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData }:
+const Rows = ({ defaultRecord, index, recordsDataTable, }:
     {
         defaultRecord: DataType | any,
         index: number,
-        databaseData: any,
+
         recordsDataTable: any,
-        headerData: any
+
     }) => {
 
-    const [records, setRecords] = useState<DataType[]>(data)
-    // const records = data
+    const [records] = useState<DataType[]>(data)
     const [value, setValue] = useState<string | undefined | number>(undefined)
     const [isFilterDescription, setIsFilterDescription] = useState<string[]>([])
     const [isFilterLicense, setIsFilterLicense] = useState<string[]>([])
@@ -68,7 +67,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
             otherRow[0].licenseType = investment[0].licenseType;
             otherRow[0].price = investment[0].price;
             otherRow[0].count = investment[0].count?.length > 0
-                ? investment[0].count.map((a: any, index: number) => {
+                ? investment[0].count.map((a: CountType, index: number) => {
 
                     if (countInvestment[index]) {
                         return {
@@ -89,7 +88,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                 );
 
             otherRow[0].disCount = investment[0].disCount?.length > 0
-                ? investment[0].disCount.map((a: any, index: number) => {
+                ? investment[0].disCount.map((a: CountType, index: number) => {
                     if (disCountInvestment[index]) {
                         return {
                             ...a,
@@ -147,11 +146,9 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
 
         }
         else {
-            //    setOtherRow(defaultRecord)
-        
+
             otherRow.map((a: any) => {
                 if (typeof a.description === 'object') {
-
                     const onFilterRecords = otherRow.filter(f => f.name === defaultRecord.name);
                     let newObj: NewObjType = {
                         id: '',
@@ -161,25 +158,23 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                         price: [],
                         count: [],
                         disCount: [],
-                        finallyPrice: [],
+                        disCountPrice: [],
                     };
                     onFilterRecords.forEach((f, idx) => {
-
                         f.description.forEach((a: any) => {
                             newObj.id = f.id;
                             newObj.name = f.name;
                             newObj.description = f.description;
                             newObj.licenseType = f.licenseType;
                             newObj.price = f.price;
-                            newObj.finallyPrice = f.price;
-
+                            newObj.disCountPrice = f.price;
                             if (count) {
                                 newObj.count = f.count
                             }
                             else {
                                 if (f.price && Array.isArray(f.price)) {
                                     if (countInvestment !== undefined) {
-                                        newObj.count = f.price.map((d: any, idx: number) => {
+                                        newObj.count = f.price.map((d: CountType, idx: number) => {
                                             return {
                                                 ...d,
                                                 type: 1,
@@ -188,7 +183,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                                         });
                                     }
                                     else {
-                                        newObj.count = f.price.map((d: any, idx: number) => {
+                                        newObj.count = f.price.map((d: CountType, idx: number) => {
                                             return {
                                                 ...d,
                                                 type: countInvestment.type,
@@ -203,7 +198,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                             }
                             else {
                                 if (f.price && Array.isArray(f.price)) {
-                                    newObj.disCount = f.price.map((d: any) => {
+                                    newObj.disCount = f.price.map((d: PriceType) => {
                                         return {
                                             ...d,
                                             type: countInvestment.type,
@@ -244,18 +239,16 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                 setPrice(price)
                 const selectedName = event.target.value;
                 if (selectedName === 'LIS-A ներդնում') {
-
                     setInvestment(selectedRecords);
-                    otherRow.map((e: any) => { e.name = selectedName })
+                    otherRow.map((e: HeaderDataTypeInvestment) => { e.name = selectedName })
 
                 } else {
                     selectedRecords.map((e: any) => {
                         e.description.map((a: any) => {
-
                             setDescription(a.value)
                         })
                     })
-                    otherRow.map((e: any) => {
+                    otherRow.map((e: HeaderDataTypeInvestment) => {
                         e.name = selectedName
                         e.description = description
                         e.licenseType = selectedRecords.map(record => record.licenseType)[0]
@@ -265,10 +258,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                         e.disCountPrice = price
                     })
                     setInvestment(null)
-                    // setDescription()
-
                     setShowAddButton(false);
-                    // setShowAddButton(selectedName === 'LIS-A ներդնում');
                 }
                 setShowAddButton(selectedName === 'LIS-A ներդնում');
                 break;
@@ -279,7 +269,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                     setDescription(event.target.value);
                 }
 
-                otherRow.map((e: any) => {
+                otherRow.map((e: HeaderDataTypeInvestment) => {
                     e.description = event.target.value
                 })
 
@@ -292,7 +282,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                     setLicense(event.target.value);
                 }
 
-                otherRow.map((e: any) => {
+                otherRow.map((e: HeaderDataTypeInvestment) => {
                     e.licenseType = event.target.value
                 })
                 break;
@@ -301,18 +291,14 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                 if (name !== 'LIS-A ներդնում') {
                     setIsPricing(+event.target.value)
                 }
-                otherRow.map((e: any) => {
+                otherRow.map((e: HeaderDataTypeInvestment) => {
                     e.price = +(event.target.value)
                 })
                 break;
-
             default:
                 break;
         }
-
-
         tableContext.onChange && tableContext.onChange(otherRow[0])
-
     }
 
     // ==========================================================
@@ -338,19 +324,18 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                     return updatedDisCountInvestment;
                 });
             }
-
         }
         else {
             switch (nameElement) {
                 case 'count':
                     setCount(e.target.value)
-                    otherRow.map((e: any) => {
+                    otherRow.map((e: HeaderDataTypeInvestment) => {
                         e.count = newValue
                     })
                     break;
                 case 'disCount':
                     setDisCount(e.target.value)
-                    otherRow.map((e: any) => {
+                    otherRow.map((e: HeaderDataTypeInvestment) => {
                         e.disCount = newValue
                     })
                     break;
@@ -1174,9 +1159,9 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
                                         ) : (
                                             <span>Invalid Data</span>
                                         )}
-                                       
-                                      
-                                      
+
+
+
                                         sx={{
                                             border: 'none',
                                             "& fieldset": { border: 'none' },
@@ -1215,7 +1200,7 @@ const Rows = ({ defaultRecord, index, databaseData, recordsDataTable, headerData
             </TableCell>
             {/* --------------------------- price */}
 
-         
+
 
         </TableRow>
 

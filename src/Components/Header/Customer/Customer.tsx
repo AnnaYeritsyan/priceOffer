@@ -24,10 +24,7 @@ const Customer: React.FC<CustomerProps> = ({ onCustomerSelect }) => {
   useEffect(() => {
     const fetchCustomer = async () => {
       const data = await getFiltersCustomerVersion();
-      console.log(data.data);
-
       const uniqueNames = new Set<string>();
-
       const uniqueItems = Object.keys(data.data).filter(key => {
         if (!uniqueNames.has(key)) {
           uniqueNames.add(key);
@@ -35,10 +32,8 @@ const Customer: React.FC<CustomerProps> = ({ onCustomerSelect }) => {
         }
         return false;
       }).map(key => ({ id: v4(), item: key }));
-
       setMenuItem(uniqueItems);
     };
-
     fetchCustomer();
   }, []);
 

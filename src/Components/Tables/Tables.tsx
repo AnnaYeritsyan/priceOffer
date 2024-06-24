@@ -2,7 +2,7 @@ import { Button, Table, TableCell, TableContainer, TableHead, TableRow, Paper, S
 import Rows from '../Rows/Rows';
 import data from '../data.json';
 import { useState, createContext, useContext, useEffect } from 'react';
-import { DataRow, DataSchema, DataType } from '../dataType';
+import {  DataType } from '../dataType';
 import Header from '../Header/Header';
 import axios from 'axios'
 import Alerts from './Alerts';
@@ -10,6 +10,7 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import ReactToPrint from 'react-to-print';
 import { useRef } from 'react';
 import Blank_Generator from '../Blank-Generator/Blank-Generator';
+import TextField from '@mui/material/TextField';
 
 const TableContext = createContext<{
     onChange?: (value: any) => void;
@@ -32,6 +33,7 @@ const Tables = () => {
     const [end, setEnd] = useState<any>('')
     const [showAlert, setShowAlert] = useState<boolean>(false)
     const [isPrinting, setIsPrinting] = useState<boolean>(false);
+    const [commentValue, setCommentValue] = useState<string>('')
     const [headerData, setHeaderDate] = useState<any>(
         {
             customer: '',
@@ -74,7 +76,8 @@ const Tables = () => {
             price: 0,
             disCount: 0,
             count: 1,
-            disCountPrice: 0
+            disCountPrice: 0,
+            
         };
 
         setRecords((prevRecords: any) => [...prevRecords, newRow]);
@@ -85,7 +88,8 @@ const Tables = () => {
 
 
     const handleSave = async () => {
-        if (customer && version) {
+
+        if ((customer && version) || customer) {
             const newClientRecord = {
                 name: customer,
                 versiondata: {
@@ -94,9 +98,11 @@ const Tables = () => {
                         start: start,
                         end: end
                     },
+                    comment:commentValue,
                     records
                 }
             };
+         
             try {
                 await axios.post('http://localhost:3004/', { newClientRecord });
                 setShowAlert(true);
@@ -105,23 +111,26 @@ const Tables = () => {
                 console.error('Failed to save data:', error);
             }
         }
+     
     };
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await axios.get('http://localhost:3004/');
                 const clientsData = response.data.data;
-               
 
-     if (customer && version) {
+
+                if (customer && version) {
                     const clientData = clientsData[customer];
                     if (clientData) {
                         const versionData = clientData.versions.find((v: any) => v.version === version);
                         if (versionData) {
                             setRecords(versionData.records);
                             setOtherRow(versionData.records.map((e: any) => e.description));
+                            setCommentValue(versionData.comment)
                         } else {
                             setRecords([]);
+                            setCommentValue('')
                         }
                     } else {
                         setRecords([]);
@@ -134,15 +143,11 @@ const Tables = () => {
         fetchData();
     }, [customer, version]);
 
-    const handlePrint = () => {
-        setIsPrinting(true);
-        setTimeout(() => {
-            // window.print();
-            setIsPrinting(false);
-        }, 1000); 
+ 
+    const handleCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setCommentValue(event.target.value);
     };
-
-const componentRef = useRef(null);
+    const componentRef = useRef(null);
 
     return (
         <TableContext.Provider value={{
@@ -157,24 +162,21 @@ const componentRef = useRef(null);
                     records[recordIndex] = value
                     setRecords([...records])
                 }
-                //setRecords((prevRecords: any) => [...prevRecords, value]);
             }
         }}>
             <Box >
                 <Box sx={{ display: 'flex', alignItems: 'center', margin: '25px 0px' }}>
                     <Header selectCustomerValue={selectCustomerValue} onDate={onDate} />
-                    {/* <Button variant='contained' onClick={handlePrint}>
-                                    <PictureAsPdfIcon/>
-                                </Button> */}
-                                 <ReactToPrint
+
+                    <ReactToPrint
                         trigger={() => <Button variant='contained'><PictureAsPdfIcon /></Button>}
                         content={() => componentRef.current}
                     />
-                   
-                    </Box>
-                     <Box sx={{display:'none'}}>
-                         <Box ref={componentRef} >
-                    <Blank_Generator headerData ={headerData}/>
+
+                </Box>
+                <Box sx={{ display: 'none' }}>
+                    <Box ref={componentRef} >
+                        <Blank_Generator headerData={headerData} commentValue={commentValue} />
                     </Box>
                 </Box>
 
@@ -182,7 +184,7 @@ const componentRef = useRef(null);
                     <Table>
                         <TableHead>
                             <TableRow >
-                            <TableCell align='center'
+                                <TableCell align='center'
                                     sx={{
                                         fontWeight: 'bold',
                                         padding: '0px'
@@ -229,7 +231,7 @@ const componentRef = useRef(null);
                                         borderRight: '1px solid #DEDEDE',
                                         padding: '0px'
                                     }}>Զեղչված գին (ՀՀ Դրամ)</TableCell>
-                              
+
                             </TableRow>
                         </TableHead>
 
@@ -242,12 +244,10 @@ const componentRef = useRef(null);
                                             defaultRecord={data}
                                             key={idx}
                                             index={idx}
-                                            databaseData={otherRow}
                                             recordsDataTable={records}
-                                            headerData={headerData}
+
                                         />
                                     )
-
                                 }
                                 )}
 
@@ -255,20 +255,24 @@ const componentRef = useRef(null);
                         </TableBody>
                     </Table>
                 </TableContainer>
-                </Box>
-                <Box sx={{ marginTop: '25px', display:'flex', justifyContent:'flex-end' }}>
-                <Button variant='outlined' onClick={handleAddRow} sx={{mr:'5px'}} >Ստեղծել նորը</Button>
-                    <Button variant='contained' onClick={handleSave} >Պահպանել</Button>
-                </Box>
-            {/*  */}
+            </Box>
+            <Box sx={{ marginTop: '25px', display: 'flex', justifyContent: 'flex-end' }}>
+                <Button variant='outlined' onClick={handleAddRow} sx={{ mr: '5px' }} >Ստեղծել նորը</Button>
+                <Button variant='contained' onClick={handleSave} >Պահպանել</Button>
+            </Box>
+
             {showAlert && (
-             <Alerts showAlert={showAlert}/>
+                <Alerts showAlert={showAlert} />
             )}
-                                
-                                {/* <Box width={'210mm' } height={'30cm'}>
-                                       <Blank_Generator headerData ={headerData}/> 
-                                </Box> */}
-                             
+            <TextField
+                id="standard-multiline-static"
+                label="Լրացուցիչ տեղեկատվություն"
+                multiline
+                sx={{ width: '50%' }}
+                variant="standard"
+                value={commentValue}
+                onChange={handleCommentChange}
+            />
         </TableContext.Provider>
     );
 };

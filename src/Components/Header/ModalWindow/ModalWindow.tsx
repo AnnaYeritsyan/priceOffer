@@ -55,6 +55,7 @@ export default function ModalWindow({open,
             id="name"
             name="name"
             label="Անվանում"
+            defaultValue={1}
             type="text"
             fullWidth
             variant="standard"

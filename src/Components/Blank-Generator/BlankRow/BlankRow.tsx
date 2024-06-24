@@ -1,7 +1,10 @@
 import { TableRow, TableCell, Box } from "@mui/material";
+import { DescriptionType, HeaderDataType, LicenseType } from "../../dataType";
+import { useState, useEffect } from "react";
 
 interface Props {
-  tableData: any[];
+  tableData:  any[];
+  headerData:any
 }
 
 const cellStyle = {
@@ -11,7 +14,8 @@ const cellStyle = {
   boxSizing: 'border-box',
   width: '100%',
   padding: '6px',
-  fontSize: '13px',
+  // fontSize: '13px',
+  fontSize:'3mm'
 };
 
 const tableCellStyle = {
@@ -19,18 +23,27 @@ const tableCellStyle = {
   border: '1px solid black',
 };
 
-const BlankRow: React.FC<Props> = ({ tableData }) => {
- 
+const BlankRow: React.FC<Props> = ({ tableData , headerData}) => {
+
+const [vuidPrice, setVuidPrice] = useState<number | null>(null);
+
+  useEffect(() => {
+    setVuidPrice(null)
+    const vuidItem = tableData?.find((e: any) => e.name === 'VUID');
+    if (vuidItem) {
+      setVuidPrice(parseFloat(vuidItem.disCountPrice));
+    }
+  }, [tableData, headerData]);
+
   const totalPriceSum = tableData?.reduce((acc, data) => {
     const prices = Array.isArray(data.disCountPrice) ? data.disCountPrice : [data.disCountPrice];
-    const sum = prices.reduce((sumAcc:any, price:any) => {
-      const parsedPrice = parseFloat(price);
-      return sumAcc + (isNaN(parsedPrice) ? 0 : parsedPrice);
-    }, 0);
+    const sum = prices.reduce((sumAcc: number, price: any) => sumAcc + parseFloat(price), 0);
     return acc + sum;
   }, 0);
 
-  const formattedTotalPrice = new Intl.NumberFormat().format(totalPriceSum);
+  const isOnlyVUID = tableData?.every(data => data.name === 'VUID');
+  const formattedFinalTotalPrice = new Intl.NumberFormat().format(isOnlyVUID ? vuidPrice || 0 : (totalPriceSum - (vuidPrice || 0)));
+
   return (
     <>
       {tableData?.map((data, index) => (
@@ -38,7 +51,7 @@ const BlankRow: React.FC<Props> = ({ tableData }) => {
           <TableCell sx={{ ...tableCellStyle, textAlign: 'center' }}>{data.name}</TableCell>
           <TableCell sx={tableCellStyle}>
             {Array.isArray(data.description) ? (
-              data.description.map((desc: any, idx: number) => (
+              data.description.map((desc:DescriptionType, idx: number) => (
                 <Box
                   key={idx}
                   sx={{
@@ -56,7 +69,7 @@ const BlankRow: React.FC<Props> = ({ tableData }) => {
 
           <TableCell sx={tableCellStyle}>
             {Array.isArray(data.licenseType) ? (
-              data.licenseType.map((license: any, idx: number) => (
+              data.licenseType.map((license: LicenseType, idx: number) => (
                 <Box
                   key={idx}
                   sx={{
@@ -93,14 +106,17 @@ const BlankRow: React.FC<Props> = ({ tableData }) => {
           </TableCell>
         </TableRow>
       ))}
-      {/* Additional rows displayed only once at the end */}
-      <TableRow sx={{ border: '1px solid black' }}>
+  
+      {
+        vuidPrice !== null ?
+         <TableRow sx={{ border: '1px solid black' }}>
         <TableCell colSpan={3} sx={{ border: '1px solid black',textAlign:'end',padding:0 , pr:'5px'  }}>(Օգտագործման լիցենզիա) Տարեկան լիցենզիայի վճարը՝</TableCell>
-        <TableCell sx={{ border: '1px solid black',padding:0, textAlign:'center'  }}>210.000</TableCell>
-      </TableRow>
+       <TableCell sx={{ border: '1px solid black',padding:0, textAlign:'center'  }}>{vuidPrice}</TableCell> 
+      </TableRow> :null
+      } 
       <TableRow sx={{ border: '1px solid black',  }}>
         <TableCell colSpan={3}sx={{ border: '1px solid black', textAlign:'end',padding:0 , pr:'5px'}}>(Ներդրման պայմանագիր) Միանվագ վճարը՝</TableCell>
-        <TableCell sx={{ border: '1px solid black',padding:0 , textAlign:'center' }} >{formattedTotalPrice}</TableCell>
+        <TableCell sx={{ border: '1px solid black',padding:0 , textAlign:'center' }} >{formattedFinalTotalPrice}</TableCell>
       </TableRow>
     </>
   );
